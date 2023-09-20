@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <cstdlib>
-#include "tcpacceptor.hpp"
+#include "Listener.hpp"
 #include <iostream>
 
 // 클래스 구조 변경 --> 깔끔하게 기능별로 
@@ -17,15 +17,13 @@ int main(int argc, char** argv)
 
     fd_set	readfds;
     int 	clientSockets[MAX_CLIENTS] = {0, }; // 클라이언트 소켓 배열
-	char	buffer[BUFFER_SIZE];
-	int		clientSocket;
 
     TCPStream* stream = NULL;
-    TCPAcceptor* acceptor = NULL;
+    Listener* acceptor = NULL;
     if (argc == 3)
-        acceptor = new TCPAcceptor(atoi(argv[1]), argv[2]);
+        acceptor = new Listener(atoi(argv[1]), argv[2]);
     else 
-        acceptor = new TCPAcceptor(atoi(argv[1]));
+        acceptor = new Listener(atoi(argv[1]));
 
     if (acceptor->start() == 0) {
 		int maxSocket = acceptor->get_sd();
@@ -48,6 +46,7 @@ int main(int argc, char** argv)
 
  			if (FD_ISSET(acceptor->get_sd(), &readfds)) {
         	    // 클라이언트 연결 수락
+				int		clientSocket;
         	    if ((clientSocket = accept(acceptor->get_sd(), NULL, NULL)) < 0) {
         	        perror("accept");
         	        exit(EXIT_FAILURE);
@@ -63,6 +62,7 @@ int main(int argc, char** argv)
         	}
 
         // 클라이언트와의 통신
+			char	buffer[BUFFER_SIZE];
         	for (int i = 0; i < MAX_CLIENTS; ++i) {
         	    if (clientSockets[i] > 0 && FD_ISSET(clientSockets[i], &readfds)) {
         	        int bytesRead = recv(clientSockets[i], buffer, BUFFER_SIZE, 0);

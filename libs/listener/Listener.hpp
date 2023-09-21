@@ -23,7 +23,7 @@ class Listener {
 		Listener() {};
 
 	public:
-		Listener(int port, const char* address);
+		Listener(int port, const char* address="");
 		~Listener();
 
 		int			start();

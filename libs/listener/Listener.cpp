@@ -1,6 +1,6 @@
 #include "Listener.hpp"
 
-Listener::Listener(int port, const char* address="")
+Listener::Listener(int port, const char* address)
 	: m_serverSocket(0), m_port(port), m_address(address), m_listening(false) {}
 
 Listener::~Listener() {

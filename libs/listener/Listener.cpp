@@ -1,51 +1,56 @@
 #include "Listener.hpp"
 
 Listener::Listener(int port, const char* address)
-	: m_serverSocket(0), m_port(port), m_address(address), m_listening(false) {}
+	: mServerSocket(0), mAddress(address), mPort(port), mListening(false) {}
+
+Listener::Listener(int port)
+	: mServerSocket(0), mAddress(""), mPort(port), mListening(false) {}
 
 Listener::~Listener() {
-	if (m_serverSocket > 0)
-		close(m_serverSocket);
+	if (mServerSocket > 0)
+		close(mServerSocket);
 }
 
 int Listener::start() {
-	if (m_listening == true)
+	if (mListening == true)
 		return 0;
 
-	m_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	mServerSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 	struct sockaddr_in address;
+	memset(&address, 0, sizeof(address));
 	address.sin_family = AF_INET;
-	address.sin_port = htons(m_port);
+	address.sin_port = htons(mPort);
+
 	address.sin_addr.s_addr = INADDR_ANY;
 
-	//int optval = 1;
-	//setsockopt(m_serverSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+	int optval = 1;
+	setsockopt(mServerSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
-	int result = bind(m_serverSocket, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
+	int result = bind(mServerSocket, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
 
 	if (result != 0) {
 		perror("bind() failed");
 		return result;
 	}
-	result = listen(m_serverSocket, MAX_CLIENTS);
+	result = listen(mServerSocket, MAX_CLIENTS);
 	if (result != 0) {
 		perror("listen() failed");
 		return result;
 	}
-	m_listening = true;
+	mListening = true;
 	return result;
 }
 
 TCPStream* Listener::accept() {
-	if (m_listening == false) 
+	if (mListening == false) 
 		return NULL;
 
 	struct sockaddr_in address;
 	socklen_t len = sizeof(address);
 	memset(&address, 0, sizeof(address));
 	
-	int sd = ::accept(m_serverSocket, reinterpret_cast<struct sockaddr*>(&address), &len);
+	int sd = ::accept(mServerSocket, reinterpret_cast<struct sockaddr*>(&address), &len);
 
 	if (sd < 0) {
 		perror("accept() failed");

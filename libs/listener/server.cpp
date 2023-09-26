@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <cstdlib>
 #include <iostream>
 #include "Listener.hpp"
@@ -13,15 +12,13 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	fd_set	readfds;
-	int 	clientSockets[MAX_CLIENTS] = {0, }; // 클라이언트 소켓 배열
+	TCPStream*	stream = NULL;
+	Listener*	acceptor = NULL;
 
-	TCPStream* stream = NULL;
-	Listener* acceptor = NULL;
-	if (argc == 3)
-		acceptor = new Listener(atoi(argv[1]), argv[2]);
-	else 
+	if (argc != 3)
 		acceptor = new Listener(atoi(argv[1]));
+	else 
+		acceptor = new Listener(atoi(argv[1]), argv[2]);
 
 	if (acceptor->start() == 0) {
 		while (1) {
@@ -41,7 +38,6 @@ int main(int argc, char** argv) {
 	perror("Could not start the server");
 	exit(-1);
 }
-
 
 // class 에 i/o_muliflexing 관련 함수들 넣어놓고 운영체제에 따라 다르게 처리
 // class 생성과 함수 사용시 그에 맞는 함수호출

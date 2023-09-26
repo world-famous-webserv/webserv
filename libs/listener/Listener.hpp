@@ -1,10 +1,10 @@
-#ifndef Listener_HPP
-#define Listener_HPP
+#pragma once
+
+#ifndef LISTENER_HPP
+#define LISTENER_HPP
 
 #include <string>
 #include <netinet/in.h>
-#include <stdio.h>
-#include <string.h>
 #include <arpa/inet.h>
 #include "TcpStream.hpp"
 
@@ -15,20 +15,20 @@ using namespace std;
 
 class Listener {
 	private:
-		int		m_serverSocket;
-		string	m_address;
-		int		m_port;
-		bool	m_listening;
+		int		mServerSocket;
+		string	mAddress;
+		int		mPort;
+		bool	mListening;
 
 		Listener() {};
 
 	public:
-		Listener(int port, const char* address="");
+		Listener(int port, const char* address);
+		Listener(int port);
 		~Listener();
 
 		int			start();
 		TCPStream*  accept();
-		int			get_sd() { return m_serverSocket; }
 };
 
-#endif // !
+#endif

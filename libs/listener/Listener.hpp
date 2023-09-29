@@ -1,11 +1,9 @@
 #pragma once
 
-#ifndef LISTENER_HPP
-#define LISTENER_HPP
-
 #include <string>
-#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
+#include <iostream>
 #include "TcpStream.hpp"
 
 #define MAX_CLIENTS 5
@@ -13,22 +11,21 @@
 
 using namespace std;
 
-class Listener {
-	private:
-		int		mServerSocket;
-		string	mAddress;
-		int		mPort;
-		bool	mListening;
-
-		Listener() {};
-
+class Listener
+{
 	public:
-		Listener(int port, const char* address);
-		Listener(int port);
 		~Listener();
-
+		Listener(const int port);
+		Listener(const int port, const char* address);
 		int			start();
 		TCPStream*  accept();
-};
 
-#endif
+	private:
+		Listener() {};
+
+		int		mPort;
+		string	mAddress;
+		bool	mListening;
+		int		mServerSocket;
+
+};

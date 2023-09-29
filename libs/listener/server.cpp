@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 				char line[256];
 				while ((len = stream->receive(line, sizeof(line))) > 0) { // len < 0 이면 오류
 					line[len] = '\0';
-					std::cout << " rcv_len - "<< strlen(line) << " received - \"" << line << "\"" << std::endl;
+					std::cout << "len - "<< strlen(line) << " received - \"" << line << "\"" << std::endl;
 					stream->send(line, len);
 				}
 				delete stream;

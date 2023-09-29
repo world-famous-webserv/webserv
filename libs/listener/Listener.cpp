@@ -7,18 +7,20 @@ Listener::~Listener()
 }
 
 Listener::Listener(const int port)
-	:mServerSocket(0),
-	mAddress(""),
+	:
 	mPort(port),
-	mListening(false)
+	mAddress(""),
+	mListening(false),
+	mServerSocket(0)
 {
 }
 
 Listener::Listener(const int port, const char* address)
-	:mServerSocket(0),
-	mAddress(address),
+	:
 	mPort(port),
-	mListening(false)
+	mAddress(address),
+	mListening(false),
+	mServerSocket(0)
 {
 }
 

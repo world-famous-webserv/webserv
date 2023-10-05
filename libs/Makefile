@@ -3,6 +3,7 @@
 
 LIBS = \
 	sample/libsample.a \
+	listener/listener.a
 
 $(LIBS):
 	$(MAKE) -C $(dir $@)

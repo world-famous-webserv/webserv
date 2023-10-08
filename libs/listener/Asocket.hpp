@@ -22,35 +22,3 @@ class ASocket
 		std::string	mAddress;
 		int 		mSocket;
 };
-
-class ClientSocket : public ASocket
-{
-	public:
-		virtual ~ClientSocket();
-		ClientSocket();
-		ClientSocket(const int port);
-		ClientSocket(const int port, const char * address);
-		ClientSocket(const ClientSocket & other);
-
-		ClientSocket & operator = (const ClientSocket * other);
-
-		virtual int	handle();
-
-};
-
-class ServerSocket : public ASocket
-{
-	public:
-		virtual ~ServerSocket();
-		ServerSocket();
-		ServerSocket(const int port);
-		ServerSocket(const int port, const char * address);
-		ServerSocket(const ServerSocket & other);
-
-		ServerSocket & operator = (const ServerSocket * other);
-
-		virtual int	handle();
-
-};
-
-

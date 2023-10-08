@@ -6,19 +6,19 @@ ClientSocket::~ClientSocket()
 
 ClientSocket::ClientSocket()
 	:
-	ASocket(),
+	ASocket()
 {
 }
 
 ClientSocket::ClientSocket(const int port)
 	:
-	ASocket(port),
+	ASocket(port)
 {
 }
 
 ClientSocket::ClientSocket(const int port, const char * address)
 	:
-	ASocket(port, address),
+	ASocket(port, address)
 {
 }
 

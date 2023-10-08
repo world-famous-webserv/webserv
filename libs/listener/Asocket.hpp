@@ -1,8 +1,16 @@
 #pragma once
  
 #include <iostream>
+#include <cstring>
 #include <string>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <cerrno>
+
+#define MAXCLIENT 5
+#define BUFFER_SIZE 1024
 
 class ASocket
 {

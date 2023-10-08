@@ -14,5 +14,6 @@ class ServerSocket : public ASocket
 		ServerSocket & operator = (const ServerSocket * other);
 
 		virtual int	handle();
+		void		setSocket();
 
 };

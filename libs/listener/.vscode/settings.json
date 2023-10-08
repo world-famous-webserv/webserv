@@ -54,7 +54,17 @@
 		"variant": "cpp",
 		"vector": "cpp",
 		"algorithm": "cpp",
-		"functional": "cpp"
+		"functional": "cpp",
+		"__functional_base": "cpp",
+		"__nullptr": "cpp",
+		"__string": "cpp",
+		"__tuple": "cpp",
+		"bit": "cpp",
+		"chrono": "cpp",
+		"iterator": "cpp",
+		"memory": "cpp",
+		"type_traits": "cpp",
+		"utility": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "disabled"
 }

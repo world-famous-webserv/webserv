@@ -1,16 +1,25 @@
-#include "sample.hpp"
 #include <cstdlib>
+#include "ServerSocket.hpp"
+#include "ClientSocket.hpp"
 
-int main(int argc, char **argv)
+int main(int ac, char **av)
 {
-    if (argc != 1 && argc != 2)
-	{
-        std::cerr << "Usage: " << argv[0] << " [configuration file]" << std::endl;
-        return (EXIT_FAILURE);
-    }
-    if (argc == 1)
-        sample();
-    else
-        std::cout << "TODO: read [" << argv[1] << "]" << std::endl;
-    return (EXIT_SUCCESS);
+	ServerSocket*	serverSocket;
+
+	if (ac < 2 || ac > 4) {
+		printf("usage: server <port> [<ip>]\n");
+		exit(1);
+	}
+	if (ac != 3)
+		serverSocket = new ServerSocket(atoi(av[1]));
+	else
+		serverSocket = new ServerSocket(atoi(av[1]), av[2]);
+	try {
+		serverSocket->setSocket();
+		while (true)
+			serverSocket->accept();
+	}
+	catch(const std::exception & e) {
+		std::cerr << "Error: " << e.what() << '\n';
+	}
 }

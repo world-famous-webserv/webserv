@@ -7,10 +7,10 @@ SRCS = \
 TOPDIR = $(abspath ..)
 include $(TOPDIR)/build/Rules.mk
 
-CPPFLAGS	+= -I$(LIB_DIR)/sample
+CPPFLAGS	+= -I$(LIB_DIR)/listener
 CXXFLAGS	+= 
-LDFLAGS		+= -L$(LIB_DIR)/sample
-LDLIBS		+= -lsample
+LDFLAGS		+= -L$(LIB_DIR)/listener
+LDLIBS		+= -llistener
 
 $(NAME): $(OBJS)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@

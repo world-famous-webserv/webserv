@@ -2,8 +2,7 @@
 .DEFAULT_GOAL = all
 
 LIBS = \
-	sample/libsample.a \
-	listener/listener.a
+	listener/liblistener.a
 
 $(LIBS):
 	$(MAKE) -C $(dir $@)

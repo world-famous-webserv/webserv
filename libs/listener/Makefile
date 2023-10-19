@@ -1,9 +1,9 @@
-NAME	= Listener.a
+NAME	= liblistener.a
 
 SRCS = \
-	Listener.cpp	\
-	TcpStream.cpp	\
-	server.cpp
+		ASocket.cpp			\
+		ClientSocket.cpp	\
+		ServerSocket.cpp
 
 # **************************************************************************** #
 TOPDIR = $(abspath ../..)

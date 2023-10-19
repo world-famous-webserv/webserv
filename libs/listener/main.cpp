@@ -9,7 +9,6 @@ int main(int ac, char **av)
 	}
 
 	ServerSocket*	serverSocket;
-	
 
 	if (ac != 3)
 		serverSocket = new ServerSocket(atoi(av[1]));
@@ -21,6 +20,6 @@ int main(int ac, char **av)
 			serverSocket->accept();
 	}
 	catch(const std::exception & e) {
-		std::cerr << e.what() << '\n'; //"Error: " + 
+		std::cerr << "Error: " << e.what() << '\n';
 	}
 }

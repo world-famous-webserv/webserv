@@ -11,8 +11,8 @@ class ServerSocket : public ASocket
 		ServerSocket(const int port);
 		ServerSocket(const int port, const char * address);
 
-		void	setSocket();
 		void	accept();
+		void	setSocket();
 
 	private:
 		ServerSocket(const ServerSocket & other);

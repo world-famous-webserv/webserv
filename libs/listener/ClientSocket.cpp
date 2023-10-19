@@ -4,24 +4,13 @@ ClientSocket::~ClientSocket()
 {
 }
 
-ClientSocket::ClientSocket()
-	:
-	ASocket()
-{
-}
-
 ClientSocket::ClientSocket(const int sd,  struct sockaddr_in * address)
 	:
 	ASocket()
 {
 	mSocket = sd;
-	char ip[50];
-	// 사용불가함수
-	inet_ntop(PF_INET, reinterpret_cast<const struct in_addr*>(&address->sin_addr.s_addr), ip, sizeof(ip) - 1);
-	mIp = ip;
 	mPort = ntohs(address->sin_port);
-	std::cout << "Client mIP: " << mIp << "\n";
-	std::cout << "Client mPort: " << mPort << "\n";
+	std::cout << "ClientSocket.cpp = Client->Port: " << mPort << "\n";
 }
 
 ssize_t	ClientSocket::send(char* buffer, size_t len)
@@ -33,3 +22,7 @@ ssize_t	ClientSocket::receive(char* buffer, size_t len)
 {
 	return read(mSocket, buffer, len);
 }
+
+// 클래스 효율적인 관리방법 찾아보기
+// main문을 최대한 간결하게 만들 방안
+// e.what() 함수 조절하기

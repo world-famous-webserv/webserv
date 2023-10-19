@@ -52,20 +52,19 @@ void ServerSocket::accept()
 		throw std::runtime_error(strerror(errno));
 
 	ClientSocket*	clientSocket = new ClientSocket(sd, &address);
-	size_t			len = 0;
+	ssize_t			len = 0;
 	char			line[LINE_BUFFER_SIZE];
 
 	if (clientSocket != NULL) {
 		while ((0 < (len = clientSocket->receive(line, sizeof(line))))) {
 			line[len] = '\0';
 
-			std::cout << "len - "<< strlen(line) << " received - \"" << line << "\"" << std::endl;
+			std::cout << "ServerSocket.cpp = len - "<< strlen(line) << " received - \"" << line << "\"" << std::endl;
 
 			clientSocket->send(line, len);
 		}
-		if (0 != errno)
+		if (0 > len)
 			throw std::runtime_error(strerror(errno));
 		delete clientSocket;
 	}
 }
-// main문을 최대한 간결하게 만들 방안

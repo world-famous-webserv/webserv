@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ASocket.hpp"
+#include "ClientSocket.hpp"
 
 class ServerSocket : public ASocket
 {
@@ -9,11 +10,12 @@ class ServerSocket : public ASocket
 		ServerSocket();
 		ServerSocket(const int port);
 		ServerSocket(const int port, const char * address);
+
+		void	setSocket();
+		void	accept();
+
+	private:
 		ServerSocket(const ServerSocket & other);
-
 		ServerSocket & operator = (const ServerSocket * other);
-
-		virtual int	handle();
-		void		setSocket();
 
 };

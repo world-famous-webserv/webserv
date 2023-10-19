@@ -9,8 +9,9 @@
 #include <arpa/inet.h>
 #include <cerrno>
 
-#define MAXCLIENT 5
+#define MAX_CLIENT 5
 #define BUFFER_SIZE 1024
+#define LINE_BUFFER_SIZE 512
 
 class ASocket
 {
@@ -23,10 +24,9 @@ class ASocket
 
 		ASocket& operator = (const ASocket & other);
 
-		virtual int handle();
-
-	private:
+	protected:
 		int 		mPort;
 		std::string	mAddress;
 		int 		mSocket;
 };
+

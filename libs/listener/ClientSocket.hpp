@@ -7,12 +7,15 @@ class ClientSocket : public ASocket
 	public:
 		virtual ~ClientSocket();
 		ClientSocket();
-		ClientSocket(const int port);
-		ClientSocket(const int port, const char * address);
+		ClientSocket(const int sd, struct sockaddr_in * address);
+
+
+		ssize_t		send(char* buffer, size_t len);
+		ssize_t		receive(char* buffer, size_t len);
+
+	private:
 		ClientSocket(const ClientSocket & other);
+		ClientSocket & operator=(const ClientSocket * other);
 
-		ClientSocket & operator = (const ClientSocket * other);
-
-		virtual int	handle();
-
+		std::string	mIp;
 };

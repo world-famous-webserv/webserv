@@ -22,21 +22,6 @@ ServerSocket::ServerSocket(const int port, const char * address)
 {
 }
 
-ServerSocket::ServerSocket(const ServerSocket & other)
-{
-	*this = other;
-}
-
-ServerSocket & ServerSocket::operator = (const ServerSocket & other)
-{
-	if (this != &other)
-	{
-		this->mPort = other.mPort;
-		this->mAddress = other.mAddress;
-	}
-	return (*this);
-}
-
 void ServerSocket::setSocket()
 {
 	struct sockaddr_in address = {};
@@ -51,7 +36,36 @@ void ServerSocket::setSocket()
 	setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
 	if (0 != bind(mSocket, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address)))
-		throw std::runtime_error("Error: " + strerror(errno));
-	if (0 != listen(mSocket, MAX_CLIENTS))
-		throw std::runtime_error("Error: " + strerror(errno));
+		throw std::runtime_error(strerror(errno));
+	if (0 != listen(mSocket, MAX_CLIENT))
+		throw std::runtime_error(strerror(errno));
 }
+
+void ServerSocket::accept()
+{
+	struct sockaddr_in	address;
+	memset(&address, 0, sizeof(address));
+	socklen_t 			sockLen = sizeof(address);
+	const int 			sd = ::accept(mSocket, reinterpret_cast<struct sockaddr*>(&address), &sockLen);
+
+	if (sd < 0)
+		throw std::runtime_error(strerror(errno));
+
+	ClientSocket*	clientSocket = new ClientSocket(sd, &address);
+	size_t			len = 0;
+	char			line[LINE_BUFFER_SIZE];
+
+	if (clientSocket != NULL) {
+		while ((0 < (len = clientSocket->receive(line, sizeof(line))))) {
+			line[len] = '\0';
+
+			std::cout << "len - "<< strlen(line) << " received - \"" << line << "\"" << std::endl;
+
+			clientSocket->send(line, len);
+		}
+		if (0 != errno)
+			throw std::runtime_error(strerror(errno));
+		delete clientSocket;
+	}
+}
+// main문을 최대한 간결하게 만들 방안

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "config.hpp"
+#include "../../libs/config/config.hpp"
 
 int main(int argc, char *argv[])
 {

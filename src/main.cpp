@@ -11,9 +11,9 @@ int main(int ac, char **av)
 		exit(1);
 	}
 	if (ac != 3)
-		serverSocket = new ServerSocket(atoi(av[1]));
+		serverSocket = new ServerSocket(std::atoi(av[1]));
 	else
-		serverSocket = new ServerSocket(atoi(av[1]), av[2]);
+		serverSocket = new ServerSocket(std::atoi(av[1]), av[2]);
 	try {
 		serverSocket->setSocket();
 		while (true)

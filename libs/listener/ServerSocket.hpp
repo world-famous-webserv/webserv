@@ -8,7 +8,6 @@ class ServerSocket : public ASocket
 {
 	public:
 		virtual ~ServerSocket();
-		ServerSocket();
 		ServerSocket(const int port);
 		ServerSocket(const int port, const char * address);
 
@@ -16,6 +15,7 @@ class ServerSocket : public ASocket
 		void	setSocket();
 
 	private:
+		ServerSocket();
 		ServerSocket(const ServerSocket & other);
 		ServerSocket & operator = (const ServerSocket * other);
 

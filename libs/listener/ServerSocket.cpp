@@ -4,15 +4,9 @@ ServerSocket::~ServerSocket()
 {
 }
 
-ServerSocket::ServerSocket()
-	:
-	ASocket()
-{
-}
-
 ServerSocket::ServerSocket(const int port)
 	:
-	ASocket(port)
+	ASocket(port, "")
 {
 }
 
@@ -43,8 +37,7 @@ void ServerSocket::setSocket()
 
 void ServerSocket::accept()
 {
-	struct sockaddr_in	address;
-	memset(&address, 0, sizeof(address));
+	struct sockaddr_in	address = {};
 	socklen_t 			sockLen = sizeof(address);
 	const int 			sd = ::accept(mSocket, reinterpret_cast<struct sockaddr*>(&address), &sockLen);
 

@@ -1,12 +1,8 @@
 #include "ClientSocket.hpp"
 
-ClientSocket::~ClientSocket()
-{
-}
-
 ClientSocket::ClientSocket(const int sd,  struct sockaddr_in * address)
 	:
-	ASocket()
+	ASocket(-1, "")
 {
 	mSocket = sd;
 	mPort = ntohs(address->sin_port);

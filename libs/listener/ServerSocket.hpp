@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SERVERSOCKET_HPP
+#define SERVERSOCKET_HPP
 
 #include "ASocket.hpp"
 #include "ClientSocket.hpp"
@@ -19,3 +20,5 @@ class ServerSocket : public ASocket
 		ServerSocket & operator = (const ServerSocket * other);
 
 };
+
+#endif

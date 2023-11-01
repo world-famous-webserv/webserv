@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CLIENTSOCKET_HPP
+#define CLIENTSOCKET_HPP
 
 #include "ASocket.hpp"
 
@@ -16,3 +17,5 @@ class ClientSocket : public ASocket
 		ClientSocket(const ClientSocket & other);
 		ClientSocket & operator=(const ClientSocket * other);
 };
+
+#endif

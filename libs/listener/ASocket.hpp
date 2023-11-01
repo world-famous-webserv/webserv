@@ -1,5 +1,6 @@
-#pragma once
- 
+#ifndef ASOCKET_HPP
+#define ASOCKET_HPP
+
 #include <cstring>
 #include <string>
 #include <cerrno>
@@ -17,11 +18,10 @@ class ASocket
 {
 	public:
 		virtual ~ASocket();
-		ASocket();
-		ASocket(const int port);
 		ASocket(const int port, const char * address);
 
 	private:
+		ASocket();
 		ASocket(const ASocket & other);
 		ASocket& operator = (const ASocket & other);
 
@@ -31,3 +31,4 @@ class ASocket
 		std::string	mAddress;
 };
 
+#endif

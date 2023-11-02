@@ -18,8 +18,8 @@ CXX             :=	c++
 CXXFLAGS        =	-Wall -Wextra -Werror -pipe -std=c++98
 CPPFLAGS        =	-I./
 DEPFLAGS        =	-MMD -MP -MF $(DEP_DIR)/$*.d
-LDFLAGS         =
-LDLIBS          =
+LDFLAGS         =	-L../../libs/config
+LDLIBS          =	-lconfig
 
 ifdef DEBUG
     CXXFLAGS      +=	-g -O0 -DDEBUG -march=native -fsanitize=address,undefined
@@ -30,6 +30,8 @@ endif
 # ---------------------------------------------------------------------------- #
 #    Define the libraries                                                      #
 # ---------------------------------------------------------------------------- #
+
+libs            :=	libconfig.a
 
 # ---------------------------------------------------------------------------- #
 #    Define the directories                                                    #
@@ -61,7 +63,7 @@ COMPILED_FILES  :=	0
 #    Define the target                                                         #
 # ---------------------------------------------------------------------------- #
 
-NAME            :=	webserv
+NAME            :=	config
 
 # ---------------------------------------------------------------------------- #
 #    Define the rules                                                          #
@@ -70,8 +72,11 @@ NAME            :=	webserv
 all:
 	@ $(MAKE) -j $(NAME)
 
-$(NAME): $(OBJS)
-	@ $(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+$(libs):
+	@ $(MAKE) -C ../../libs/config
+
+$(NAME): $(OBJS) $(libs)
+	@ $(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@ $(LDLIBS)
 	@ printf "\n$(MAGENTA)[$(NAME)] Linking Success\n$(WHITE)"
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp | dir_guard
@@ -101,8 +106,8 @@ debug: fclean
 	@ $(MAKE) all DEBUG=1
 
 test:
-	@ $(MAKE)
-	@ ./$(NAME) configs/default.conf
+	@ $(MAKE) all
+	@ ./$(NAME) ../../configs/default.conf
 
 .PHONY: all clean fclean re dir_guard debug test
 

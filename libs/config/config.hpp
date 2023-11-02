@@ -8,12 +8,15 @@
 class Config
 {
     public:
+        typedef std::unordered_map<std::string, std::string> value_type;
+        typedef std::unordered_map<std::string, value_type>::const_iterator const_iterator;
+
         ~Config();
         Config(const std::string file);
         Config(const Config &other);
         Config &operator=(const Config &other);
-        std::string get(const std::string key);
-        std::unordered_map<std::string, std::string> mDict;
+        std::vector<std::string> get(const std::string serverName, const std::string key);
+        std::unordered_map<std::string, value_type> mDict;
     
     private:
 
@@ -25,5 +28,3 @@ class Config
         inline bool endsWith(const std::string& str, const std::string& suffix);
         inline std::string joinVector(const std::vector<std::string>& elements, const std::string& separator);
 };
-
-std::ostream &operator<<(std::ostream &stream, Config &config);

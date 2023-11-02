@@ -9,7 +9,7 @@ Config::Config(const std::string file)
 
 Config::Config(const Config &other)
 {
-    (void)other;
+    *this = other;
 }
 
 Config &Config::operator=(const Config &other)
@@ -19,14 +19,22 @@ Config &Config::operator=(const Config &other)
     return *this;
 }
 
-std::string Config::get(const std::string key)
+std::vector<std::string> Config::get(const std::string serverName, const std::string key)
 {
-    std::unordered_map<std::string, std::string>::iterator it = mDict.find(key);
+    Config::const_iterator it = mDict.begin();
+    std::vector<std::string> val;
 
-    if (it == mDict.end())
-        throw std::runtime_error(key + " not found in the map");
-    
-    return it->second;
+    while (it != mDict.end()) {
+        if (it->first == serverName) {
+            value_type server = it->second;
+            if (server.find(key) != server.end())
+                val.push_back(server[key]);
+        }
+        ++it;
+    }
+    if (val.size() == 0)
+        throw std::runtime_error(serverName + ", " + key + " not found in the map");
+    return val;
 }
 
 bool Config::parse(const std::string file)
@@ -37,6 +45,7 @@ bool Config::parse(const std::string file)
 		return false;
 	}
     
+    value_type vServer;
     std::vector<std::string> vKey;
     for (std::string prev, line; std::getline(in, line); ) {
 
@@ -45,21 +54,46 @@ bool Config::parse(const std::string file)
         if (line == "")
             continue;
         if (line == "}" || endsWith(line, "}")) {
-            vKey.pop_back();
+            if (vKey.size() == 0) {
+                mDict[vServer["server_name"]] = vServer;
+                vServer.clear();
+            } else
+                vKey.pop_back();
             continue;
         } else if (line == "{") {
-            vKey.push_back(prev);
+            if (vServer.size())
+                vKey.push_back(prev);
+            else {
+                std::string::size_type idx = prev.find(':');
+                if (idx == std::string::npos)
+                    vServer["server_name"] = "default";
+                else
+                    vServer["server_name"] = strtrim(prev.substr(idx + 1));
+            }
             continue;
         } else if (endsWith(line, "{")) {
-            vKey.push_back(strtrim(line.substr(0, line.find('{'))));
+            if (vServer.size())
+                vKey.push_back(strtrim(line.substr(0, line.find('{'))));
+            else {
+                std::string::size_type idx = line.find(':');
+                if (idx == std::string::npos)
+                    vServer["server_name"] = "default";
+                else
+                    vServer["server_name"] = strtrim(line.substr(idx + 1, line.find('{') - idx - 1));
+            }
             continue;
         }
         std::string::size_type idx = line.find(' ');
         if (idx == std::string::npos)
             return false;
-        std::string key = joinVector(vKey, " ") + " " + strtrim(line.substr(0, idx));
+        std::string key;
+        if (vKey.size())
+            key = joinVector(vKey, " ") + " " + strtrim(line.substr(0, idx));
+        else
+            key = strtrim(line.substr(0, idx));
         std::string val = strtrim(line.substr(idx + 1), ";");
-        mDict[key] = val;
+        vServer[key] = val;
+
         prev = line;
     }
 
@@ -99,13 +133,3 @@ inline std::string Config::joinVector(const std::vector<std::string>& elements, 
     return result;
 }
 
-std::ostream &operator<<(std::ostream &stream, Config &config)
-{
-    std::unordered_map<std::string, std::string>::const_iterator it = config.mDict.begin();
-
-    while (it != config.mDict.end()) {
-        stream << it->first << " = " << it->second << '\n';
-        ++it;
-    }
-    return stream;
-}

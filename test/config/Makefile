@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------- #
 
 CXX             :=	c++
-CXXFLAGS        :=	-Wall -Wextra -Werror -pipe -std=c++98
+CXXFLAGS        :=	-Wall -Wextra -Werror -Wpedantic -pipe -std=c++98
 CPPFLAGS        =	-I$(LIBCONFIG_DIR)
 DEPFLAGS        =	-MMD -MP -MF $(DEP_DIR)/$*.d
 LDFLAGS         =	-L$(LIBCONFIG_DIR)

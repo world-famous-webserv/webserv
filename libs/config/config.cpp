@@ -1,7 +1,7 @@
 #include "config.hpp"
 
 Config::~Config() { }
-Config::Config(const std::string file)
+Config::Config(const stringT &file)
 {
     if (parse(file) == false)
         exit(EXIT_FAILURE);
@@ -19,14 +19,14 @@ Config &Config::operator=(const Config &other)
     return *this;
 }
 
-std::vector<std::string> Config::get(const std::string serverName, const std::string key)
+std::vector<Config::keyT> Config::get(const serverNameT &serverName, const keyT &key)
 {
     Config::const_iterator it = mDict.begin();
-    std::vector<std::string> val;
+    std::vector<valueT> val;
 
     while (it != mDict.end()) {
         if (it->first == serverName) {
-            value_type server = it->second;
+            serverT server = it->second;
             if (server.find(key) != server.end())
                 val.push_back(server[key]);
         }
@@ -37,17 +37,17 @@ std::vector<std::string> Config::get(const std::string serverName, const std::st
     return val;
 }
 
-bool Config::parse(const std::string file)
+bool Config::parse(const stringT &file)
 {
-    std::ifstream in(file, std::ios_base::in);
+    std::ifstream in(file.c_str(), std::ios_base::in);
 	if (in.is_open() == false) {
 		std::cout << "Error: not a valid file." << '\n';
 		return false;
 	}
     
-    value_type vServer;
-    std::vector<std::string> vKey;
-    for (std::string prev, line; std::getline(in, line); ) {
+    serverT Server;
+    std::vector<keyT> vKey;
+    for (stringT prev, line; std::getline(in, line); ) {
 
         line = strtrim(line);
         std::replace(line.begin(), line.end(), '\t', ' ');
@@ -55,81 +55,75 @@ bool Config::parse(const std::string file)
             continue;
         if (line == "}" || endsWith(line, "}")) {
             if (vKey.size() == 0) {
-                mDict[vServer["server_name"]] = vServer;
-                vServer.clear();
+                mDict[Server["server_name"]] = Server;
+                Server.clear();
             } else
                 vKey.pop_back();
             continue;
         } else if (line == "{") {
-            if (vServer.size())
+            if (Server.size())
                 vKey.push_back(prev);
             else {
-                std::string::size_type idx = prev.find(':');
-                if (idx == std::string::npos)
-                    vServer["server_name"] = "default";
+                const stringT::size_type idx = prev.find(':');
+                if (idx == stringT::npos)
+                    Server["server_name"] = "default";
                 else
-                    vServer["server_name"] = strtrim(prev.substr(idx + 1));
+                    Server["server_name"] = strtrim(prev.substr(idx + 1));
             }
             continue;
         } else if (endsWith(line, "{")) {
-            if (vServer.size())
+            if (Server.size())
                 vKey.push_back(strtrim(line.substr(0, line.find('{'))));
             else {
-                std::string::size_type idx = line.find(':');
-                if (idx == std::string::npos)
-                    vServer["server_name"] = "default";
+                const stringT::size_type idx = line.find(':');
+                if (idx == stringT::npos)
+                    Server["server_name"] = "default";
                 else
-                    vServer["server_name"] = strtrim(line.substr(idx + 1, line.find('{') - idx - 1));
+                    Server["server_name"] = strtrim(line.substr(idx + 1, line.find('{') - idx - 1));
             }
             continue;
         }
-        std::string::size_type idx = line.find(' ');
-        if (idx == std::string::npos)
+        const stringT::size_type idx = line.find(' ');
+        if (idx == stringT::npos)
             return false;
-        std::string key;
+        keyT key;
         if (vKey.size())
             key = joinVector(vKey, " ") + " " + strtrim(line.substr(0, idx));
         else
             key = strtrim(line.substr(0, idx));
-        std::string val = strtrim(line.substr(idx + 1), ";");
-        vServer[key] = val;
+        const valueT val = strtrim(line.substr(idx + 1), ";");
+        Server[key] = val;
 
         prev = line;
     }
-
     return true;
 }
 
-inline std::string Config::strtrim(const std::string& str, const std::string& whitespace) {
-    size_t start = str.find_first_not_of(whitespace);
-    size_t end = str.find_last_not_of(whitespace);
-
-    if (start == std::string::npos)
+inline Config::stringT Config::strtrim(const stringT &str, const stringT &whitespace) {
+    const size_t start = str.find_first_not_of(whitespace);
+    if (start == stringT::npos)
         return "";
+    const size_t end = str.find_last_not_of(whitespace);
     return str.substr(start, end - start + 1);
 }
 
-inline bool Config::startsWith(const std::string& str, const std::string& prefix) {
+inline bool Config::startsWith(const stringT &str, const stringT &prefix) {
     return str.compare(0, prefix.length(), prefix) == 0;
 }
 
-inline bool Config::endsWith(const std::string& str, const std::string& suffix) {
-    if (str.length() < suffix.length()) {
+inline bool Config::endsWith(const stringT &str, const stringT &suffix) {
+    if (str.length() < suffix.length())
         return false;
-    }
     return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
 }
 
-inline std::string Config::joinVector(const std::vector<std::string>& elements, const std::string& separator) {
-    std::string result;
+inline Config::stringT Config::joinVector(const std::vector<keyT> &elements, const stringT &separator) {
+    stringT joined;
     
-    for (size_t i = 0; i < elements.size(); ++i) {
-        result += elements[i];
-        
-        if (i < elements.size() - 1) {
-            result += separator;
-        }
+    for (std::vector<keyT>::size_type i = 0, end = elements.size(); i < end; ++i) {
+        joined += elements[i];        
+        if (i < elements.size() - 1)
+            joined += separator;
     }
-    return result;
+    return joined;
 }
-

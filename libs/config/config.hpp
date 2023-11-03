@@ -1,30 +1,37 @@
-#pragma once
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
+
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#include <unordered_map>
+#include <map>
+#include <vector>
 
 class Config
 {
     public:
-        typedef std::unordered_map<std::string, std::string> value_type;
-        typedef std::unordered_map<std::string, value_type>::const_iterator const_iterator;
+        typedef std::string stringT;
+        typedef stringT serverNameT, keyT, valueT;
+        typedef std::map<keyT, valueT> serverT;
+        typedef std::map<serverNameT, serverT> dictT;
+        typedef dictT::const_iterator const_iterator;
 
         ~Config();
-        Config(const std::string file);
+        Config(const stringT &file);
         Config(const Config &other);
         Config &operator=(const Config &other);
-        std::vector<std::string> get(const std::string serverName, const std::string key);
-        std::unordered_map<std::string, value_type> mDict;
+        std::vector<keyT> get(const serverNameT &serverName, const keyT &key);
+        dictT mDict;
     
     private:
-
         Config();
-        bool parse(const std::string file);
 
-        std::string strtrim(const std::string& str, const std::string& whitespace=" \t\n\r");
-        inline bool startsWith(const std::string& fullString, const std::string& prefix);
-        inline bool endsWith(const std::string& str, const std::string& suffix);
-        inline std::string joinVector(const std::vector<std::string>& elements, const std::string& separator);
+        bool parse(const stringT &file);
+        inline stringT strtrim(const stringT &str, const stringT &whitespace=" \t\n\r");
+        inline bool startsWith(const stringT &str, const stringT &prefix);
+        inline bool endsWith(const stringT &str, const stringT &suffix);
+        inline stringT joinVector(const std::vector<keyT> &elements, const stringT& separator);
 };
+
+#endif /* CONFIG_HPP */

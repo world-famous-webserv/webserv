@@ -1,25 +1,13 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: juwkim <juwkim@student.42seoul.kr>         +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/08/23 01:13:48 by juwkim            #+#    #+#              #
-#    Updated: 2023/09/02 07:39:15 by juwkim           ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 # ---------------------------------------------------------------------------- #
 #    Define the compiler and flags                                             #
 # ---------------------------------------------------------------------------- #
 
 CXX             :=	c++
-CXXFLAGS        =	-Wall -Wextra -Werror -pipe -std=c++98
-CPPFLAGS        =	-I./
+CXXFLAGS        :=	-Wall -Wextra -Werror -pipe -std=c++98
+CPPFLAGS        =	-I$(LIBCONFIG_DIR)
 DEPFLAGS        =	-MMD -MP -MF $(DEP_DIR)/$*.d
-LDFLAGS         =	-L../../libs/config
-LDLIBS          =	-lconfig
+LDFLAGS         =	-L$(LIBCONFIG_DIR)
+LDLIBS          :=	-lconfig
 
 ifdef DEBUG
     CXXFLAGS      +=	-g -O0 -DDEBUG -march=native -fsanitize=address,undefined
@@ -31,7 +19,8 @@ endif
 #    Define the libraries                                                      #
 # ---------------------------------------------------------------------------- #
 
-libs            :=	libconfig.a
+LIBCONFIG		:=	libconfig.a
+LIBCONFIG_DIR	:=	$(abspath ../..)/libs/config
 
 # ---------------------------------------------------------------------------- #
 #    Define the directories                                                    #
@@ -70,43 +59,43 @@ NAME            :=	config
 # ---------------------------------------------------------------------------- #
 
 all:
-	@ $(MAKE) -j $(NAME)
+	$(MAKE) -j $(NAME)
 
-$(libs):
-	@ $(MAKE) -C ../../libs/config
+$(LIBCONFIG):
+	$(MAKE) -C $(LIBCONFIG_DIR)
 
-$(NAME): $(OBJS) $(libs)
-	@ $(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@ $(LDLIBS)
+$(NAME): $(OBJS) $(LIBCONFIG)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@ $(LDLIBS)
 	@ printf "\n$(MAGENTA)[$(NAME)] Linking Success\n$(WHITE)"
 
-$(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp | dir_guard
-	@ $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | dir_guard
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< -o $@
 	@ $(eval COMPILED_FILES = $(shell expr $(COMPILED_FILES) + 1))
 	@ $(eval PROGRESS = $(shell expr 100 "*" $(COMPILED_FILES) / $(TOTAL_FILES)))
 	@ printf "                                                                                                         \r"
 	@ printf "$(YELLOW)[$(NAME)] [%02d/%02d] ( %3d %%) Compiling $<\r$(WHITE)" $(COMPILED_FILES) $(TOTAL_FILES) $(PROGRESS)
 
 clean:
-	@ $(RM) -r $(BUILD_DIR)
+	$(RM) -r $(BUILD_DIR)
 	@ printf "$(BLUE)[$(NAME)] obj. dep. files$(WHITE)$(GREEN) => Cleaned!\n$(WHITE)"
 
 fclean:
-	@ $(RM) -r $(BUILD_DIR) $(NAME)
+	$(RM) -r $(BUILD_DIR) $(NAME)
 	@ printf "$(BLUE)[$(NAME)] obj. dep. files$(WHITE)$(GREEN) => Cleaned!\n$(WHITE)"
 	@ printf "$(CYAN)[$(NAME)] exec. files$(WHITE)$(GREEN)     => Cleaned!\n$(WHITE)"
 
 re: fclean
-	@ $(MAKE) all
+	$(MAKE) all
 	@ printf "$(GREEN)[$(NAME)] Cleaned and rebuilt everything!\n$(WHITE)"
 
 dir_guard:
-	@ mkdir -p $(OBJ_DIR) $(DEP_DIR)
+	mkdir -p $(OBJ_DIR) $(DEP_DIR)
 
 debug: fclean
-	@ $(MAKE) all DEBUG=1
+	$(MAKE) all DEBUG=1
 
 test:
-	@ $(MAKE) all
+	$(MAKE) all
 	@ ./$(NAME) ../../configs/default.conf
 
 .PHONY: all clean fclean re dir_guard debug test

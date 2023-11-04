@@ -3,6 +3,7 @@
 
 LIBS = \
 	sample/libsample.a \
+	config/libconfig.a \
 
 $(LIBS):
 	$(MAKE) -C $(dir $@)

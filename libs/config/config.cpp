@@ -1,6 +1,12 @@
 #include "config.hpp"
 
 Config::~Config() { }
+
+Config::Config() {
+    if (parse("configs/default.conf") == false)
+        exit(EXIT_FAILURE);
+}
+
 Config::Config(const stringT &file)
 {
     if (parse(file) == false)

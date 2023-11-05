@@ -46,10 +46,10 @@ void ServerSocket::accept()
 
 	ClientSocket*	clientSocket = new ClientSocket(sd, &address);
 	ssize_t			len = 0;
-	char			line[LINE_BUFFER_SIZE];
+	char			line[LINE_BUFFER_SIZE + 1];
 
 	if (clientSocket != NULL) {
-		while ((0 < (len = clientSocket->receive(line, sizeof(line))))) {
+		while ((0 < (len = clientSocket->receive(line, LINE_BUFFER_SIZE)))) {
 			line[len] = '\0';
 
 			std::cout << "ServerSocket.cpp = len - "<< strlen(line) << " received - \"" << line << "\"" << std::endl;

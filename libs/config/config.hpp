@@ -18,6 +18,7 @@ class Config
         typedef dictT::const_iterator const_iterator;
 
         ~Config();
+        Config();
         Config(const stringT &file);
         Config(const Config &other);
         Config &operator=(const Config &other);
@@ -25,7 +26,6 @@ class Config
         dictT mDict;
     
     private:
-        Config();
 
         bool parse(const stringT &file);
         inline stringT strtrim(const stringT &str, const stringT &whitespace=" \t\n\r");

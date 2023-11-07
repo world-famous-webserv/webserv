@@ -1,4 +1,3 @@
-#pragma once
 #ifndef LISTEN_CONFIG_HPP_
 # define LISTEN_CONFIG_HPP_
 

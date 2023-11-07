@@ -1,4 +1,3 @@
-#pragma once
 #ifndef SERVER_HPP_
 # define SERVER_HPP_
 # include <stdio.h>

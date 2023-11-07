@@ -1,4 +1,3 @@
-#pragma once
 #ifndef LIBS_MULTIPLEX_IO_EVENT_HPP_
 # define LIBS_MULTIPLEX_IO_EVENT_HPP_
 # include <unistd.h>

@@ -1,4 +1,3 @@
-#pragma once
 #ifndef LIBS_MULTIPLEX_MULTIPLEX_HPP_
 # define LIBS_MULTIPLEX_MULTIPLEX_HPP_
 # include <string.h>

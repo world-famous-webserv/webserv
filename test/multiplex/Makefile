@@ -27,4 +27,4 @@ test: $(NAME)
 	nc -zv localhost 8080
 
 test2: $(NAME)
-	netcat localhost 8080
+	nc -v localhost 8080

@@ -31,7 +31,7 @@ int	Server::GetAddrInfo(struct addrinfo **info)
 
 	const char *node = conf_->address.c_str();
 	const char *service= conf_->port.c_str();
-	int ret = getaddrinfo(node, service, &hints, info);
+	const int ret = getaddrinfo(node, service, &hints, info);
 	if (ret != 0)
 		std::cerr << node << ":" << service << ": " << gai_strerror(ret) << std::endl;
 	return ret;

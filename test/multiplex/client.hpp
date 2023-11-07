@@ -13,7 +13,7 @@
 class Client : public IOEvent
 {
  public:
-	Client(int fd, ListenConfig* conf);
+	Client(const int fd, ListenConfig* const conf);
 	virtual ~Client(void);
 
 	void Open(void);

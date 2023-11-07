@@ -8,7 +8,7 @@ Client::~Client(void)
 {
 }
 
-Client::Client(int fd, ListenConfig *conf): conf_(conf)
+Client::Client(const int fd, ListenConfig *const conf): conf_(conf)
 {
 	identifier_ = fd;
 	this->Open();
@@ -98,7 +98,7 @@ void Client::Read(void)
 	if (identifier_ == -1)
 		return ;
 	char buf[1025] = {0};
-	ssize_t nbytes = recv(identifier_, buf, sizeof(buf) - 1, 0);
+	const ssize_t nbytes = recv(identifier_, buf, sizeof(buf) - 1, 0);
 	if (nbytes < 0) {
 		std::cerr << "Client::Read fail: " << strerror(errno) << std::endl;
 		return this->Close();
@@ -117,10 +117,10 @@ void Client::Write(void)
 {
 	if (identifier_ == -1)
 		return ;
-	size_t len = sendbuf_.length();
+	const size_t len = sendbuf_.length();
 	if (len == 0)
 		return ;
-	ssize_t nbytes = send(identifier_, sendbuf_.c_str(), len, 0);
+	const ssize_t nbytes = send(identifier_, sendbuf_.c_str(), len, 0);
 	if (nbytes < 0) {
 		std::cerr << "Client::Write fail: " << strerror(errno) << std::endl;
 		return this->Close();

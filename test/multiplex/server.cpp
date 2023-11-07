@@ -19,16 +19,15 @@ Server::Server(ListenConfig *conf): conf_(conf)
 
 int	Server::GetAddrInfo(struct addrinfo **info)
 {
-	struct addrinfo hints = {
-		.ai_flags = AI_PASSIVE,
-		.ai_family = AF_UNSPEC,
-		.ai_socktype = SOCK_STREAM,
-		.ai_protocol = IPPROTO_TCP,
-		.ai_addrlen = 0,
-		.ai_addr = NULL,
-		.ai_canonname = NULL,
-		.ai_next = NULL
-	};
+	struct addrinfo hints;
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_addrlen = 0;
+	hints.ai_addr = NULL;
+	hints.ai_canonname = NULL;
+	hints.ai_next = NULL;
 
 	const char *node = conf_->address.c_str();
 	const char *service= conf_->port.c_str();

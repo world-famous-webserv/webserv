@@ -1,15 +1,18 @@
+TOPDIR = $(abspath ../..)
+
 NAME	= libsample.a
 
-SRCS = \
+LIBS	= \
+
+SRCS	= \
 	sample.cpp
 
 # **************************************************************************** #
-TOPDIR = $(abspath ../..)
 include $(TOPDIR)/build/Rules.mk
 
-CPPFLAGS	+= 
-CXXFLAGS	+= 
-LDFLAGS		+= 
+CPPFLAGS	+=
+CXXFLAGS	+=
+LDFLAGS		+=
 LDLIBS		+=
 
 $(NAME): $(OBJS)

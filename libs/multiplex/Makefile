@@ -1,16 +1,19 @@
+TOPDIR = $(abspath ../..)
+
 NAME	= libmultiplex.a
+
+LIBS	= \
 
 SRCS	= \
 	io_event.cpp \
 	multiplex.cpp
 
 # **************************************************************************** #
-TOPDIR = $(abspath ../..)
 include $(TOPDIR)/build/Rules.mk
 
-CPPFLAGS	+= 
-CXXFLAGS	+= 
-LDFLAGS		+= 
+CPPFLAGS	+=
+CXXFLAGS	+=
+LDFLAGS		+=
 LDLIBS		+=
 
 $(NAME): $(OBJS)

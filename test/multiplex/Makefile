@@ -1,15 +1,16 @@
+TOPDIR = $(abspath ../..)
+
 NAME	= main
+
+LIBS	= \
+	$(TOPDIR)/libs/multiplex/libmultiplex.a \
 
 SRCS	= \
 	server.cpp \
 	client.cpp \
 	main.cpp
 
-LIBS	= \
-	../../libs/multiplex/libmultiplex.a \
-
 # **************************************************************************** #
-TOPDIR = $(abspath ../..)
 include $(TOPDIR)/build/Rules.mk
 
 CPPFLAGS	+= 

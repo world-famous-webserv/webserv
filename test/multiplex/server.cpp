@@ -40,7 +40,6 @@ int	Server::GetAddrInfo(struct addrinfo **info)
 void Server::SetSocket(int fd)
 {
 	int on = 1;
-	int timeout = 0;
 
 	struct linger linger;
 	linger.l_onoff = 1;
@@ -54,7 +53,7 @@ void Server::SetSocket(int fd)
 	// http2
 	// quic
 	// proxy_protocol
-#if 0
+#ifdef SO_SETFIB
 	if (conf_->setfib != -1
 		&& setsockopt(fd, SOL_SOCKET, SO_SETFIB, &conf_->setfib, sizeof(conf_->setfib)) == -1)
 		perror("SetSocket::SO_SETFIB");
@@ -68,26 +67,33 @@ void Server::SetSocket(int fd)
 	if (conf_->sndbuf != -1
 		&& setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &conf_->sndbuf, sizeof(conf_->sndbuf)) == -1)
 		perror("SetSocket::SO_SNDBUF");
-#if 0
+#ifdef SO_ACCEPTFILTER
 	if (conf_->accept_filter.length() > 0
 		&& setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, conf_->accept.c_str(), conf_->accept_filter.length()) == -1)
 		perror("SetSocket::SO_ACCEPTFILTER");
 #endif
+#ifdef TCP_DEFER_ACCEPT
+	int timeout = 0;
 	if (conf_->deferred == true
 		&& setsockopt(fd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, sizeof(timeout)) == -1)
 		perror("SetSocket::TCP_DEFER_ACCEPT");
+#endif
 	if (conf_->ipv6only == true
 		&& setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &conf_->ipv6only, sizeof(conf_->ipv6only)) == -1)
 		perror("SetSocket::IPV6_V6ONLY");
 	if (conf_->reuseport == true
 		&& setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &conf_->reuseport, sizeof(conf_->reuseport)) == -1)
 		perror("SetSocket::SO_REUSEPORT");
+#ifdef TCP_KEEPALIVE
 	if (conf_->so_keepalive == true
 		&& setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &conf_->so_keepalive, sizeof(conf_->so_keepalive)) == -1)
 		perror("SetSocket::SO_KEEPALIVE");
+#endif
+#ifdef TCP_KEEPIDLE
 	if (conf_->keepidle
 		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &conf_->keepidle, sizeof(conf_->keepidle)) == -1)
 		perror("SetSocket::TCP_KEEPIDLE");
+#endif
 	if (conf_->keepintvl
 		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &conf_->keepintvl, sizeof(conf_->keepintvl)) == -1)
 		perror("SetSocket::TCP_KEEPINTVL");

@@ -2,7 +2,8 @@
 
 static void setConfig(ListenConfig& config)
 {
-	config.address = "*";
+//	config.address = "*";		// bsd error, linux ok
+	config.address = "127.0.0.1";
 	config.port = "8080";
 	config.default_server = true;
 	config.ssl = false;

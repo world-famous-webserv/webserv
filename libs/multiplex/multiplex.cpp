@@ -108,11 +108,12 @@ void Multiplex::Loop(void)
 		for (int i = 0; i < nevents; i++)
 		{
 			IOEvent *event = static_cast<IOEvent*>(eventlist[i].udata);
-			if (eventlist[i].flags & EV_ERROR)
+
+			if (eventlist[i].flags == EV_ERROR)
 				event->Broken(eventlist[i].data);
-			else if (eventlist[i].filter & EVFILT_READ)
+			else if (eventlist[i].filter == EVFILT_READ)
 				event->Read();
-			else if (eventlist[i].filter & EVFILT_WRITE)
+			else if (eventlist[i].filter == EVFILT_WRITE)
 				event->Write();
 		}
 #endif

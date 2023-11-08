@@ -55,11 +55,16 @@ Multiplex& Multiplex::GetInstance(void)
 
 void Multiplex::AddItem(IOEvent* event)
 {
-	IOMap::iterator it = ios_.find(event->identifier());
-	if (it != ios_.end())
+	IOMap::iterator it = ios_.begin();
+	while (it != ios_.end())
 	{
-		delete it->second;
-		ios_.erase(it);
+		if (it->first == -1 || it->first == event->identifier())
+		{
+			delete it->second;
+			it = ios_.erase(it);
+		}
+		else
+			++it;
 	}
 #ifdef __LINUX__
 	struct epoll_event changes;

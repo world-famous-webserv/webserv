@@ -45,9 +45,7 @@ void IOEvent::Close(void)
 
 void IOEvent::Broken(int errcode)
 {
-	errno = errcode;
-	if (errno)
-		perror("Broken");
-	errno = 0;
+	if (errcode)
+		std::cerr << identifier_ << " is broken because of " << strerror(errcode) << std::endl;
 	this->Close();
 }

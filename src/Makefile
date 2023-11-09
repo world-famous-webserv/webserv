@@ -1,16 +1,20 @@
+TOPDIR = $(abspath ..)
+
 NAME	= webserv
 
-SRCS = \
+LIBS	= \
+	$(TOPDIR)/libs/sample/libsample.a \
+
+SRCS	= \
 	main.cpp
 
 # **************************************************************************** #
-TOPDIR = $(abspath ..)
 include $(TOPDIR)/build/Rules.mk
 
-CPPFLAGS	+= -I$(LIB_DIR)/sample
-CXXFLAGS	+= 
-LDFLAGS		+= -L$(LIB_DIR)/sample
-LDLIBS		+= -lsample
+CPPFLAGS	+=
+CXXFLAGS	+=
+LDFLAGS		+=
+LDLIBS		+=
 
 $(NAME): $(OBJS)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@

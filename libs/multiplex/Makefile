@@ -1,11 +1,12 @@
 TOPDIR = $(abspath ../..)
 
-NAME	= libsample.a
+NAME	= libmultiplex.a
 
 LIBS	= \
 
 SRCS	= \
-	sample.cpp
+	io_event.cpp \
+	multiplex.cpp
 
 # **************************************************************************** #
 include $(TOPDIR)/build/Rules.mk

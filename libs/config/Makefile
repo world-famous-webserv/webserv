@@ -1,16 +1,19 @@
+TOPDIR = $(abspath ../..)
+
 NAME	= libconfig.a
 
-SRCS = \
+LIBS	= \
+
+SRCS	= \
 	config.cpp
 
 # **************************************************************************** #
-TOPDIR = $(abspath ../..)
 include $(TOPDIR)/build/Rules.mk
 
-CPPFLAGS	+= -I$(LIB_DIR)/config
-CXXFLAGS	+= 
-LDFLAGS		+= -L$(LIB_DIR)/config
-LDLIBS		+= -lconfig
+CPPFLAGS	+=
+CXXFLAGS	+=
+LDFLAGS		+=
+LDLIBS		+=
 
 $(NAME): $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^

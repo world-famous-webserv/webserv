@@ -1,4 +1,3 @@
-#pragma once
 #ifndef SAMPLE_HPP
 # define SAMPLE_HPP
 # include <iostream>

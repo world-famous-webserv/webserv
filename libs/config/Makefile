@@ -5,7 +5,11 @@ NAME	= libconfig.a
 LIBS	= \
 
 SRCS	= \
-	config.cpp
+	config.cpp \
+	configFileReader.cpp \
+	configLocation.cpp \
+	configServer.cpp \
+	configStringUtils.cpp \
 
 # **************************************************************************** #
 include $(TOPDIR)/build/Rules.mk

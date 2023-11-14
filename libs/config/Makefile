@@ -1,11 +1,11 @@
 TOPDIR = $(abspath ../..)
 
-NAME	= libsample.a
+NAME	= libconfig.a
 
 LIBS	= \
 
 SRCS	= \
-	sample.cpp
+	config.cpp
 
 # **************************************************************************** #
 include $(TOPDIR)/build/Rules.mk

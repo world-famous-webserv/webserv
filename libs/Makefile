@@ -3,6 +3,9 @@
 
 LIBS = \
 	listener/liblistener.a
+	sample/libsample.a \
+	config/libconfig.a \
+	multiplex/libmultiplex.a \
 
 $(LIBS):
 	$(MAKE) -C $(dir $@)

@@ -1,10 +1,14 @@
+TOPDIR = $(abspath ..)
+
 NAME	= webserv
 
-SRCS = \
+LIBS	= \
+	$(TOPDIR)/libs/sample/libsample.a \
+
+SRCS	= \
 	main.cpp
 
 # **************************************************************************** #
-TOPDIR = $(abspath ..)
 include $(TOPDIR)/build/Rules.mk
 
 CPPFLAGS	+= -I$(LIB_DIR)/listener

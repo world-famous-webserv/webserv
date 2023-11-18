@@ -1,5 +1,5 @@
-#include "sample.hpp"
 #include <cstdlib>
+#include <iostream>
 
 int main(int argc, char **argv)
 {
@@ -8,9 +8,5 @@ int main(int argc, char **argv)
         std::cerr << "Usage: " << argv[0] << " [configuration file]" << std::endl;
         return (EXIT_FAILURE);
     }
-    if (argc == 1)
-        sample();
-    else
-        std::cout << "TODO: read [" << argv[1] << "]" << std::endl;
     return (EXIT_SUCCESS);
 }

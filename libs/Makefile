@@ -2,7 +2,6 @@
 .DEFAULT_GOAL = all
 
 LIBS = \
-	sample/libsample.a \
 	config/libconfig.a \
 	multiplex/libmultiplex.a \
 

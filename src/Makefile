@@ -3,7 +3,6 @@ TOPDIR = $(abspath ..)
 NAME	= webserv
 
 LIBS	= \
-	$(TOPDIR)/libs/sample/libsample.a \
 
 SRCS	= \
 	main.cpp

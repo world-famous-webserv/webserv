@@ -41,15 +41,15 @@ Connection: Closed
 typedef struct t_response
 {
 	std::string	httpVersion = "HTTP/1.1";
-	std::string	date = "Mon, 27 Jul 2009 12:28:53 GMT"; // 생성시간
-	std::string	server = "Apache/2.2.14 (win32)";
-	std::string lastModified = "Wed, 22 Jul 2009 19:15:56 GMT"; // 마지막 수정시간
-	std::string	etag = "34aa387-d-1568eb00";
-	std::string	vary = "Authorization,Accept";
-	std::string acceptRanges = "bytes";
-	std::string	contentLength = "88";
-	std::string contentType = "text/html";
-	std::string	connection = "Closed";
+	std::string	date = "Mon, 27 Jul 2009 12:28:53 GMT"; // 응답이 생성된 날짜와 시간
+	std::string	server = "Apache/2.2.14 (win32)"; // 서버 소프트웨어의 이름과 버전
+	std::string lastModified = "Wed, 22 Jul 2009 19:15:56 GMT"; // 요청된 리소스의 마지막 수정시간
+	std::string	etag = "34aa387-d-1568eb00"; // 요청한 리소스의 엔터티 태그를 나타냄, 리보스의 버전을 식별하는데 사용됨.
+	std::string	vary = "Authorization,Accept"; // 캐싱 정책에 대한 정보
+	std::string acceptRanges = "bytes"; // 서버가 리소스의 일부만 전송 할 수 있는지 여부를 나타냄
+	std::string	contentLength = "88"; // 본문의길이를 바이트 단위로 나타냄
+	std::string contentType = "text/html"; // 응답 본문의 데이터 타입을 정의함
+	std::string	connection = "Closed"; // 현재 연결의 상태를 나타냄
 }
 
 static void Get(int fd);
@@ -59,8 +59,8 @@ void	Request();
 
 std::string getRequestedFile(const std::string& filePath); 
 
-http 메세지
-startline 파싱 
-emptyline 나올때까지 headers들 파싱
+//http 메세지
+//startline 파싱 
+//emptyline 나올때까지 headers들 파싱
 
 #endif /* GET_HPP */

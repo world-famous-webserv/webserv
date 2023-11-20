@@ -4,6 +4,7 @@
 LIBS = \
 	config/libconfig.a \
 	multiplex/libmultiplex.a \
+	http/libhttp.a \
 
 $(LIBS):
 	$(MAKE) -C $(dir $@)

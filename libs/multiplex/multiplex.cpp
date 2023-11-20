@@ -63,7 +63,10 @@ void Multiplex::Refresh(void)
 			ios_.erase(it++);
 		}
 		else
+		{
+			it->second->Update();
 			++it;
+		}
 	}
 }
 

@@ -6,6 +6,8 @@ LIBS	= \
 
 SRCS	= \
 	http.cpp \
+	http_request.cpp \
+	http_response.cpp \
 
 # **************************************************************************** #
 include $(TOPDIR)/build/Rules.mk

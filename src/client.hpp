@@ -27,8 +27,11 @@ class Client : public IOEvent
 
 	void SetSocket(int fd);
 
-	Http http_;
+	std::stringstream in_;
+	std::stringstream out_;
+
 	ListenConfig* conf_;
+	Http http_;
 };
 
 # endif /* CLIENT_HPP_ */

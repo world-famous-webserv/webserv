@@ -96,35 +96,35 @@ void Client::Read(void)
 {
 	if (identifier_ == -1)
 		return ;
-	try
-	{
-		http_ << identifier_;
-	}
-	catch (std::exception& e)
-	{
-		std::cerr << "Client:Read Fail: " << strerror(errno) << std::endl;
-		return this->Close();
-	}
+	// recv
+	char buf[1024] = {0};
+	ssize_t nbytes = recv(identifier_, buf, sizeof(buf), 0);
+	if (nbytes < 0) return this->Broken(errno);
+	if (nbytes == 0) return this->Close();
+	// put
+	in_.clear();
+	in_.write(buf, nbytes);
 }
 
 void Client::Write(void)
 {
 	if (identifier_ == -1)
 		return ;
-	try
-	{
-		http_ >> identifier_;
-	}
-	catch (std::exception& e)
-	{
-		std::cerr << "Client:Write Fail: " << strerror(errno) << std::endl;
-		return this->Close();
-	}
+	// get
+	char buf[1024] = {0};
+	out_.clear();
+	out_.read(buf, sizeof(buf));
+	if (out_.gcount() <= 0) return;
+	// send
+	ssize_t nbytes = send(identifier_, buf, out_.gcount(), 0);
+	if (nbytes < 0) return this->Broken(errno);
+	if (nbytes == 0) return this->Close();
+	out_.seekg(nbytes, std::ios::cur);
 }
 
 void Client::Update(void)
 {
 	if (identifier_ == -1)
 		return ;
-	http_.Do();
+	http_.Do(in_, out_);
 }

@@ -1,5 +1,10 @@
-#include "sample.hpp"
 #include <cstdlib>
+#include <iostream>
+
+#if 1	// TODO: change
+#include "listen_config.hpp"
+#include "server.hpp"
+#endif
 
 int main(int argc, char **argv)
 {
@@ -8,9 +13,11 @@ int main(int argc, char **argv)
         std::cerr << "Usage: " << argv[0] << " [configuration file]" << std::endl;
         return (EXIT_FAILURE);
     }
-    if (argc == 1)
-        sample();
-    else
-        std::cout << "TODO: read [" << argv[1] << "]" << std::endl;
+	// 1. config
+	ListenConfig config;
+
+	// 2. service
+	Multiplex::GetInstance().AddItem(new Server(&config));
+	Multiplex::GetInstance().Loop();
     return (EXIT_SUCCESS);
 }

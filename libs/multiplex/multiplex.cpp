@@ -53,18 +53,30 @@ Multiplex& Multiplex::GetInstance(void)
 	return instance;
 }
 
-void Multiplex::AddItem(IOEvent* event)
+void Multiplex::Refresh(void)
 {
-	IOMap::iterator it = ios_.begin();
-	while (it != ios_.end())
+	for (IOMap::iterator it = ios_.begin(); it != ios_.end();)
 	{
-		if (it->first == -1 || it->first == event->identifier())
+		if (it->second->identifier() == -1)
 		{
 			delete it->second;
-			it = ios_.erase(it);
+			ios_.erase(it++);
 		}
 		else
+		{
+			it->second->Update();
 			++it;
+		}
+	}
+}
+
+void Multiplex::AddItem(IOEvent* event)
+{
+	IOMap::iterator it = ios_.find(event->identifier());
+	if (it != ios_.end())
+	{
+		delete it->second;
+		ios_.erase(it);
 	}
 #ifdef __LINUX__
 	struct epoll_event changes;
@@ -88,6 +100,7 @@ void Multiplex::Loop(void)
 
 	while (true)
 	{
+		this->Refresh();
 #ifdef __LINUX__
 		struct epoll_event eventlist[kMaxEvent];
 		int nevents = epoll_wait(handler_, eventlist, kMaxEvent, -1);
@@ -113,7 +126,6 @@ void Multiplex::Loop(void)
 		for (int i = 0; i < nevents; i++)
 		{
 			IOEvent *event = static_cast<IOEvent*>(eventlist[i].udata);
-
 			if (eventlist[i].flags == EV_ERROR)
 				event->Broken(eventlist[i].data);
 			else if (eventlist[i].filter == EVFILT_READ)

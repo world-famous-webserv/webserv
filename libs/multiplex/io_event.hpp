@@ -22,6 +22,7 @@ class IOEvent
 	virtual void Open(void) = 0;
 	virtual void Read(void) = 0;
 	virtual void Write(void) = 0;
+	virtual void Update(void) = 0;
  protected:
 	int identifier_;
 };

@@ -1,11 +1,13 @@
 TOPDIR = $(abspath ../..)
 
-NAME	= libsample.a
+NAME	= libhttp.a
 
 LIBS	= \
 
 SRCS	= \
-	sample.cpp
+	http.cpp \
+	http_request.cpp \
+	http_response.cpp \
 
 # **************************************************************************** #
 include $(TOPDIR)/build/Rules.mk

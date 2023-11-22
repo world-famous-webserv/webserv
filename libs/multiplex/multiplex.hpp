@@ -21,6 +21,8 @@ class Multiplex
 	Multiplex(const Multiplex &obj);
 	Multiplex& operator=(const Multiplex &obj);
 
+	void Refresh(void);
+
 	int   handler_;
 	IOMap ios_;
 };

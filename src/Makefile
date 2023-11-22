@@ -3,9 +3,12 @@ TOPDIR = $(abspath ..)
 NAME	= webserv
 
 LIBS	= \
-	$(TOPDIR)/libs/sample/libsample.a \
+	$(TOPDIR)/libs/multiplex/libmultiplex.a \
+	$(TOPDIR)/libs/http/libhttp.a \
 
 SRCS	= \
+	server.cpp \
+	client.cpp \
 	main.cpp
 
 # **************************************************************************** #
@@ -16,5 +19,5 @@ CXXFLAGS	+=
 LDFLAGS		+=
 LDLIBS		+=
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(LIBS)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@

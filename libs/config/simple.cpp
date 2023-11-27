@@ -466,6 +466,10 @@ return_t Simple::ParseReturn(const std::vector<std::string> &tokens, size_t &idx
         ret.code = Utils::StringtoSize(argument, error_msg_);
         if (error_msg_.empty() == false)
             return ret;
+        if (ret.code < 100 || ret.code > 599) {
+            error_msg_ = "return: code: Invalid range";
+            return ret;
+        }
         if (ret.code == 301 || ret.code == 302 || ret.code == 303 || ret.code == 307 || ret.code == 308) { // return code URL
             if (idx == tokens.size()) {
                 error_msg_ = "return: Missing URL";

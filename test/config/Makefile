@@ -65,7 +65,7 @@ $(LIBCONFIG):
 	$(MAKE) -C $(LIBCONFIG_DIR)
 
 $(NAME): $(OBJS) $(LIBCONFIG)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@ $(LDLIBS)
+	$(CXX) $(LDFLAGS) $< -o $@ $(LDLIBS)
 	@ printf "\n$(MAGENTA)[$(NAME)] Linking Success\n$(WHITE)"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | dir_guard

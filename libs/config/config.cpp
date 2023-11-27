@@ -2,134 +2,58 @@
 
 Config::~Config() { }
 
-Config::Config() {
-    if (parse("configs/default.conf") == false)
-        exit(EXIT_FAILURE);
+Config::Config(const std::string &file): error_msg_("")
+{
+    Parse(file);
 }
 
-Config::Config(const stringT &file)
+Config::Config(const Config &obj)
 {
-    if (parse(file) == false)
-        exit(EXIT_FAILURE);
+    *this = obj;
 }
 
-Config::Config(const Config &other)
+Config &Config::operator=(const Config &obj)
 {
-    *this = other;
-}
-
-Config &Config::operator=(const Config &other)
-{
-    if (this == &other)
+    if (this == &obj)
         return *this;
+    error_msg_ = obj.error_msg_;
+    main_ = obj.main_;
     return *this;
 }
 
-std::vector<Config::keyT> Config::get(const serverNameT &serverName, const keyT &key)
-{
-    Config::const_iterator it = mDict.begin();
-    std::vector<valueT> val;
-
-    while (it != mDict.end()) {
-        if (it->first == serverName) {
-            serverT server = it->second;
-            if (server.find(key) != server.end())
-                val.push_back(server[key]);
-        }
-        ++it;
-    }
-    if (val.size() == 0)
-        throw std::runtime_error(serverName + ", " + key + " not found in the map");
-    return val;
-}
-
-bool Config::parse(const stringT &file)
+void Config::Parse(const std::string &file)
 {
     std::ifstream in(file.c_str(), std::ios_base::in);
 	if (in.is_open() == false) {
-		std::cout << "Error: not a valid file." << '\n';
-		return false;
-	}
-    
-    serverT Server;
-    std::vector<keyT> vKey;
-    for (stringT prev, line; std::getline(in, line); ) {
-
-        line = strtrim(line);
-        std::replace(line.begin(), line.end(), '\t', ' ');
-        if (line == "")
-            continue;
-        if (line == "}" || endsWith(line, "}")) {
-            if (vKey.size() == 0) {
-                mDict[Server["server_name"]] = Server;
-                Server.clear();
-            } else
-                vKey.pop_back();
-            continue;
-        } else if (line == "{") {
-            if (Server.size())
-                vKey.push_back(prev);
-            else {
-                const stringT::size_type idx = prev.find(':');
-                if (idx == stringT::npos)
-                    Server["server_name"] = "default";
-                else
-                    Server["server_name"] = strtrim(prev.substr(idx + 1));
-            }
-            continue;
-        } else if (endsWith(line, "{")) {
-            if (Server.size())
-                vKey.push_back(strtrim(line.substr(0, line.find('{'))));
-            else {
-                const stringT::size_type idx = line.find(':');
-                if (idx == stringT::npos)
-                    Server["server_name"] = "default";
-                else
-                    Server["server_name"] = strtrim(line.substr(idx + 1, line.find('{') - idx - 1));
-            }
-            continue;
-        }
-        const stringT::size_type idx = line.find(' ');
-        if (idx == stringT::npos)
-            return false;
-        keyT key;
-        if (vKey.size())
-            key = joinVector(vKey, " ") + " " + strtrim(line.substr(0, idx));
-        else
-            key = strtrim(line.substr(0, idx));
-        const valueT val = strtrim(line.substr(idx + 1), ";");
-        Server[key] = val;
-
-        prev = line;
+        error_msg_ = "Config: File not found.";
+        return;
     }
-    return true;
-}
-
-inline Config::stringT Config::strtrim(const stringT &str, const stringT &whitespace) {
-    const size_t start = str.find_first_not_of(whitespace);
-    if (start == stringT::npos)
-        return "";
-    const size_t end = str.find_last_not_of(whitespace);
-    return str.substr(start, end - start + 1);
-}
-
-inline bool Config::startsWith(const stringT &str, const stringT &prefix) {
-    return str.compare(0, prefix.length(), prefix) == 0;
-}
-
-inline bool Config::endsWith(const stringT &str, const stringT &suffix) {
-    if (str.length() < suffix.length())
-        return false;
-    return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
-}
-
-inline Config::stringT Config::joinVector(const std::vector<keyT> &elements, const stringT &separator) {
-    stringT joined;
-    
-    for (std::vector<keyT>::size_type i = 0, end = elements.size(); i < end; ++i) {
-        joined += elements[i];        
-        if (i < elements.size() - 1)
-            joined += separator;
+	std::string read;
+    for (std::string line; std::getline(in, line);) {
+        if (line.size())
+            read += line + "\n";
     }
-    return joined;
+	in.close();
+    const std::vector<std::string> tokens = Utils::stringSplit(read);
+
+    if (Utils::CheckBrackets(tokens) == false) {
+        error_msg_ = "Config: Brackets are not balanced.";
+        return;
+    }
+
+    // for (std::vector<std::string>::size_type i = 0, end = tokens.size(); i < end; ++i)
+    //     std::cout << tokens[i] << " ";
+
+    size_t idx = 0;
+    main_ = Block::ParseMain(tokens, idx, error_msg_);
+}
+
+bool Config::is_open() const
+{
+    return error_msg_.empty();
+}
+
+std::string Config::error_msg() const
+{
+    return error_msg_;
 }

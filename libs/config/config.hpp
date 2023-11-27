@@ -1,37 +1,44 @@
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#ifndef LIBS_CONFIG_CONFIG_HPP_
+#define LIBS_CONFIG_CONFIG_HPP_
 
-#include <string>
-#include <fstream>
-#include <iostream>
-#include <algorithm>
-#include <map>
-#include <vector>
+#include <string>  /* std::string */
+#include <fstream> /* std::ifstream */
+#include <vector>  /* std::vector */
+#include "block.hpp" /* Block */
+#include "utils.hpp" /* res_t */
 
 class Config
 {
     public:
-        typedef std::string stringT;
-        typedef stringT serverNameT, keyT, valueT;
-        typedef std::map<keyT, valueT> serverT;
-        typedef std::map<serverNameT, serverT> dictT;
-        typedef dictT::const_iterator const_iterator;
-
         ~Config();
-        Config();
-        Config(const stringT &file);
-        Config(const Config &other);
-        Config &operator=(const Config &other);
-        std::vector<keyT> get(const serverNameT &serverName, const keyT &key);
-        dictT mDict;
-    
-    private:
+        explicit Config(const std::string &file);
+        Config(const Config &obj);
+        Config &operator=(const Config &obj);
 
-        bool parse(const stringT &file);
-        inline stringT strtrim(const stringT &str, const stringT &whitespace=" \t\n\r");
-        inline bool startsWith(const stringT &str, const stringT &prefix);
-        inline bool endsWith(const stringT &str, const stringT &suffix);
-        inline stringT joinVector(const std::vector<keyT> &elements, const stringT& separator);
+        bool is_open() const;
+        std::string error_msg() const;
+
+        BlockMain_t &main() { return main_; }
+        const BlockMain_t &main() const { return main_; }
+
+        BlockHttp_t &http() { return main_.http_; }
+        const BlockHttp_t &http() const { return main_.http_; }
+
+        std::vector<BlockServer_t> &servers() { return main_.http_.servers_; }
+        const std::vector<BlockServer_t> &servers() const { return main_.http_.servers_; }
+
+        BlockServer_t &server() { return main_.http_.servers_[0]; }
+        const BlockServer_t &server() const { return main_.http_.servers_[0]; }
+
+        std::vector<BlockLocation_t> &locations() { return server().locations_; }
+        const std::vector<BlockLocation_t> &locations() const { return server().locations_; }
+
+    private:
+        Config();
+        void Parse(const std::string &file);
+
+        std::string error_msg_;
+        BlockMain_t main_;
 };
 
-#endif /* CONFIG_HPP */
+#endif /* LIBS_CONFIG_CONFIG_HPP_ */

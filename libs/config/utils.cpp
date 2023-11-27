@@ -19,32 +19,26 @@ std::vector<std::string> Utils::stringSplit(const std::string &str, const std::s
 	while (true) {
 		start = str.find_first_not_of(whitespace, end);
 		if (start == std::string::npos)
-			break ;
+			break;
 		end = str.find_first_of(whitespace, start);
 		if (end == std::string::npos) {
 			tokens.push_back(str.substr(start));
-			break ;
+			break;
 		}
         int s = start, e = end;
         while (s < e) {
-            if (str[s] == '{')
-                tokens.push_back("{");
-            else if (str[s] == '}')
-                tokens.push_back("}");
-            else if (str[s] == ';')
-                tokens.push_back(";");
+            if (str[s] == '{')      tokens.push_back("{");
+            else if (str[s] == '}') tokens.push_back("}");
+            else if (str[s] == ';') tokens.push_back(";");
             else
                 break;
             ++s;
         }
         std::vector<std::string> tmp;
         while (s < e) {
-            if (str[e - 1] == '{')
-                tmp.push_back("{");
-            else if (str[e - 1] == '}')
-                tmp.push_back("}");
-            else if (str[e - 1] == ';')
-                tmp.push_back(";");
+            if (str[e - 1] == '{')      tmp.push_back("{");
+            else if (str[e - 1] == '}') tmp.push_back("}");
+            else if (str[e - 1] == ';') tmp.push_back(";");
             else
                 break;
             --e;
@@ -61,21 +55,54 @@ bool Utils::CheckBrackets(const std::vector<std::string> &tokens)
 {
     int brackets = 0;
     for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++it) {
-        if (*it == "{")
-            ++brackets;
-        else if (*it == "}")
-            --brackets;
+        if (*it == "{")      ++brackets;
+        else if (*it == "}") --brackets;
         if (brackets < 0)
             return false;
     }
     return brackets == 0;
 }
 
-int Utils::Stoi(const std::string &str)
+size_t Utils::StringtoSize(const std::string &str, std::string &error_msg_)
 {
-    int time = 0;
+    size_t size = 0;
+    size_t i = 0;
+    while (i < str.size() && std::isdigit(str[i]))
+        size = size * 10 + str[i++] - '0';
+    if (i == str.size())
+        return size;
+    const std::string unit = str.substr(i);
+    if (unit == "b" || unit == "B")
+        return size;
+    else if (unit == "k" || unit == "K")
+        return size * 1024;
+    else if (unit == "m" || unit == "M")
+        return size * 1024 * 1024;
+    else if (unit == "g" || unit == "G")
+        return size * 1024 * 1024 * 1024;
+    else
+        error_msg_ = "StringtoSize: Invalid Unit: " + unit;
+    return size;
+}
+
+size_t Utils::StringtoTime(const std::string &str, std::string &error_msg_)
+{
+    size_t time = 0;
     size_t i = 0;
     while (i < str.size() && std::isdigit(str[i]))
         time = time * 10 + str[i++] - '0';
+    if (i == str.size())
+        return time;
+    const std::string unit = str.substr(i);
+    if (unit == "s" || unit == "S")
+        return time;
+    else if (unit == "m" || unit == "M")
+        return time * 60;
+    else if (unit == "h" || unit == "H")
+        return time * 60 * 60;
+    else if (unit == "d" || unit == "D")
+        return time * 60 * 60 * 24;
+    else
+        error_msg_ = "StringtoTime: Invalid Unit: " + unit;
     return time;
 }

@@ -66,6 +66,7 @@ void Block::InitServer(BlockServer_t &server)
     Simple::InitKeepaliveTimeout(server.keepalive_timeout_);
     Simple::InitListen(server.listen_);
     Simple::InitTryFiles(server.try_files_);
+    Simple::InitReturn(server.return_);
 }
 
 void Block::InitLocation(BlockLocation_t &location)
@@ -91,6 +92,7 @@ void Block::InitLocation(BlockLocation_t &location)
     Simple::InitKeepaliveTimeout(location.keepalive_timeout_);
     Simple::InitTryFiles(location.try_files_);
     Simple::InitFastcgiPass(location.fastcgi_pass_);
+    Simple::InitReturn(location.return_);
 }
 
 BlockMain_t Block::ParseMain(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg_)
@@ -254,6 +256,8 @@ BlockServer_t Block::ParseServer(const std::vector<std::string> &tokens, size_t 
             server.try_files_ = Simple::ParseTryFiles(tokens, idx, error_msg_);
         else if (directive == "fastcgi_param")
             Simple::ParseFastcgiParam(tokens, idx, error_msg_, server.fastcgi_param_);
+        else if (directive == "return")
+            server.return_ = Simple::ParseReturn(tokens, idx, error_msg_);
         else
             error_msg_ = "Server: Unknown directive [ " + directive + " ]";
     }
@@ -338,6 +342,8 @@ BlockLocation_t Block::ParseLocation(const std::vector<std::string> &tokens, siz
             Simple::ParseFastcgiParam(tokens, idx, error_msg_, location.fastcgi_param_);
         else if (directive == "fastcgi_pass")
             location.fastcgi_pass_ = Simple::ParseFastcgiPass(tokens, idx, error_msg_);
+        else if (directive == "return")
+            location.return_ = Simple::ParseReturn(tokens, idx, error_msg_);
         else
             error_msg_ = "Location: Unknown directive [ " + directive + " ] at location [ " + location.name_ + " ]";
     }

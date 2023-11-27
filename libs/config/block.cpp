@@ -10,7 +10,7 @@ Block &Block::operator=(const Block &obj)
     return *this;
 }
 
-BlockLimitExcept_s::BlockLimitExcept_s(): allow(""), deny("") { }
+BlockLimitExcept_s::BlockLimitExcept_s(): allows(), denys() { }
 
 BlockLocation_s::BlockLocation_s():
     name(""),
@@ -22,8 +22,8 @@ BlockLocation_s::BlockLocation_s():
     tcp_nopush(false),
     default_type("text/html"),
     root("html"),
-    allow(""),
-    deny(""),
+    allows(),
+    denys(),
     lingering_close("on"),
     send_lowat(0),
     sendfile_max_chunk(2 * 1024 * 1024), \
@@ -46,8 +46,8 @@ BlockServer_s::BlockServer_s(): \
     tcp_nopush(false),
     default_type("text/html"),
     root("html"),
-    allow(""),
-    deny(""),
+    allows(),
+    denys(),
     lingering_close("on"),
     lingering_time(30),
     lingering_timeout(5),
@@ -73,8 +73,8 @@ BlockHttp_s::BlockHttp_s():
     tcp_nopush(false),
     default_type("text/html"),
     root("html"),
-    allow(""),
-    deny(""),
+    allows(),
+    denys(),
     lingering_close("on"),
     lingering_time(30),
     lingering_timeout(5),
@@ -144,9 +144,9 @@ BlockHttp_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx
         else if (directive == "autoindex")
             http.autoindex = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "allow")
-            http.allow = Simple::ParseStringType(tokens, idx, error_msg, directive);
+            http.allows.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "deny")
-            http.deny = Simple::ParseStringType(tokens, idx, error_msg, directive);
+            http.denys.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "absolute_redirect")
             http.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_close") {
@@ -224,9 +224,9 @@ BlockServer_t Block::ParseServer(const std::vector<std::string> &tokens, size_t 
         else if (directive == "autoindex")
             server.autoindex = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "allow")
-            server.allow = Simple::ParseStringType(tokens, idx, error_msg, directive);
+            server.allows.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "deny")
-            server.deny = Simple::ParseStringType(tokens, idx, error_msg, directive);
+            server.denys.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "absolute_redirect")
             server.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_close") {
@@ -258,10 +258,6 @@ BlockServer_t Block::ParseServer(const std::vector<std::string> &tokens, size_t 
         else
             error_msg = "Server: Unknown directive [ " + directive + " ]";
     }
-
-    // if (server.listens_.empty() == true) {
-
-    // }
 
     if (idx == tokens.size())
         error_msg = "Server: Missing }";
@@ -313,9 +309,9 @@ BlockLocation_t Block::ParseLocation(const std::vector<std::string> &tokens, siz
         else if (directive == "limit_except")
             ParseLimitExcept(tokens, idx, error_msg, location.limit_excepts);
         else if (directive == "allow")
-            location.allow = Simple::ParseStringType(tokens, idx, error_msg, directive);
+            location.allows.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "deny")
-            location.deny = Simple::ParseStringType(tokens, idx, error_msg, directive);
+            location.denys.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "absolute_redirect")
             location.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_close") {
@@ -415,10 +411,10 @@ void Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx
     }
 
     for (std::vector<std::string>::size_type i = 0, end = methods.size(); i < end; ++i) {
-        BlockLimitExcept_t limit_except;
-        limit_except.allow = allow;
-        limit_except.deny = deny;
-        limit_excepts[methods[i]] = limit_except;
+        if (limit_excepts.find(methods[i]) == limit_excepts.end())
+            limit_excepts[methods[i]] = BlockLimitExcept_s();
+        limit_excepts[methods[i]].allows.push_back(allow);
+        limit_excepts[methods[i]].denys.push_back(deny);
     }
     if (idx == tokens.size())
         error_msg = "LimitExcept: Missing }";

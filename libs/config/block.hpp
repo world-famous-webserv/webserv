@@ -8,8 +8,8 @@
 
 typedef struct BlockLimitExcept_s
 {
-    std::string allow;
-    std::string deny;
+    std::vector<std::string> allows;
+    std::vector<std::string> denys;
     BlockLimitExcept_s();
 } BlockLimitExcept_t;
 
@@ -24,8 +24,8 @@ typedef struct BlockLocation_s
     bool tcp_nopush;
     std::string default_type;
     std::string root;
-    std::string allow;
-    std::string deny;
+    std::vector<std::string> allows;
+    std::vector<std::string> denys;
     std::string lingering_close;
     size_t send_lowat;
     size_t sendfile_max_chunk;
@@ -57,8 +57,8 @@ typedef struct BlockServer_s
     bool tcp_nopush;
     std::string default_type;
     std::string root;
-    std::string allow;
-    std::string deny;
+    std::vector<std::string> allows;
+    std::vector<std::string> denys;
     std::string lingering_close;
     size_t lingering_time;
     size_t lingering_timeout;
@@ -92,8 +92,8 @@ typedef struct BlockHttp_s
     bool tcp_nopush;
     std::string default_type;
     std::string root;
-    std::string allow;
-    std::string deny;
+    std::vector<std::string> allows;
+    std::vector<std::string> denys;
     std::string lingering_close;
     size_t lingering_time;
     size_t lingering_timeout;

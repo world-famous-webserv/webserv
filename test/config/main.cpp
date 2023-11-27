@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 
     std::string file;
     if (argc == 1)
-        file = "../../configs/default.conf";
+        file = "../../data/default.conf";
     else
         file = argv[1];
 

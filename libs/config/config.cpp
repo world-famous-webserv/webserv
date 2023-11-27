@@ -21,6 +21,7 @@ Config &Config::operator=(const Config &obj)
     return *this;
 }
 
+#include <iostream>
 void Config::Parse(const std::string &file)
 {
     std::ifstream in(file.c_str(), std::ios_base::in);
@@ -30,9 +31,16 @@ void Config::Parse(const std::string &file)
     }
 	std::string read;
     for (std::string line; std::getline(in, line);) {
-        if (line.size())
+        if (line.empty() == true)
+            continue;
+        const size_t pos = line.find('#');
+        if (pos == std::string::npos)
             read += line + "\n";
+        else if (pos)
+            read += line.substr(0, pos) + "\n";
     }
+    std::cout << read << std::endl;
+
 	in.close();
     const std::vector<std::string> tokens = Utils::stringSplit(read);
 
@@ -40,6 +48,7 @@ void Config::Parse(const std::string &file)
         error_msg_ = "Config: Brackets are not balanced.";
         return;
     }
+
 
     // for (std::vector<std::string>::size_type i = 0, end = tokens.size(); i < end; ++i)
     //     std::cout << tokens[i] << " ";

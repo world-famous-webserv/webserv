@@ -3,6 +3,7 @@
 
 # include <string>  /* std::string */
 # include <cstring> /* std::strcmp */
+# include <algorithm>
 # include "simple.hpp"
 # include "utils.hpp"
 

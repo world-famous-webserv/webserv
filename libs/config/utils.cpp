@@ -71,21 +71,11 @@ bool Utils::CheckBrackets(const std::vector<std::string> &tokens)
     return brackets == 0;
 }
 
-int Utils::StoiTime(const std::string &str)
+int Utils::Stoi(const std::string &str)
 {
     int time = 0;
     size_t i = 0;
     while (i < str.size() && std::isdigit(str[i]))
         time = time * 10 + str[i++] - '0';
-    if (i == str.size())
-        return time;
-    if (str[i] == 's')
-        return time;
-    if (str[i] == 'm')
-        return time * 60;
-    if (str[i] == 'h')
-        return time * 60 * 60;
-    if (str[i] == 'd')
-        return time * 60 * 60 * 24;
-    return -1;
+    return time;
 }

@@ -29,9 +29,10 @@ void Config::Parse(const std::string &file)
         return;
     }
 	std::string read;
-    for (std::string line; std::getline(in, line);)
+    for (std::string line; std::getline(in, line);) {
         if (line.size())
             read += line + "\n";
+    }
 	in.close();
     const std::vector<std::string> tokens = Utils::stringSplit(read);
 

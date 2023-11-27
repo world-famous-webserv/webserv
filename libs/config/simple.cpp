@@ -101,7 +101,7 @@ keepalive_timeout_t Simple::ParseKeepaliveTimeout(const std::vector<std::string>
         error_msg_ =  "keepalive_timeout: Missing argument";
         return keepalive_timeout;
     }
-    const int timeout = Utils::StoiTime(tokens[idx]);
+    const int timeout = Utils::Stoi(tokens[idx]);
     if (timeout == -1) {
         error_msg_ = "keepalive_timeout: Invalid argument";
         return keepalive_timeout;
@@ -116,7 +116,7 @@ keepalive_timeout_t Simple::ParseKeepaliveTimeout(const std::vector<std::string>
         ++idx;
         return keepalive_timeout;
     }
-    const int header_timeout = Utils::StoiTime(tokens[idx]);
+    const int header_timeout = Utils::Stoi(tokens[idx]);
     if (header_timeout == -1) {
         error_msg_ = "keepalive_timeout: header_timeout: Invalid argument";
         return keepalive_timeout;
@@ -142,7 +142,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
 
     if (pos == std::string::npos) {
         if (argument.find_first_not_of("0123456789") == std::string::npos)
-            listen.port = static_cast<size_t>(std::stoi(argument));
+            listen.port = static_cast<size_t>(Utils::Stoi(argument));
         else {
             listen.address = argument;
             listen.port = 80;
@@ -161,7 +161,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
         }
         const std::string port_s = argument.substr(pos + 1);
         if (port_s.find_first_not_of("0123456789") == std::string::npos) {
-            listen.port = static_cast<size_t>(std::stoi(port_s));
+            listen.port = static_cast<size_t>(Utils::Stoi(port_s));
         } else {
             error_msg_ = "listen: Invalid port";
             return listen;
@@ -216,9 +216,9 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
                     error_msg_ = "listen: so_keepalive: Invalid value";
                     return listen;
                 }
-                listen.keepidle = static_cast<size_t>(std::stoi(value.substr(0, pos1)));
-                listen.keepintvl = static_cast<size_t>(std::stoi(value.substr(pos1 + 1, pos2 - pos1 - 1)));
-                listen.keepcnt = static_cast<size_t>(std::stoi(value.substr(pos2 + 1)));
+                listen.keepidle = static_cast<size_t>(Utils::Stoi(value.substr(0, pos1)));
+                listen.keepintvl = static_cast<size_t>(Utils::Stoi(value.substr(pos1 + 1, pos2 - pos1 - 1)));
+                listen.keepcnt = static_cast<size_t>(Utils::Stoi(value.substr(pos2 + 1)));
             }
         }
         else if (option.substr(0, 6) == "setfib") {
@@ -226,31 +226,31 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
                 error_msg_ = "listen: setfib: Missing number";
                 return listen;
             }
-            listen.setfib = std::stoi(option.substr(7));
+            listen.setfib = Utils::Stoi(option.substr(7));
         } else if (option.substr(0, 8) == "fastopen") {
             if (option.size() < 10 || option[8] != '=') {
                 error_msg_ = "listen: fastopen: Missing number";
                 return listen;
             }
-            listen.setfib = std::stoi(option.substr(9));
+            listen.setfib = Utils::Stoi(option.substr(9));
         } else if (option.substr(0, 7) == "backlog") {
             if (option.size() < 9 || option[7] != '=') {
                 error_msg_ = "listen: backlog: Missing number";
                 return listen;
             }
-            listen.backlog = std::stoi(option.substr(8));
+            listen.backlog = Utils::Stoi(option.substr(8));
         } else if (option.substr(0, 6) == "rcvbuf") {
             if (option.size() < 8 || option[6] != '=') {
                 error_msg_ = "listen: rcvbuf: Missing number";
                 return listen;
             }
-            listen.rcvbuf = static_cast<size_t>(std::stoi(option.substr(7)));
+            listen.rcvbuf = static_cast<size_t>(Utils::Stoi(option.substr(7)));
         } else if (option.substr(0, 6) == "sndbuf") {
             if (option.size() < 8 || option[6] != '=') {
                 error_msg_ = "listen: sndbuf: Missing number";
                 return listen;
             }
-            listen.sndbuf = static_cast<size_t>(std::stoi(option.substr(7)));
+            listen.sndbuf = static_cast<size_t>(Utils::Stoi(option.substr(7)));
         } else if (option.substr(0, 13) == "accept_filter") {
             if (option.size() < 15 || option[13] != '=') {
                 error_msg_ = "listen: accept_filter: Missing filter value";
@@ -302,9 +302,9 @@ size_t Simple::ParseSizeType(const std::vector<std::string> &tokens, size_t &idx
         return res;
     const size_t pos = argument.find_first_not_of("0123456789");
     if (pos == std::string::npos)
-        res = static_cast<size_t>(std::stoi(argument));
+        res = static_cast<size_t>(Utils::Stoi(argument));
     else {
-        res = static_cast<size_t>(std::stoi(argument.substr(0, pos)));
+        res = static_cast<size_t>(Utils::Stoi(argument.substr(0, pos)));
         const std::string unit = argument.substr(pos);
         if (is_time) {
             if (unit == "s" || unit == "S")
@@ -374,10 +374,10 @@ std::map<int, std::string> Simple::ParseErrorPage(const std::vector<std::string>
         const std::string argument = arguments[i];
         const size_t pos = argument.find_first_not_of("0123456789");
         if (pos != std::string::npos) {
-            error_msg_ = "error_page: status code: Invalid character argument: " + argument + " at: " + std::to_string(pos);
+            error_msg_ = "error_page: status code: Invalid character argument: " + argument;
             return error_page;
         }
-        const int status_code = std::stoi(argument);
+        const int status_code = Utils::Stoi(argument);
         if (status_code < 100 || status_code > 599) {
             error_msg_ = "error_page: status code: Invalid range";
             return error_page;
@@ -420,7 +420,7 @@ try_files_t Simple::ParseTryFiles(const std::vector<std::string> &tokens, size_t
             error_msg_ = "try_files: code: Invalid number";
             return try_files;
         } else
-            try_files.code = static_cast<size_t>(std::stoi(code_s));
+            try_files.code = static_cast<size_t>(Utils::Stoi(code_s));
     } else
         try_files.uri = token;
     try_files.files = arguments;
@@ -464,7 +464,7 @@ fastcgi_pass_t Simple::ParseFastcgiPass(const std::vector<std::string> &tokens, 
         fastcgi_pass.address = argument.substr(0, pos);
         const std::string port_s = argument.substr(pos + 1);
         if (port_s.find_first_not_of("0123456789") == std::string::npos)
-            fastcgi_pass.port = static_cast<size_t>(std::stoi(port_s));
+            fastcgi_pass.port = static_cast<size_t>(Utils::Stoi(port_s));
         else {
             error_msg_ = "fastcgi_pass: Invalid port";
             return fastcgi_pass;

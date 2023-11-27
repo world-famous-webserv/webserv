@@ -2,6 +2,7 @@
 # define LIBS_CONFIG_BLOCK_HPP_
 
 # include <string>  /* std::string */
+# include <algorithm>
 # include "simple.hpp"
 # include "utils.hpp"
 

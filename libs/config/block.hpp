@@ -1,8 +1,9 @@
 #ifndef LIBS_CONFIG_BLOCK_HPP_
 # define LIBS_CONFIG_BLOCK_HPP_
 
-# include <string>  /* std::string */
-# include <algorithm>
+# include <string>       /* std::string */
+# include <algorithm>    /* std::find */
+# include <sys/socket.h> /* struct linger */
 # include "simple.hpp"
 # include "utils.hpp"
 
@@ -29,8 +30,7 @@ typedef struct BlockLocation_s
     std::string lingering_close;
     size_t send_lowat;
     size_t sendfile_max_chunk;
-    size_t lingering_time;
-    size_t lingering_timeout;
+    struct linger linger;
     size_t client_max_body_size;
     size_t client_body_timeout;
     size_t keepalive_requests;
@@ -59,9 +59,7 @@ typedef struct BlockServer_s
     std::string root;
     std::vector<std::string> allows;
     std::vector<std::string> denys;
-    std::string lingering_close;
-    size_t lingering_time;
-    size_t lingering_timeout;
+    struct linger linger;
     size_t send_lowat;
     size_t sendfile_max_chunk;
     size_t client_max_body_size;
@@ -94,9 +92,7 @@ typedef struct BlockHttp_s
     std::string root;
     std::vector<std::string> allows;
     std::vector<std::string> denys;
-    std::string lingering_close;
-    size_t lingering_time;
-    size_t lingering_timeout;
+    struct linger linger;
     size_t send_lowat;
     size_t sendfile_max_chunk;
     size_t client_max_body_size;

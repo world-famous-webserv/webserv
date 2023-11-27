@@ -26,14 +26,14 @@ BlockLocation_s::BlockLocation_s():
     denys(),
     lingering_close("on"),
     send_lowat(0),
-    sendfile_max_chunk(2 * 1024 * 1024), \
-    lingering_time(30),
-    lingering_timeout(5),
+    sendfile_max_chunk(2 * 1024 * 1024),
     client_max_body_size(1 * 1024 * 1024),
     client_body_timeout(60),
     keepalive_requests(1000),
     keepalive_time(1 * 60 * 60)
 {
+    linger.l_onoff = 1;
+    linger.l_linger = 5;
     index.push_back("index.html");
 }
 
@@ -48,9 +48,6 @@ BlockServer_s::BlockServer_s(): \
     root("html"),
     allows(),
     denys(),
-    lingering_close("on"),
-    lingering_time(30),
-    lingering_timeout(5),
     send_lowat(0),
     sendfile_max_chunk(2 * 1024 * 1024),
     client_max_body_size(1 * 1024 * 1024),
@@ -60,6 +57,8 @@ BlockServer_s::BlockServer_s(): \
     keepalive_requests(1000),
     keepalive_time(1 * 60 * 60)
 {
+    linger.l_onoff = 1;
+    linger.l_linger = 5;
     server_name.push_back("");
     index.push_back("index.html");
 }
@@ -75,9 +74,6 @@ BlockHttp_s::BlockHttp_s():
     root("html"),
     allows(),
     denys(),
-    lingering_close("on"),
-    lingering_time(30),
-    lingering_timeout(5),
     send_lowat(0),
     sendfile_max_chunk(2 * 1024 * 1024),
     client_max_body_size(1 * 1024 * 1024),
@@ -87,6 +83,8 @@ BlockHttp_s::BlockHttp_s():
     keepalive_requests(1000),
     keepalive_time(1 * 60 * 60)
 {
+    linger.l_onoff = 1;
+    linger.l_linger = 5;
     index.push_back("index.html");
 }
 
@@ -149,16 +147,10 @@ BlockHttp_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx
             http.denys.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "absolute_redirect")
             http.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
-        else if (directive == "lingering_close") {
-            http.lingering_close = Simple::ParseStringType(tokens, idx, error_msg, directive);
-            if (http.lingering_close != "on" && http.lingering_close != "off" && http.lingering_close != "always") {
-                error_msg = "Http: Invalid value for [ " + directive + " ]";
-                return http;
-            }
-        } else if (directive == "lingering_time")
-            http.lingering_time = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+        else if (directive == "lingering_close")
+            http.linger.l_onoff = static_cast<int>(Simple::ParseBoolType(tokens, idx, error_msg, directive));
         else if (directive == "lingering_timeout")
-            http.lingering_timeout = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            http.linger.l_linger = static_cast<int>(Simple::ParseSizeType(tokens, idx, error_msg, directive, true));
         else if (directive == "send_lowat")
             http.send_lowat = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
         else if (directive == "sendfile_max_chunk")
@@ -229,16 +221,10 @@ BlockServer_t Block::ParseServer(const std::vector<std::string> &tokens, size_t 
             server.denys.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "absolute_redirect")
             server.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
-        else if (directive == "lingering_close") {
-            server.lingering_close = Simple::ParseStringType(tokens, idx, error_msg, directive);
-            if (server.lingering_close != "on" && server.lingering_close != "off" && server.lingering_close != "always") {
-                error_msg = "Server: Invalid value for [ " + directive + " ]";
-                return server;
-            }
-        } else if (directive == "lingering_time")
-            server.lingering_time = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+        else if (directive == "lingering_close")
+            server.linger.l_onoff = static_cast<int>(Simple::ParseBoolType(tokens, idx, error_msg, directive));
         else if (directive == "lingering_timeout")
-            server.lingering_timeout = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            server.linger.l_linger = static_cast<int>(Simple::ParseSizeType(tokens, idx, error_msg, directive, true));
         else if (directive == "send_lowat")
             server.send_lowat = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
         else if (directive == "sendfile_max_chunk")
@@ -314,16 +300,10 @@ BlockLocation_t Block::ParseLocation(const std::vector<std::string> &tokens, siz
             location.denys.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
         else if (directive == "absolute_redirect")
             location.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
-        else if (directive == "lingering_close") {
-            location.lingering_close = Simple::ParseStringType(tokens, idx, error_msg, directive);
-            if (location.lingering_close != "on" && location.lingering_close != "off" && location.lingering_close != "always") {
-                error_msg = "Location: Invalid value for [ " + directive + " ]";
-                return location;
-            }
-        } else if (directive == "lingering_time")
-            location.lingering_time = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+        else if (directive == "lingering_close")
+            location.linger.l_onoff = static_cast<int>(Simple::ParseBoolType(tokens, idx, error_msg, directive));
         else if (directive == "lingering_timeout")
-            location.lingering_timeout = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            location.linger.l_linger = static_cast<int>(Simple::ParseSizeType(tokens, idx, error_msg, directive, true));
         else if (directive == "send_lowat")
             location.send_lowat = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
         else if (directive == "sendfile_max_chunk")
@@ -362,7 +342,7 @@ void Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx
     // GET, HEAD, POST, PUT, DELETE, MKCOL, COPY, MOVE, OPTIONS, PROPFIND, PROPPATCH, LOCK, UNLOCK, PATCH
     std::vector<std::string> methods;
     while (idx < tokens.size() && tokens[idx] != "{" && error_msg.empty() == true) {
-        const std::string method = tokens[idx];
+        const std::string &method = tokens[idx];
         if (method == "GET" || method == "HEAD" || method == "POST" || method == "PUT" || method == "DELETE" || \
             method == "MKCOL" || method == "COPY" || method == "MOVE" || method == "OPTIONS" || method == "PROPFIND" || method == "PROPPATCH" || \
             method == "LOCK" || method == "UNLOCK" || method == "PATCH") {

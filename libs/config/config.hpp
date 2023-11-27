@@ -18,20 +18,7 @@ class Config
         bool is_open() const;
         std::string error_msg() const;
 
-        BlockMain_t &main() { return main_; }
-        const BlockMain_t &main() const { return main_; }
-
-        BlockHttp_t &http() { return main_.http; }
-        const BlockHttp_t &http() const { return main_.http; }
-
-        std::vector<BlockServer_t> &servers() { return main_.http.servers; }
-        const std::vector<BlockServer_t> &servers() const { return main_.http.servers; }
-
-        BlockServer_t &server() { return main_.http.servers[0]; }
-        const BlockServer_t &server() const { return main_.http.servers[0]; }
-
-        std::vector<BlockLocation_t> &locations() { return server().locations; }
-        const std::vector<BlockLocation_t> &locations() const { return server().locations; }
+        std::vector<BlockServer_t> get_servers(const std::string &name, const size_t port) const;
 
     private:
         Config();

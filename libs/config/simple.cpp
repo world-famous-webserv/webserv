@@ -12,7 +12,7 @@ Simple &Simple::operator=(const Simple &obj)
 
 listen_s::listen_s():
     address("*"),
-    port(8000),
+    port("8000"),
     default_server(false),
     ssl(false),
     http2(false),
@@ -141,7 +141,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
 
     if (pos == std::string::npos) {
         if (argument.find_first_not_of("0123456789") == std::string::npos)
-            listen.port = Utils::StringtoSize(argument, error_msg);
+            listen.port = argument;
         else {
             listen.address = argument;
             listen.port = 80;
@@ -160,7 +160,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
         }
         const std::string port_s = argument.substr(pos + 1);
         if (port_s.find_first_not_of("0123456789") == std::string::npos) {
-            listen.port = Utils::StringtoSize(port_s, error_msg);
+            listen.port = port_s;
         } else {
             error_msg = "listen: Invalid port";
             return listen;

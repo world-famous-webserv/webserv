@@ -66,3 +66,26 @@ std::string Config::error_msg() const
 {
     return error_msg_;
 }
+
+// BlockServer_t Config::get_server(const std::string &host) const
+// {
+//     const size_t idx = host.find(':');
+
+//     std::vector<BlockServer_t> servers;
+//     for (std::vector<BlockServer_t>::const_iterator i = main_.http.servers.begin(), end = main_.http.servers.end(); i != end; ++i) {
+//         const BlockServer_t &server = *i;
+
+//         if (std::find(server.server_name.begin(), server.server_name.end(), name) == server.server_name.end())
+//             continue;
+        
+//         const std::vector<listen_t> &listens = server.listens;
+//         for (std::vector<listen_t>::const_iterator j = listens.begin(), end = listens.end(); j != end; ++j) {
+//             const listen_t &listen = *j;
+//             if (listen.port == port) {
+//                 servers.push_back(server);
+//                 break;
+//             }
+//         }
+//     }
+//     return servers;
+// }

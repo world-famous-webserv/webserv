@@ -7,7 +7,7 @@
 
 typedef struct listen_s {
     std::string address;
-    size_t port;
+    std::string port;
     bool default_server;
     bool ssl;
     bool http2;

@@ -163,3 +163,9 @@ void Server::Write(void)
 		return ;
 	std::cout << "Server::Write" << std::endl;
 }
+
+void Server::Update(void)
+{
+	if (identifier_ == -1)
+		return ;
+}

@@ -133,3 +133,9 @@ void Client::Write(void)
 		sendbuf_.erase(0, nbytes);
 	}
 }
+
+void Client::Update(void)
+{
+	if (identifier_ == -1)
+		return ;
+}

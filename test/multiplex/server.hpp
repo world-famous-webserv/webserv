@@ -19,6 +19,7 @@ class Server : public IOEvent
 	void Open(void);
 	void Read(void);
 	void Write(void);
+	void Update(void);
  private:
 	Server(void);
 	Server(const Server &obj);

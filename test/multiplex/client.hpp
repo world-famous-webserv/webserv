@@ -18,6 +18,7 @@ class Client : public IOEvent
 	void Open(void);
 	void Read(void);
 	void Write(void);
+	void Update(void);
  private:
 	Client(void);
 	Client(const Client &obj);

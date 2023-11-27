@@ -343,19 +343,19 @@ void Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx
     std::vector<std::string> methods;
     while (idx < tokens.size() && tokens[idx] != "{" && error_msg.empty() == true) {
         const std::string &method = tokens[idx];
-        if (method == "GET" || method == "HEAD" || method == "POST" || method == "PUT" || method == "DELETE" || \
-            method == "MKCOL" || method == "COPY" || method == "MOVE" || method == "OPTIONS" || method == "PROPFIND" || method == "PROPPATCH" || \
-            method == "LOCK" || method == "UNLOCK" || method == "PATCH") {
-                if (std::find(methods.begin(), methods.end(), method) != methods.end()) {
-                    error_msg = "LimitExcept: Duplicate method [ " + method + " ]";
-                    return;
-                }
-                else {
-                    methods.push_back(method);
-                    ++idx;
-                }
+        if (method == "GET" || method == "HEAD" || method == "POST" || method == "PUT" || \
+            method == "DELETE" || method == "MKCOL" || method == "COPY" || method == "MOVE" || \
+            method == "OPTIONS" || method == "PROPFIND" || method == "PROPPATCH" || method == "LOCK" || \
+            method == "UNLOCK" || method == "PATCH")
+        {
+            if (std::find(methods.begin(), methods.end(), method) != methods.end()) {
+                error_msg = "LimitExcept: Duplicate method [ " + method + " ]";
+                return;
+            } else {
+                methods.push_back(method);
+                ++idx;
             }
-        else {
+        } else {
             error_msg = "LimitExcept: Unknown method [ " + method + " ]";
             return;
         }
@@ -369,35 +369,33 @@ void Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx
         return;
     }
     ++idx;
-    std::string allow("");
-    std::string deny("");
 
+    std::vector<std::string> allows;
+    std::vector<std::string> denys;
     while (idx < tokens.size() && tokens[idx] != "}" && error_msg.empty() == true) {
         const std::string directive = tokens[idx++];
-        if (directive == "allow") {
-            if (allow.empty() == false)
-                error_msg = "LimitExcept: Duplicate allow";
-            else
-                allow = Simple::ParseStringType(tokens, idx, error_msg, directive);
-        }
-        else if (directive == "deny") {
-            if (deny.empty() == false)
-                error_msg = "LimitExcept: Duplicate deny";
-            else
-                deny = Simple::ParseStringType(tokens, idx, error_msg, directive);
-        }
-        else
+        if (directive == "allow")
+            allows.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
+        else if (directive == "deny")
+            denys.push_back(Simple::ParseStringType(tokens, idx, error_msg, directive));
+        else {
             error_msg = "LimitExcept: Unknown directive [ " + directive + " ]";
+            return;
+        }
     }
 
-    for (std::vector<std::string>::size_type i = 0, end = methods.size(); i < end; ++i) {
-        if (limit_excepts.find(methods[i]) == limit_excepts.end())
-            limit_excepts[methods[i]] = BlockLimitExcept_s();
-        limit_excepts[methods[i]].allows.push_back(allow);
-        limit_excepts[methods[i]].denys.push_back(deny);
-    }
-    if (idx == tokens.size())
+    if (idx == tokens.size()) {
         error_msg = "LimitExcept: Missing }";
+        return;
+    } else if (error_msg.empty() == false)
+        return;
     else
         ++idx;
+
+    for (std::vector<std::string>::const_iterator i = methods.begin(); i != methods.end(); ++i) {
+        if (limit_excepts.find(*i) == limit_excepts.end())
+            limit_excepts[*i] = BlockLimitExcept_s();
+        limit_excepts[*i].allows = allows;
+        limit_excepts[*i].denys = denys;
+    }
 }

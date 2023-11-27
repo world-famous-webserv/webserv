@@ -2,7 +2,6 @@
 # define LIBS_CONFIG_BLOCK_HPP_
 
 # include <string>  /* std::string */
-# include <cstring> /* std::strcmp */
 # include <algorithm>
 # include "simple.hpp"
 # include "utils.hpp"
@@ -38,11 +37,12 @@ typedef struct BlockLocation_s
     keepalive_timeout_t keepalive_timeout_;
     std::vector<std::string> index_;
     std::vector<struct BlockLocation_s> locations_;
-    std::map<int, std::string> error_page_;
+    std::map<size_t, std::string> error_page_;
     std::map<std::string, struct BlockLimitExcept_s> limit_excepts_;
     std::map<std::string, std::string> fastcgi_param_;
     fastcgi_pass_t fastcgi_pass_;
     try_files_t try_files_;
+    return_t return_;
 } BlockLocation_t;
 
 typedef struct BlockServer_s
@@ -73,9 +73,10 @@ typedef struct BlockServer_s
     std::vector<std::string> index_;
     std::vector<std::string> server_name_;
     std::vector<struct BlockLocation_s> locations_;
-    std::map<int, std::string> error_page_;
+    std::map<size_t, std::string> error_page_;
     std::map<std::string, std::string> fastcgi_param_;
     try_files_t try_files_;
+    return_t return_;
 } BlockServer_t;
 
 typedef struct BlockHttp_s
@@ -104,7 +105,7 @@ typedef struct BlockHttp_s
     keepalive_timeout_t keepalive_timeout_;
     std::vector<std::string> index_;
     std::vector<struct BlockServer_s> servers_;
-    std::map<int, std::string> error_page_;
+    std::map<size_t, std::string> error_page_;
     std::map<std::string, std::string> fastcgi_param_;
 } BlockHttp_t;
 
@@ -132,7 +133,6 @@ class Block
         Block();
         Block(const Block &obj);
         Block &operator=(const Block &obj);
-
 };
 
 #endif /* LIBS_CONFIG_BLOCK_HPP_ */

@@ -2,6 +2,15 @@
 #include <vector>
 #include "config.hpp"
 
+void print_return(const return_t &ret)
+{
+    std::cout << "return" << '\n';
+    std::cout << "    code: " << ret.code << '\n';
+    std::cout << "    url: " << ret.url << '\n';
+    std::cout << "    text: " << ret.text << '\n';
+    std::cout << '\n';
+}
+
 void print_http(const BlockHttp_t &http)
 {
     std::cout << "http" << '\n';
@@ -33,7 +42,7 @@ void print_http(const BlockHttp_t &http)
         std::cout << " " << http.index_[i];
     std::cout << '\n' << '\n';
     std::cout << "error_page:" << '\n';
-    for (std::map<int, std::string>::const_iterator it = http.error_page_.begin(); it != http.error_page_.end(); it++)
+    for (std::map<size_t, std::string>::const_iterator it = http.error_page_.begin(); it != http.error_page_.end(); it++)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << '\n';
     std::cout << "fastcgi_param:" << '\n';
@@ -103,7 +112,7 @@ void print_server(const BlockServer_t &server) {
         std::cout << " " << server.server_name_[i];
     std::cout << "\n\n";
     std::cout << "error_page:" << '\n';
-    for (std::map<int, std::string>::const_iterator it = server.error_page_.begin(); it != server.error_page_.end(); it++)
+    for (std::map<size_t, std::string>::const_iterator it = server.error_page_.begin(); it != server.error_page_.end(); it++)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << '\n';
     std::cout << "fastcgi_param:" << '\n';
@@ -116,6 +125,7 @@ void print_server(const BlockServer_t &server) {
     for (size_t i = 0; i < server.try_files_.files.size(); i++)
         std::cout << " " << server.try_files_.files[i];
     std::cout << '\n';
+    print_return(server.return_);
 }
 
 void print_location(const BlockLocation_t &location) {
@@ -147,7 +157,7 @@ void print_location(const BlockLocation_t &location) {
         std::cout << " " << location.index_[i];
     std::cout << '\n' << '\n';
     std::cout << "error_page:" << '\n';
-    for (std::map<int, std::string>::const_iterator it = location.error_page_.begin(); it != location.error_page_.end(); it++)
+    for (std::map<size_t, std::string>::const_iterator it = location.error_page_.begin(); it != location.error_page_.end(); it++)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << '\n';
     std::cout << "fastcgi_param:" << '\n';
@@ -165,6 +175,7 @@ void print_location(const BlockLocation_t &location) {
     std::cout << "    port: " << location.fastcgi_pass_.port << '\n';
     std::cout << "    unix: " << location.fastcgi_pass_.unix << '\n';
     std::cout << "\n";
+    print_return(location.return_);
 }
 
 int main(int argc, char *argv[])

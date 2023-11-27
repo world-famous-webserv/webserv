@@ -6,10 +6,9 @@ LIBS	= \
 
 SRCS	= \
 	config.cpp \
-	configFileReader.cpp \
-	configLocation.cpp \
-	configServer.cpp \
-	configStringUtils.cpp \
+	utils.cpp \
+	block.cpp \
+	simple.cpp \
 
 # **************************************************************************** #
 include $(TOPDIR)/build/Rules.mk

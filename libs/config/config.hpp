@@ -2,6 +2,7 @@
 #define LIBS_CONFIG_CONFIG_HPP_
 
 #include <string>  /* std::string */
+#include <sstream> /* std::stringstream */
 #include <fstream> /* std::ifstream */
 #include <vector>  /* std::vector */
 #include "block.hpp" /* Block */
@@ -15,10 +16,13 @@ class Config
         Config(const Config &obj);
         Config &operator=(const Config &obj);
 
-        bool is_open() const;
-        std::string error_msg() const;
+        bool IsOpen() const;
+        std::string ErrorMsg() const;
 
-        std::vector<BlockServer_t> get_servers(const std::string &name, const size_t port) const;
+        BlockHttp_t GetHttp() const { return main_.http; }
+        BlockServer_t GetServer(const std::string &host) const;
+
+        std::vector<BlockServer_t> GetServers() const { return main_.http.servers; }
 
     private:
         Config();

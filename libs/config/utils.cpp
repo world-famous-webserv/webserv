@@ -12,7 +12,7 @@ Utils& Utils::operator=(const Utils &obj)
     return *this;
 }
 
-std::vector<std::string> Utils::stringSplit(const std::string &str, const std::string &whitespace)
+std::vector<std::string> Utils::StringSplit(const std::string &str, const std::string &whitespace)
 {
 	std::vector<std::string> tokens;
 	std::string::size_type start, end = 0;

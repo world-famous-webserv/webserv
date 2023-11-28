@@ -65,15 +65,15 @@ typedef struct default_s {
     keepalive_timeout_t keepalive_timeout;
     try_files_t try_files;
     fastcgi_pass_t fastcgi_pass;
-    int sendfile;
-    int autoindex;
-    int absolute_redirect;
-    int server_name_in_redirect;
-    int tcp_nodelay;
-    int tcp_nopush;
+    bool sendfile;
+    bool autoindex;
+    bool absolute_redirect;
+    bool server_name_in_redirect;
+    bool tcp_nodelay;
+    bool tcp_nopush;
     std::string default_type;
     std::string root;
-    std::string index;
+    std::vector<std::string> index;
     std::string server_name;
     struct linger linger;
     int send_lowat;
@@ -90,10 +90,10 @@ typedef struct default_s {
 class Simple
 {
     public:
-        static int ParseBoolType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
-        static std::string ParseStringType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
-        static std::vector<std::string> ParseStringVectorType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
-        static int ParseIntType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive, const bool is_time);
+        static bool ParseBool(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
+        static std::string ParseString(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
+        static std::vector<std::string> ParseStringVector(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
+        static int ParseInt(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive, const bool is_time);
 
         static fastcgi_pass_t ParseFastcgiPass(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
         static void ParseFastcgiParam(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, std::map<std::string, std::string> &fastcgi_param);
@@ -103,8 +103,7 @@ class Simple
         static try_files_t ParseTryFiles(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
         static return_t ParseReturn(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
 
-        static default_t Default;
-
+        static const default_t Default;
     private:
         Simple();
         ~Simple();

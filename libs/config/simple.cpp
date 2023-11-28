@@ -1,5 +1,7 @@
 #include "simple.hpp"
 
+const default_t Simple::Default = default_s();
+
 Simple::~Simple() { }
 Simple::Simple() { }
 Simple::Simple(const Simple &obj) { *this = obj; }
@@ -16,15 +18,14 @@ default_s::default_s():
     keepalive_timeout(),
     try_files(),
     fastcgi_pass(),
-    sendfile(0),
-    autoindex(0),
-    absolute_redirect(1),
-    server_name_in_redirect(0),
-    tcp_nodelay(1),
-    tcp_nopush(0),
+    sendfile(false),
+    autoindex(false),
+    absolute_redirect(true),
+    server_name_in_redirect(false),
+    tcp_nodelay(true),
+    tcp_nopush(false),
     default_type("text/html"),
     root("html"),
-    index("index.html"),
     server_name(""),
     send_lowat(0),
     sendfile_max_chunk(2 * 1024 * 1024),
@@ -40,6 +41,8 @@ default_s::default_s():
 
     listen.address = "*";
     listen.port = "8000";
+
+    index.push_back("index.html");
 }
 
 listen_s::listen_s():
@@ -55,14 +58,14 @@ listen_s::listen_s():
     ipv6only(false),
     reuseport(false),
     so_keepalive(false),
-    keepidle(0),
-    keepintvl(0),
-    keepcnt(0),
-    setfib(0),
-    fastopen(0),
-    backlog(0),
-    rcvbuf(0),
-    sndbuf(0),
+    keepidle(-1),
+    keepintvl(-1),
+    keepcnt(-1),
+    setfib(-1),
+    fastopen(-1),
+    backlog(-1),
+    rcvbuf(-1),
+    sndbuf(-1),
     accept_filter(""),
     unixpath("")
 {
@@ -77,7 +80,7 @@ return_s::return_s():
 
 keepalive_timeout_s::keepalive_timeout_s():
     timeout(75),
-    header_timeout(0)
+    header_timeout(-1)
 {
 }
 
@@ -90,20 +93,20 @@ try_files_s::try_files_s():
 
 fastcgi_pass_s::fastcgi_pass_s():
     address(""),
-    port(0),
+    port(""),
     unix(false)
 {
 }
 
-int Simple::ParseBoolType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
+bool Simple::ParseBool(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
 {
-    int res = -1;
+    bool res = false;
     if (idx == tokens.size()) {
         error_msg =  directive + ": Missing argument";
         return res;
     }
-    if (tokens[idx] == "on")       res = 1;
-    else if (tokens[idx] == "off") res = 0;
+    if (tokens[idx] == "on")       res = true;
+    else if (tokens[idx] == "off") res = false;
     else {
         error_msg = directive + ": Invalid argument [ " + tokens[idx] + " ]";
         return res;
@@ -116,7 +119,7 @@ int Simple::ParseBoolType(const std::vector<std::string> &tokens, size_t &idx, s
     return res;
 }
 
-std::string Simple::ParseStringType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
+std::string Simple::ParseString(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
 {
     std::string res;
     if (idx == tokens.size()) {
@@ -321,7 +324,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
     return listen;
 }
 
-std::vector<std::string> Simple::ParseStringVectorType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
+std::vector<std::string> Simple::ParseStringVector(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
 {
     std::vector<std::string> res;
     if (idx == tokens.size()) {
@@ -337,7 +340,7 @@ std::vector<std::string> Simple::ParseStringVectorType(const std::vector<std::st
     return res;
 }
 
-int Simple::ParseIntType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive, const bool is_time)
+int Simple::ParseInt(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive, const bool is_time)
 {
     int res = -1;
     if (idx == tokens.size()) {

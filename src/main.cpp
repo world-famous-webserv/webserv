@@ -1,10 +1,8 @@
 #include <cstdlib>
 #include <iostream>
 
-#if 1	// TODO: change
-#include "listen_config.hpp"
+#include "config.hpp"
 #include "server.hpp"
-#endif
 
 int main(int argc, char **argv)
 {
@@ -14,10 +12,18 @@ int main(int argc, char **argv)
         return (EXIT_FAILURE);
     }
 	// 1. config
-	ListenConfig config;
+    Config config(argc == 2 ? argv[1] : "../data/default.conf");
 
 	// 2. service
-	Multiplex::GetInstance().AddItem(new Server(&config));
+	std::vector<BlockServer_t> servers = config.GetServers();
+
+	for (size_t i = 0; i < servers.size(); ++i) {
+		const BlockServer_t &server = servers[i];
+		for (size_t j = 0; j < server.listens.size(); ++j) {
+			const listen_t &listen = server.listens[j];
+			Multiplex::GetInstance().AddItem(new Server(server, listen));
+		}
+	}
 	Multiplex::GetInstance().Loop();
     return (EXIT_SUCCESS);
 }

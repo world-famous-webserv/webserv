@@ -9,7 +9,9 @@ Server::~Server(void)
 	this->Close();
 }
 
-Server::Server(ListenConfig *conf): conf_(conf)
+Server::Server(const BlockServer_t &server, const listen_t &listen):
+	server_(server),
+	listen_(listen)
 {
 	this->Open();
 }
@@ -30,8 +32,8 @@ int	Server::GetAddrInfo(struct addrinfo **info)
 	hints.ai_canonname = NULL;
 	hints.ai_next = NULL;
 
-	const char *node = conf_->address.c_str();
-	const char *service= conf_->port.c_str();
+	const char *node = listen_.address.c_str();
+	const char *service= listen_.port.c_str();
 	const int ret = getaddrinfo(node, service, &hints, info);
 	if (ret != 0)
 		std::cerr << node << ":" << service << ": " << gai_strerror(ret) << std::endl;
@@ -42,10 +44,7 @@ void Server::SetSocket(int fd)
 {
 	int on = 1;
 
-	struct linger linger;
-	linger.l_onoff = 1;
-	linger.l_linger = 10;
-	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &linger, sizeof(linger)) == -1)
+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &server_.linger, sizeof(linger)) == -1)
 		std::cerr << "SetSocket::SO_LINGER" << strerror(errno) << std::endl;
 	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1)
 		std::cerr << "SetSocket::SO_REUSEADDR" << strerror(errno) << std::endl;
@@ -55,51 +54,51 @@ void Server::SetSocket(int fd)
 	// quic
 	// proxy_protocol
 #ifdef SO_SETFIB
-	if (conf_->setfib != -1
-		&& setsockopt(fd, SOL_SOCKET, SO_SETFIB, &conf_->setfib, sizeof(conf_->setfib)) == -1)
+	if (listen_.setfib != -1
+		&& setsockopt(fd, SOL_SOCKET, SO_SETFIB, &listen_.setfib, sizeof(listen_.setfib)) == -1)
 		std::cerr << "SetSocket::SO_SETFIB" << strerror(errno) << std::endl;
 #endif
-	if (conf_->fastopen != -1
-		&& setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN, &conf_->fastopen, sizeof(conf_->fastopen)) == -1)
+	if (listen_.fastopen != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN, &listen_.fastopen, sizeof(listen_.fastopen)) == -1)
 		std::cerr << "SetSocket::TCP_FASTOPEN" << strerror(errno) << std::endl;
-	if (conf_->rcvbuf != -1
-		&& setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &conf_->rcvbuf, sizeof(conf_->rcvbuf)) == -1)
+	if (listen_.rcvbuf != -1
+		&& setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &listen_.rcvbuf, sizeof(listen_.rcvbuf)) == -1)
 		std::cerr << "SetSocket::SO_RCVBUF" << strerror(errno) << std::endl;
-	if (conf_->sndbuf != -1
-		&& setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &conf_->sndbuf, sizeof(conf_->sndbuf)) == -1)
+	if (listen_.sndbuf != -1
+		&& setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &listen_.sndbuf, sizeof(listen_.sndbuf)) == -1)
 		std::cerr << "SetSocket::SO_SNDBUF" << strerror(errno) << std::endl;
 #ifdef SO_ACCEPTFILTER
-	if (conf_->accept_filter.length() > 0
-		&& setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, conf_->accept.c_str(), conf_->accept_filter.length()) == -1)
+	if (listen_.accept_filter.length() > 0
+		&& setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, listen_.accept_filter.c_str(), listen_.accept_filter.length()) == -1)
 		std::cerr << "SetSocket::SO_ACCEPTFILTER" << strerror(errno) << std::endl;
 #endif
 #ifdef TCP_DEFER_ACCEPT
 	int timeout = 0;
-	if (conf_->deferred == true
+	if (listen_.deferred == true
 		&& setsockopt(fd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, sizeof(timeout)) == -1)
 		std::cerr << "SetSocket::TCP_DEFER_ACCEPT" << strerror(errno) << std::endl;
 #endif
-	if (conf_->ipv6only == true
-		&& setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &conf_->ipv6only, sizeof(conf_->ipv6only)) == -1)
+	if (listen_.ipv6only == true
+		&& setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &listen_.ipv6only, sizeof(listen_.ipv6only)) == -1)
 		std::cerr << "SetSocket::IPV6_V6ONLY" << strerror(errno) << std::endl;
-	if (conf_->reuseport == true
-		&& setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &conf_->reuseport, sizeof(conf_->reuseport)) == -1)
+	if (listen_.reuseport == true
+		&& setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &listen_.reuseport, sizeof(listen_.reuseport)) == -1)
 		std::cerr << "SetSocket::SO_REUSEPORT" << strerror(errno) << std::endl;
 #ifdef SO_KEEPALIVE
-	if (conf_->so_keepalive == true
-		&& setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &conf_->so_keepalive, sizeof(conf_->so_keepalive)) == -1)
+	if (listen_.so_keepalive == true
+		&& setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &listen_.so_keepalive, sizeof(listen_.so_keepalive)) == -1)
 		std::cerr << "SetSocket::SO_KEEPALIVE" << strerror(errno) << std::endl;
 #endif
 #ifdef TCP_KEEPIDLE
-	if (conf_->keepidle
-		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &conf_->keepidle, sizeof(conf_->keepidle)) == -1)
+	if (listen_.keepidle != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &listen_.keepidle, sizeof(listen_.keepidle)) == -1)
 		std::cerr << "SetSocket::TCP_KEEPIDLE" << strerror(errno) << std::endl;
 #endif
-	if (conf_->keepintvl
-		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &conf_->keepintvl, sizeof(conf_->keepintvl)) == -1)
+	if (listen_.keepintvl != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &listen_.keepintvl, sizeof(listen_.keepintvl)) == -1)
 		std::cerr << "SetSocket::TCP_KEEPINTVL" << strerror(errno) << std::endl;
-	if (conf_->keepcnt
-		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &conf_->keepcnt, sizeof(conf_->keepcnt)) == -1)
+	if (listen_.keepcnt != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &listen_.keepcnt, sizeof(listen_.keepcnt)) == -1)
 		std::cerr << "SetSocket::TCP_KEEPCNT" << strerror(errno) << std::endl;
 }
 
@@ -111,7 +110,7 @@ int Server::CreatSocket(struct addrinfo *info)
 		this->SetSocket(fd);
 		if (bind(fd, info->ai_addr, info->ai_addrlen) == 0)
 		{
-			if (listen(fd, conf_->backlog) == 0)
+			if (listen(fd, listen_.backlog) == 0)
 				return fd;
 		}
 		close(fd);
@@ -125,7 +124,7 @@ int Server::CreatSocket(struct addrinfo *info)
 
 void Server::Open(void)
 {
-	std::cout << "Server::Open - " << conf_->address << ":" << conf_->port << std::endl;
+	std::cout << "Server::Open - " << listen_.address << ":" << listen_.port << std::endl;
 	struct addrinfo *info = NULL;
 	if (this->GetAddrInfo(&info) != 0)
 		return ;
@@ -155,7 +154,7 @@ void Server::Read(void)
 		return ;
 	}
 	std::cout << "- connection success: " << fd << std::endl;
-	Multiplex::GetInstance().AddItem(new Client(fd, conf_));
+	Multiplex::GetInstance().AddItem(new Client(fd, server_, listen_));
 }
 
 void Server::Write(void)

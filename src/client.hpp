@@ -8,12 +8,12 @@
 # include "io_event.hpp"
 
 # include "http.hpp"
-# include "listen_config.hpp"
+# include "config.hpp"
 
 class Client : public IOEvent
 {
  public:
-	Client(const int fd, ListenConfig* const conf);
+	Client(const int fd, const BlockServer_t &server, const listen_t &listen);
 	virtual ~Client(void);
 
 	void Open(void);
@@ -30,8 +30,9 @@ class Client : public IOEvent
 	std::stringstream in_;
 	std::stringstream out_;
 
-	ListenConfig* conf_;
 	Http http_;
+	BlockServer_t server_;
+	listen_t listen_;
 };
 
 # endif /* CLIENT_HPP_ */

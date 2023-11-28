@@ -7,13 +7,13 @@
 # include <netinet/tcp.h>
 # include "io_event.hpp"
 
-# include "listen_config.hpp"
 # include "client.hpp"
+# include "config.hpp"
 
 class Server : public IOEvent
 {
  public:
-	Server(ListenConfig* conf);
+	Server(const BlockServer_t &server, const listen_t &listen);
 	virtual ~Server(void);
 
 	void Open(void);
@@ -29,7 +29,8 @@ class Server : public IOEvent
 	int	GetAddrInfo(struct addrinfo **info);
 	int CreatSocket(struct addrinfo *info);
 
-	ListenConfig* conf_;
+	BlockServer_t server_;
+	listen_t listen_;
 };
 
 # endif /* SERVER_HPP_ */

@@ -12,7 +12,7 @@ Utils& Utils::operator=(const Utils &obj)
     return *this;
 }
 
-std::vector<std::string> Utils::stringSplit(const std::string &str, const std::string &whitespace)
+std::vector<std::string> Utils::StringSplit(const std::string &str, const std::string &whitespace)
 {
 	std::vector<std::string> tokens;
 	std::string::size_type start, end = 0;
@@ -63,9 +63,9 @@ bool Utils::CheckBrackets(const std::vector<std::string> &tokens)
     return brackets == 0;
 }
 
-size_t Utils::StringtoSize(const std::string &str, std::string &error_msg_)
+int Utils::StringtoSize(const std::string &str, std::string &error_msg)
 {
-    size_t size = 0;
+    int size = 0;
     size_t i = 0;
     while (i < str.size() && std::isdigit(str[i]))
         size = size * 10 + str[i++] - '0';
@@ -81,13 +81,13 @@ size_t Utils::StringtoSize(const std::string &str, std::string &error_msg_)
     else if (unit == "g" || unit == "G")
         return size * 1024 * 1024 * 1024;
     else
-        error_msg_ = "StringtoSize: Invalid Unit: " + unit;
+        error_msg = "StringtoSize: Invalid Unit: " + unit;
     return size;
 }
 
-size_t Utils::StringtoTime(const std::string &str, std::string &error_msg_)
+int Utils::StringtoTime(const std::string &str, std::string &error_msg)
 {
-    size_t time = 0;
+    int time = 0;
     size_t i = 0;
     while (i < str.size() && std::isdigit(str[i]))
         time = time * 10 + str[i++] - '0';
@@ -103,6 +103,6 @@ size_t Utils::StringtoTime(const std::string &str, std::string &error_msg_)
     else if (unit == "d" || unit == "D")
         return time * 60 * 60 * 24;
     else
-        error_msg_ = "StringtoTime: Invalid Unit: " + unit;
+        error_msg = "StringtoTime: Invalid Unit: " + unit;
     return time;
 }

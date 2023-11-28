@@ -2,6 +2,7 @@
 #define LIBS_CONFIG_CONFIG_HPP_
 
 #include <string>  /* std::string */
+#include <sstream> /* std::stringstream */
 #include <fstream> /* std::ifstream */
 #include <vector>  /* std::vector */
 #include "block.hpp" /* Block */
@@ -15,23 +16,13 @@ class Config
         Config(const Config &obj);
         Config &operator=(const Config &obj);
 
-        bool is_open() const;
-        std::string error_msg() const;
+        bool IsOpen() const;
+        std::string ErrorMsg() const;
 
-        BlockMain_t &main() { return main_; }
-        const BlockMain_t &main() const { return main_; }
+        BlockHttp_t GetHttp() const { return main_.http; }
+        BlockServer_t GetServer(const std::string &host) const;
 
-        BlockHttp_t &http() { return main_.http_; }
-        const BlockHttp_t &http() const { return main_.http_; }
-
-        std::vector<BlockServer_t> &servers() { return main_.http_.servers_; }
-        const std::vector<BlockServer_t> &servers() const { return main_.http_.servers_; }
-
-        BlockServer_t &server() { return main_.http_.servers_[0]; }
-        const BlockServer_t &server() const { return main_.http_.servers_[0]; }
-
-        std::vector<BlockLocation_t> &locations() { return server().locations_; }
-        const std::vector<BlockLocation_t> &locations() const { return server().locations_; }
+        std::vector<BlockServer_t> GetServers() const { return main_.http.servers; }
 
     private:
         Config();

@@ -26,7 +26,7 @@ fclean:
 re: fclean
 	$(MAKE)
 
-test:
+testcurl:
 	curl -v --http1.1 -X GET "http://localhost:8080"
 
 .PHONY: all clean fclean re bonus

@@ -96,7 +96,7 @@ debug: fclean
 
 test:
 	$(MAKE) all
-	@ ./$(NAME) ../../configs/default.conf
+	@ ./$(NAME) ../../data/default.conf
 
 .PHONY: all clean fclean re dir_guard debug test
 

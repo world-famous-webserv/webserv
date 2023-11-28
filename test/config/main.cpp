@@ -211,5 +211,8 @@ int main(int argc, const char *argv[])
     const std::string path = config.GetPath(url);
     std::cout << "url: " << url << " path: " << path << '\n';
 
+    const BlockLocation_t location = config.GetLocation(url);
+    print_location(location);
+
     return EXIT_SUCCESS;
 }

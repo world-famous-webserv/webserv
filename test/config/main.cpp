@@ -22,11 +22,12 @@ void print_http(const BlockHttp_t &http)
     std::cout << "tcp_nopush: " << http.tcp_nopush << '\n';
     std::cout << "default_type: " << http.default_type << '\n';
     std::cout << "root: " << http.root << '\n';
-    std::cout << "allow: " << http.allow << '\n';
-    std::cout << "deny: " << http.deny << '\n';
-    std::cout << "lingering_close: " << http.lingering_close << '\n';
-    std::cout << "lingering_time: " << http.lingering_time << '\n';
-    std::cout << "lingering_timeout: " << http.lingering_timeout << '\n';
+    for (size_t i = 0; i < http.allows.size(); ++i)
+        std::cout << "allow: " << http.allows[i] << '\n';
+    for (size_t i = 0; i < http.denys.size(); ++i)
+        std::cout << "deny: " << http.denys[i] << '\n';
+    std::cout << "lingering_close: " << http.linger.l_onoff << '\n';
+    std::cout << "lingering_timeout: " << http.linger.l_linger << '\n';
     std::cout << "send_lowat: " << http.send_lowat << '\n';
     std::cout << "sendfile_max_chunk: " << http.sendfile_max_chunk << '\n';
     std::cout << "client_max_body_size: " << http.client_max_body_size << '\n';
@@ -42,11 +43,11 @@ void print_http(const BlockHttp_t &http)
         std::cout << " " << http.index[i];
     std::cout << '\n' << '\n';
     std::cout << "error_page:" << '\n';
-    for (std::map<size_t, std::string>::const_iterator it = http.error_page.begin(); it != http.error_page.end(); it++)
+    for (std::map<int, std::string>::const_iterator it = http.error_page.begin(); it != http.error_page.end(); ++it)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << '\n';
     std::cout << "fastcgi_param:" << '\n';
-    for (std::map<std::string, std::string>::const_iterator it = http.fastcgi_param.begin(); it != http.fastcgi_param.end(); it++)
+    for (std::map<std::string, std::string>::const_iterator it = http.fastcgi_param.begin(); it != http.fastcgi_param.end(); ++it)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << '\n';
 }
@@ -87,11 +88,12 @@ void print_server(const BlockServer_t &server) {
     std::cout << "tcp_nopush: " << server.tcp_nopush << '\n';
     std::cout << "default_type: " << server.default_type << '\n';
     std::cout << "root: " << server.root << '\n';
-    std::cout << "allow: " << server.allow << '\n';
-    std::cout << "deny: " << server.deny << '\n';
-    std::cout << "lingering_close: " << server.lingering_close << '\n';
-    std::cout << "lingering_time: " << server.lingering_time << '\n';
-    std::cout << "lingering_timeout: " << server.lingering_timeout << '\n';
+    for (size_t i = 0; i < server.allows.size(); ++i)
+        std::cout << "allow: " << server.allows[i] << '\n';
+    for (size_t i = 0; i < server.denys.size(); ++i)
+        std::cout << "deny: " << server.denys[i] << '\n';
+    std::cout << "lingering_close: " << server.linger.l_onoff << '\n';
+    std::cout << "lingering_timeout: " << server.linger.l_linger << '\n';
     std::cout << "send_lowat: " << server.send_lowat << '\n';
     std::cout << "sendfile_max_chunk: " << server.sendfile_max_chunk << '\n';
     std::cout << "client_max_body_size: " << server.client_max_body_size << '\n';
@@ -112,17 +114,17 @@ void print_server(const BlockServer_t &server) {
         std::cout << " " << server.server_name[i];
     std::cout << "\n\n";
     std::cout << "error_page:" << '\n';
-    for (std::map<size_t, std::string>::const_iterator it = server.error_page.begin(); it != server.error_page.end(); it++)
+    for (std::map<int, std::string>::const_iterator it = server.error_page.begin(); it != server.error_page.end(); ++it)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << '\n';
     std::cout << "fastcgi_param:" << '\n';
-    for (std::map<std::string, std::string>::const_iterator it = server.fastcgi_param.begin(); it != server.fastcgi_param.end(); it++)
+    for (std::map<std::string, std::string>::const_iterator it = server.fastcgi_param.begin(); it != server.fastcgi_param.end(); ++it)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << "    try_files:" << '\n';
     std::cout << "    uri: " << server.try_files.uri << '\n';
     std::cout << "    code: " << server.try_files.code << '\n';
     std::cout << "    files:";
-    for (size_t i = 0; i < server.try_files.files.size(); i++)
+    for (size_t i = 0; i < server.try_files.files.size(); ++i)
         std::cout << " " << server.try_files.files[i];
     std::cout << '\n';
     print_return(server.ret);
@@ -139,11 +141,12 @@ void print_location(const BlockLocation_t &location) {
     std::cout << "tcp_nopush: " << location.tcp_nopush << '\n';
     std::cout << "default_type: " << location.default_type << '\n';
     std::cout << "root: " << location.root << '\n';
-    std::cout << "allow: " << location.allow << '\n';
-    std::cout << "deny: " << location.deny << '\n';
-    std::cout << "lingering_close: " << location.lingering_close << '\n';
-    std::cout << "lingering_time: " << location.lingering_time << '\n';
-    std::cout << "lingering_timeout: " << location.lingering_timeout << '\n';
+    for (size_t i = 0; i < location.allows.size(); ++i)
+        std::cout << "allow: " << location.allows[i] << '\n';
+    for (size_t i = 0; i < location.denys.size(); ++i)
+        std::cout << "deny: " << location.denys[i] << '\n';
+    std::cout << "lingering_close: " << location.linger.l_onoff << '\n';
+    std::cout << "lingering_timeout: " << location.linger.l_linger << '\n';
     std::cout << "send_lowat: " << location.send_lowat << '\n';
     std::cout << "sendfile_max_chunk: " << location.sendfile_max_chunk << '\n';
     std::cout << "client_max_body_size: " << location.client_max_body_size << '\n';
@@ -157,11 +160,11 @@ void print_location(const BlockLocation_t &location) {
         std::cout << " " << location.index[i];
     std::cout << '\n' << '\n';
     std::cout << "error_page:" << '\n';
-    for (std::map<size_t, std::string>::const_iterator it = location.error_page.begin(); it != location.error_page.end(); it++)
+    for (std::map<int, std::string>::const_iterator it = location.error_page.begin(); it != location.error_page.end(); ++it)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << '\n';
     std::cout << "fastcgi_param:" << '\n';
-    for (std::map<std::string, std::string>::const_iterator it = location.fastcgi_param.begin(); it != location.fastcgi_param.end(); it++)
+    for (std::map<std::string, std::string>::const_iterator it = location.fastcgi_param.begin(); it != location.fastcgi_param.end(); ++it)
         std::cout << it->first << " = " << it->second << '\n';
     std::cout << "try_files:" << '\n';
     std::cout << "    uri: " << location.try_files.uri << '\n';
@@ -178,7 +181,7 @@ void print_location(const BlockLocation_t &location) {
     print_return(location.ret);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
     if (argc > 2) {
         std::cerr << "Usage: " << argv[0] << " [configuration file] | None" << '\n';
@@ -193,27 +196,15 @@ int main(int argc, char *argv[])
 
     Config config(file);
 
-    if (config.is_open() == false) {
-        std::cerr << "Error: " << config.error_msg() << '\n';
+    if (config.IsOpen() == false) {
+        std::cerr << "Error: " << config.ErrorMsg() << '\n';
         return EXIT_SUCCESS;
     }
-    const BlockHttp_t http = config.http();
-    const BlockServer_t server = config.server();
-
+    const BlockHttp_t http = config.GetHttp();
     print_http(http);
+
+    const BlockServer_t server = config.GetServer("localhos:8080");
     print_server(server);
-
-    // 존재하는 모든 서버를 벡터로 받아온다.
-    /*
-    const std::vector<BlockServer_t> servers = config.servers();
-    for (size_t i = 0; i < servers.size(); i++)
-        print_server(servers[i]);
-    */
-
-    // 존재하는 모든 location을 벡터로 받아온다.
-    const std::vector<BlockLocation_t> locations = config.locations();
-    for (size_t i = 0; i < locations.size(); i++)
-        print_location(locations[i]);
 
     return EXIT_SUCCESS;
 }

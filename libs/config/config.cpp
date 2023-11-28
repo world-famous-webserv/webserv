@@ -1,7 +1,8 @@
 #include "config.hpp"
 
 Config::~Config() { }
-Config::Config(const std::string &file): error_msg_("")
+Config::Config(const std::string &file):
+    error_msg_("")
 {
     Parse(file);
 }
@@ -34,12 +35,8 @@ void Config::Parse(const std::string &file)
         const size_t pos = line.find('#');
         if (pos == std::string::npos)
             oss << line << '\n';
-        else if (pos) {
-            // performance issue
-            // oss << line.substr(0, pos) << '\n';
-            line[pos] = '\0';
-            oss << line << '\n';
-        }
+        else if (pos)
+            oss << line.substr(0, pos) << '\n';
     }
 	in.close();
 
@@ -96,4 +93,54 @@ BlockServer_t Config::GetServer(const std::string &host) const
 
     // 만약 servers가 비어있다면? 무조건 하나는 있다고 가정.
     return servers.front();
+}
+
+std::string Config::GetUrl(const std::string &str) const
+{
+    std::vector<std::string> parts;
+    std::istringstream iss(str);
+    for (std::string part; std::getline(iss, part, '/');) {
+		if (part == "" || part == ".")
+            continue;
+		if (part == "..") {
+			if (parts.empty())
+				return "";
+			parts.pop_back();
+		}
+        else
+			parts.push_back(part);
+	}
+    if (parts.empty())
+        return "";
+    std::string url;
+    for (std::vector<std::string>::const_iterator i = parts.begin(), end = parts.end(); i != end; ++i)
+        url += "/" + *i;
+    return url;
+}
+
+std::string Config::GetPath(const std::string &url) const
+{
+    const BlockLocation_t &location = GetLocation(url);
+    std::string path = location.root + url.substr(location.name.length() - (location.name[0] == '/'));
+    return path;
+}
+
+BlockLocation_t Config::GetLocation(const std::string &url) const
+{
+    BlockLocation_t *ret = NULL;
+    size_t max_location_name_length = 0;
+
+    std::vector<BlockServer_t> servers = GetServers();
+    for (size_t i = 0, end = servers.size(); i != end; ++i) {
+        BlockServer_t &server = servers[i];
+        std::vector<BlockLocation_t> &locations = server.locations;
+        for (size_t j = 0, end = locations.size(); j != end; ++j) {
+            BlockLocation_t &location = locations[j];
+            if (url.length() > max_location_name_length && url.length() >= location.name.length() && url.compare(0, location.name.length(), location.name) == 0) {
+                max_location_name_length = location.name.length();
+                ret = &location;
+            }
+        }
+    }
+    return *ret;
 }

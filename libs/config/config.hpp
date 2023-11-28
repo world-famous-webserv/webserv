@@ -6,7 +6,7 @@
 #include <fstream> /* std::ifstream */
 #include <vector>  /* std::vector */
 #include "block.hpp" /* Block */
-#include "utils.hpp" /* res_t */
+#include "utils.hpp"
 
 class Config
 {
@@ -24,12 +24,17 @@ class Config
 
         std::vector<BlockServer_t> GetServers() const { return main_.http.servers; }
 
+        std::string GetUrl(const std::string &str) const;
+        std::string GetPath(const std::string &url) const;
+        BlockLocation_t GetLocation(const std::string &url) const;
+
     private:
         Config();
         void Parse(const std::string &file);
 
         std::string error_msg_;
         BlockMain_t main_;
+
 };
 
 #endif /* LIBS_CONFIG_CONFIG_HPP_ */

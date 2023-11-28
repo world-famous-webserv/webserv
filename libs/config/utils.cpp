@@ -63,9 +63,9 @@ bool Utils::CheckBrackets(const std::vector<std::string> &tokens)
     return brackets == 0;
 }
 
-size_t Utils::StringtoSize(const std::string &str, std::string &error_msg)
+int Utils::StringtoSize(const std::string &str, std::string &error_msg)
 {
-    size_t size = 0;
+    int size = 0;
     size_t i = 0;
     while (i < str.size() && std::isdigit(str[i]))
         size = size * 10 + str[i++] - '0';
@@ -85,9 +85,9 @@ size_t Utils::StringtoSize(const std::string &str, std::string &error_msg)
     return size;
 }
 
-size_t Utils::StringtoTime(const std::string &str, std::string &error_msg)
+int Utils::StringtoTime(const std::string &str, std::string &error_msg)
 {
-    size_t time = 0;
+    int time = 0;
     size_t i = 0;
     while (i < str.size() && std::isdigit(str[i]))
         time = time * 10 + str[i++] - '0';

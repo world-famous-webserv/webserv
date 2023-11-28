@@ -10,9 +10,41 @@ Simple &Simple::operator=(const Simple &obj)
     return *this;
 }
 
+default_s::default_s():
+    listen(),
+    ret(),
+    keepalive_timeout(),
+    try_files(),
+    fastcgi_pass(),
+    sendfile(0),
+    autoindex(0),
+    absolute_redirect(1),
+    server_name_in_redirect(0),
+    tcp_nodelay(1),
+    tcp_nopush(0),
+    default_type("text/html"),
+    root("html"),
+    index("index.html"),
+    server_name(""),
+    send_lowat(0),
+    sendfile_max_chunk(2 * 1024 * 1024),
+    client_max_body_size(1 * 1024 * 1024),
+    client_body_timeout(60),
+    client_header_timeout(60),
+    client_header_buffer_size(1 * 1024),
+    keepalive_requests(1000),
+    keepalive_time(1 * 60 * 60)
+{
+    linger.l_onoff = 1;
+    linger.l_linger = 5;
+
+    listen.address = "*";
+    listen.port = "8000";
+}
+
 listen_s::listen_s():
-    address("*"),
-    port("8000"),
+    address(""),
+    port(""),
     default_server(false),
     ssl(false),
     http2(false),
@@ -63,15 +95,15 @@ fastcgi_pass_s::fastcgi_pass_s():
 {
 }
 
-bool Simple::ParseBoolType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
+int Simple::ParseBoolType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
 {
-    bool res = false;
+    int res = -1;
     if (idx == tokens.size()) {
         error_msg =  directive + ": Missing argument";
         return res;
     }
-    if (tokens[idx] == "on")       res = true;
-    else if (tokens[idx] == "off") res = false;
+    if (tokens[idx] == "on")       res = 1;
+    else if (tokens[idx] == "off") res = 0;
     else {
         error_msg = directive + ": Invalid argument [ " + tokens[idx] + " ]";
         return res;
@@ -144,7 +176,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
             listen.port = argument;
         else {
             listen.address = argument;
-            listen.port = 80;
+            listen.port = "80";
         }
     } else if (argument.substr(0, pos) == "unix") {
         if (pos + 1 == argument.size()) {
@@ -305,9 +337,9 @@ std::vector<std::string> Simple::ParseStringVectorType(const std::vector<std::st
     return res;
 }
 
-size_t Simple::ParseSizeType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive, const bool is_time)
+int Simple::ParseIntType(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive, const bool is_time)
 {
-    size_t res = 0;
+    int res = -1;
     if (idx == tokens.size()) {
         error_msg = directive + ": Missing argument";
         return res;
@@ -326,9 +358,9 @@ size_t Simple::ParseSizeType(const std::vector<std::string> &tokens, size_t &idx
     return res;
 }
 
-std::map<size_t, std::string> Simple::ParseErrorPage(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)
+std::map<int, std::string> Simple::ParseErrorPage(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)
 {
-    std::map<size_t, std::string> error_page;
+    std::map<int, std::string> error_page;
 
     if (idx == tokens.size()) {
         error_msg = "error_page: Missing status code";
@@ -352,7 +384,7 @@ std::map<size_t, std::string> Simple::ParseErrorPage(const std::vector<std::stri
 
     std::string uri = arguments.back(); arguments.pop_back();
     for (size_t i = 0; i < arguments.size(); ++i) {
-        size_t status_code = Utils::StringtoSize(arguments[i], error_msg);
+        int status_code = Utils::StringtoSize(arguments[i], error_msg);
         if (error_msg.empty() == false)
             return error_page;
         if (status_code < 100 || status_code > 599) {
@@ -440,7 +472,7 @@ fastcgi_pass_t Simple::ParseFastcgiPass(const std::vector<std::string> &tokens, 
     size_t pos = argument.find_first_of(":");
     if (pos == std::string::npos) {
         fastcgi_pass.address = argument;
-        fastcgi_pass.port = 8000;
+        fastcgi_pass.port = "8000";
     } else {
         fastcgi_pass.address = argument.substr(0, pos);
         fastcgi_pass.port = Utils::StringtoSize(argument.substr(pos + 1), error_msg);

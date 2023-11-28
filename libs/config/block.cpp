@@ -14,78 +14,73 @@ BlockLimitExcept_s::BlockLimitExcept_s(): allows(), denys() { }
 
 BlockLocation_s::BlockLocation_s():
     name(""),
-    sendfile(false),
-    autoindex(false),
-    absolute_redirect(true),
-    server_name_in_redirect(false),
-    tcp_nodelay(true),
-    tcp_nopush(false),
-    default_type("text/html"),
-    root("html"),
+    sendfile(-1),
+    autoindex(-1),
+    absolute_redirect(-1),
+    server_name_in_redirect(-1),
+    tcp_nodelay(-1),
+    tcp_nopush(-1),
+    default_type(""),
+    root(""),
     allows(),
     denys(),
-    lingering_close("on"),
-    send_lowat(0),
-    sendfile_max_chunk(2 * 1024 * 1024),
-    client_max_body_size(1 * 1024 * 1024),
-    client_body_timeout(60),
-    keepalive_requests(1000),
-    keepalive_time(1 * 60 * 60)
+    send_lowat(-1),
+    sendfile_max_chunk(-1),
+    client_max_body_size(-1),
+    client_body_timeout(-1),
+    keepalive_requests(-1),
+    keepalive_time(-1)
 {
-    linger.l_onoff = 1;
-    linger.l_linger = 5;
-    index.push_back("index.html");
+    linger.l_onoff = -1;
+    linger.l_linger = -1;
 }
 
-BlockServer_s::BlockServer_s(): \
-    sendfile(false),
-    autoindex(false),
-    absolute_redirect(true),
-    server_name_in_redirect(false),
-    tcp_nodelay(true),
-    tcp_nopush(false),
-    default_type("text/html"),
-    root("html"),
+BlockServer_s::BlockServer_s():
+    sendfile(-1),
+    autoindex(-1),
+    absolute_redirect(-1),
+    server_name_in_redirect(-1),
+    tcp_nodelay(-1),
+    tcp_nopush(-1),
+    default_type(""),
+    root(""),
     allows(),
     denys(),
-    send_lowat(0),
-    sendfile_max_chunk(2 * 1024 * 1024),
-    client_max_body_size(1 * 1024 * 1024),
-    client_body_timeout(60),
-    client_header_timeout(60),
-    client_header_buffer_size(1 * 1024),
-    keepalive_requests(1000),
-    keepalive_time(1 * 60 * 60)
+    send_lowat(-1),
+    sendfile_max_chunk(-1),
+    client_max_body_size(-1),
+    client_body_timeout(-1),
+    client_header_timeout(-1),
+    client_header_buffer_size(-1),
+    keepalive_requests(-1),
+    keepalive_time(-1)
 {
-    linger.l_onoff = 1;
-    linger.l_linger = 5;
-    server_name.push_back("");
-    index.push_back("index.html");
+    linger.l_onoff = -1;
+    linger.l_linger = -1;
 }
 
 BlockHttp_s::BlockHttp_s():
-    sendfile(false),
-    autoindex(false),
-    absolute_redirect(true),
-    server_name_in_redirect(false),
-    tcp_nodelay(true),
-    tcp_nopush(false),
-    default_type("text/html"),
-    root("html"),
+    sendfile(-1),
+    autoindex(-1),
+    absolute_redirect(-1),
+    server_name_in_redirect(-1),
+    tcp_nodelay(-1),
+    tcp_nopush(-1),
+    default_type(""),
+    root(""),
     allows(),
     denys(),
-    send_lowat(0),
-    sendfile_max_chunk(2 * 1024 * 1024),
-    client_max_body_size(1 * 1024 * 1024),
-    client_body_timeout(60),
-    client_header_timeout(60),
-    client_header_buffer_size(1 * 1024),
-    keepalive_requests(1000),
-    keepalive_time(1 * 60 * 60)
+    send_lowat(-1),
+    sendfile_max_chunk(-1),
+    client_max_body_size(-1),
+    client_body_timeout(-1),
+    client_header_timeout(-1),
+    client_header_buffer_size(-1),
+    keepalive_requests(-1),
+    keepalive_time(-1)
 {
-    linger.l_onoff = 1;
-    linger.l_linger = 5;
-    index.push_back("index.html");
+    linger.l_onoff = -1;
+    linger.l_linger = -1;
 }
 
 BlockMain_s::BlockMain_s(): http() { }
@@ -124,17 +119,17 @@ BlockHttp_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx
         else if (directive == "root")
             http.root = Simple::ParseStringType(tokens, idx, error_msg, directive);
         else if (directive == "client_max_body_size")
-            http.client_max_body_size = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            http.client_max_body_size = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "client_body_timeout")
-            http.client_body_timeout = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            http.client_body_timeout = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "client_header_timeout")
-            http.client_header_timeout = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            http.client_header_timeout = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "client_header_buffer_size")
-            http.client_header_buffer_size = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            http.client_header_buffer_size = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "keepalive_requests")
-            http.keepalive_requests = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            http.keepalive_requests = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "keepalive_time")
-            http.keepalive_time = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            http.keepalive_time = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "index")
             http.index = Simple::ParseStringVectorType(tokens, idx, error_msg, directive);
         else if (directive == "error_page")
@@ -148,13 +143,13 @@ BlockHttp_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx
         else if (directive == "absolute_redirect")
             http.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_close")
-            http.linger.l_onoff = static_cast<int>(Simple::ParseBoolType(tokens, idx, error_msg, directive));
+            http.linger.l_onoff = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_timeout")
-            http.linger.l_linger = static_cast<int>(Simple::ParseSizeType(tokens, idx, error_msg, directive, true));
+            http.linger.l_linger = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "send_lowat")
-            http.send_lowat = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            http.send_lowat = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "sendfile_max_chunk")
-            http.sendfile_max_chunk = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            http.sendfile_max_chunk = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "server_name_in_redirect")
             http.server_name_in_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "tcp_nodelay")
@@ -198,17 +193,17 @@ BlockServer_t Block::ParseServer(const std::vector<std::string> &tokens, size_t 
         else if (directive == "root")
             server.root = Simple::ParseStringType(tokens, idx, error_msg, directive);
         else if (directive == "client_max_body_size")
-            server.client_max_body_size = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            server.client_max_body_size = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "client_body_timeout")
-            server.client_body_timeout = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            server.client_body_timeout = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "client_header_timeout")
-            server.client_header_timeout = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            server.client_header_timeout = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "client_header_buffer_size")
-            server.client_header_buffer_size = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            server.client_header_buffer_size = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "keepalive_requests")
-            server.keepalive_requests = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            server.keepalive_requests = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "keepalive_time")
-            server.keepalive_time = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            server.keepalive_time = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "index")
             server.index = Simple::ParseStringVectorType(tokens, idx, error_msg, directive);
         else if (directive == "error_page")
@@ -222,13 +217,13 @@ BlockServer_t Block::ParseServer(const std::vector<std::string> &tokens, size_t 
         else if (directive == "absolute_redirect")
             server.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_close")
-            server.linger.l_onoff = static_cast<int>(Simple::ParseBoolType(tokens, idx, error_msg, directive));
+            server.linger.l_onoff = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_timeout")
-            server.linger.l_linger = static_cast<int>(Simple::ParseSizeType(tokens, idx, error_msg, directive, true));
+            server.linger.l_linger = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "send_lowat")
-            server.send_lowat = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            server.send_lowat = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "sendfile_max_chunk")
-            server.sendfile_max_chunk = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            server.sendfile_max_chunk = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "server_name_in_redirect")
             server.server_name_in_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "tcp_nodelay")
@@ -279,13 +274,13 @@ BlockLocation_t Block::ParseLocation(const std::vector<std::string> &tokens, siz
         else if (directive == "root")
             location.root = Simple::ParseStringType(tokens, idx, error_msg, directive);
         else if (directive == "client_max_body_size")
-            location.client_max_body_size = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            location.client_max_body_size = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "client_body_timeout")
-            location.client_body_timeout = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            location.client_body_timeout = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "keepalive_requests")
-            location.keepalive_requests = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            location.keepalive_requests = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "keepalive_time")
-            location.keepalive_time = Simple::ParseSizeType(tokens, idx, error_msg, directive, true);
+            location.keepalive_time = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "index")
             location.index = Simple::ParseStringVectorType(tokens, idx, error_msg, directive);
         else if (directive == "error_page")
@@ -301,13 +296,13 @@ BlockLocation_t Block::ParseLocation(const std::vector<std::string> &tokens, siz
         else if (directive == "absolute_redirect")
             location.absolute_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_close")
-            location.linger.l_onoff = static_cast<int>(Simple::ParseBoolType(tokens, idx, error_msg, directive));
+            location.linger.l_onoff = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "lingering_timeout")
-            location.linger.l_linger = static_cast<int>(Simple::ParseSizeType(tokens, idx, error_msg, directive, true));
+            location.linger.l_linger = Simple::ParseIntType(tokens, idx, error_msg, directive, true);
         else if (directive == "send_lowat")
-            location.send_lowat = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            location.send_lowat = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "sendfile_max_chunk")
-            location.sendfile_max_chunk = Simple::ParseSizeType(tokens, idx, error_msg, directive, false);
+            location.sendfile_max_chunk = Simple::ParseIntType(tokens, idx, error_msg, directive, false);
         else if (directive == "server_name_in_redirect")
             location.server_name_in_redirect = Simple::ParseBoolType(tokens, idx, error_msg, directive);
         else if (directive == "tcp_nodelay")

@@ -200,11 +200,16 @@ int main(int argc, const char *argv[])
         std::cerr << "Error: " << config.ErrorMsg() << '\n';
         return EXIT_SUCCESS;
     }
+    
     const BlockHttp_t http = config.GetHttp();
     print_http(http);
 
-    const BlockServer_t server = config.GetServer("localhos:8080");
+    const BlockServer_t server = config.GetServer("localhost:8080");
     print_server(server);
+
+    const std::string url = "/kapouet/pouic/toto/pouet";
+    const std::string path = config.GetPath(url);
+    std::cout << "url: " << url << " path: " << path << '\n';
 
     return EXIT_SUCCESS;
 }

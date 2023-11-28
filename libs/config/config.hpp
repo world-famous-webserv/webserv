@@ -6,7 +6,7 @@
 #include <fstream> /* std::ifstream */
 #include <vector>  /* std::vector */
 #include "block.hpp" /* Block */
-#include "utils.hpp" /* res_t */
+#include "utils.hpp"
 
 class Config
 {
@@ -23,6 +23,9 @@ class Config
         BlockServer_t GetServer(const std::string &host) const;
 
         std::vector<BlockServer_t> GetServers() const { return main_.http.servers; }
+
+        std::string GetPath(const std::string &url) const;
+        BlockLocation_t GetLocation(const std::string &path) const;
 
     private:
         Config();

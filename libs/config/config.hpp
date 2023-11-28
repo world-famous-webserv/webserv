@@ -24,8 +24,9 @@ class Config
 
         std::vector<BlockServer_t> GetServers() const { return main_.http.servers; }
 
+        std::string GetUrl(const std::string &str) const;
         std::string GetPath(const std::string &url) const;
-        BlockLocation_t GetLocation(const std::string &path) const;
+        BlockLocation_t GetLocation(const std::string &url) const;
 
     private:
         Config();
@@ -33,6 +34,7 @@ class Config
 
         std::string error_msg_;
         BlockMain_t main_;
+
 };
 
 #endif /* LIBS_CONFIG_CONFIG_HPP_ */

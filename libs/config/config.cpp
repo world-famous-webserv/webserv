@@ -1,7 +1,8 @@
 #include "config.hpp"
 
 Config::~Config() { }
-Config::Config(const std::string &file): error_msg_("")
+Config::Config(const std::string &file):
+    error_msg_("")
 {
     Parse(file);
 }
@@ -94,12 +95,10 @@ BlockServer_t Config::GetServer(const std::string &host) const
     return servers.front();
 }
 
-std::string Config::GetPath(const std::string &url) const
+std::string Config::GetUrl(const std::string &str) const
 {
-    // remove ..
-
     std::vector<std::string> parts;
-    std::istringstream iss(url);
+    std::istringstream iss(str);
     for (std::string part; std::getline(iss, part, '/');) {
 		if (part == "" || part == ".")
             continue;
@@ -113,15 +112,20 @@ std::string Config::GetPath(const std::string &url) const
 	}
     if (parts.empty())
         return "";
-    std::string str;
+    std::string url;
     for (std::vector<std::string>::const_iterator i = parts.begin(), end = parts.end(); i != end; ++i)
-        str += "/" + *i;
-    BlockLocation_t location = GetLocation(str);
-    const std::string path = location.root + str.substr(location.name.length() - (location.name[0] == '/'));
+        url += "/" + *i;
+    return url;
+}
+
+std::string Config::GetPath(const std::string &url) const
+{
+    const BlockLocation_t &location = GetLocation(url);
+    std::string path = location.root + url.substr(location.name.length() - (location.name[0] == '/'));
     return path;
 }
 
-BlockLocation_t Config::GetLocation(const std::string &path) const
+BlockLocation_t Config::GetLocation(const std::string &url) const
 {
     BlockLocation_t *ret = NULL;
     size_t max_location_name_length = 0;
@@ -132,7 +136,7 @@ BlockLocation_t Config::GetLocation(const std::string &path) const
         std::vector<BlockLocation_t> &locations = server.locations;
         for (size_t j = 0, end = locations.size(); j != end; ++j) {
             BlockLocation_t &location = locations[j];
-            if (path.length() > max_location_name_length && path.length() >= location.name.length() && path.compare(0, location.name.length(), location.name) == 0) {
+            if (url.length() > max_location_name_length && url.length() >= location.name.length() && url.compare(0, location.name.length(), location.name) == 0) {
                 max_location_name_length = location.name.length();
                 ret = &location;
             }

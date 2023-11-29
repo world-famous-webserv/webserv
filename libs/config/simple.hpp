@@ -9,16 +9,16 @@
 typedef struct listen_s {
     std::string address;
     std::string port;
-    bool default_server;
-    bool ssl;
-    bool http2;
-    bool quic;
-    bool proxy_protocol;
-    bool deferred;
-    bool bind;
-    bool ipv6only;
-    bool reuseport;
-    bool so_keepalive;
+    int default_server;
+    int ssl;
+    int http2;
+    int quic;
+    int proxy_protocol;
+    int deferred;
+    int bind;
+    int ipv6only;
+    int reuseport;
+    int so_keepalive;
     int keepidle;
     int keepintvl;
     int keepcnt;
@@ -90,7 +90,7 @@ typedef struct default_s {
 class Simple
 {
     public:
-        static bool ParseBool(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
+        static int ParseBool(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
         static std::string ParseString(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
         static std::vector<std::string> ParseStringVector(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
         static int ParseInt(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive, const bool is_time);

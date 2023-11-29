@@ -27,7 +27,7 @@ Multiplex::Multiplex(void)
 	handler_ = kqueue();
 #endif
 	if (handler_ == -1)
-		throw std::runtime_error(strerror(errno));
+		std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 }
 
 Multiplex::Multiplex(const Multiplex& obj)
@@ -83,13 +83,13 @@ void Multiplex::AddItem(IOEvent* event)
 	changes.events = EPOLLIN | EPOLLOUT;
 	changes.data.ptr = event;
 	if (epoll_ctl(handler_, EPOLL_CTL_ADD, event->identifier(), &changes) == -1)
-		throw std::runtime_error(strerror(errno));
+		std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 #else
 	struct kevent changes[2];
 	EV_SET(&changes[0], event->identifier(), EVFILT_READ, EV_ADD, 0, 0, event);
 	EV_SET(&changes[1], event->identifier(), EVFILT_WRITE, EV_ADD, 0, 0, event);
     if (kevent(handler_, changes, 2, NULL, 0, NULL) == -1)
-		throw std::runtime_error(strerror(errno));
+		std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 #endif
 	ios_[event->identifier()] = event;
 }
@@ -105,7 +105,7 @@ void Multiplex::Loop(void)
 		struct epoll_event eventlist[kMaxEvent];
 		int nevents = epoll_wait(handler_, eventlist, kMaxEvent, -1);
 		if (nevents == - 1)
-			throw std::runtime_error(strerror(errno));
+			std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 		for (int i = 0; i < nevents; i++)
 		{
 			IOEvent *event = static_cast<IOEvent*>(eventlist[i].data.ptr);
@@ -122,7 +122,7 @@ void Multiplex::Loop(void)
 		struct kevent eventlist[kMaxEvent];
 		int nevents = kevent(handler_, NULL, 0, eventlist, kMaxEvent, NULL);
 		if (nevents == - 1)
-			throw std::runtime_error(strerror(errno));
+			std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 		for (int i = 0; i < nevents; i++)
 		{
 			IOEvent *event = static_cast<IOEvent*>(eventlist[i].udata);

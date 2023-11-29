@@ -98,15 +98,15 @@ fastcgi_pass_s::fastcgi_pass_s():
 {
 }
 
-bool Simple::ParseBool(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
+int Simple::ParseBool(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive)
 {
-    bool res = false;
+    int res = -1;
     if (idx == tokens.size()) {
         error_msg =  directive + ": Missing argument";
         return res;
     }
-    if (tokens[idx] == "on")       res = true;
-    else if (tokens[idx] == "off") res = false;
+    if (tokens[idx] == "on")       res = 1;
+    else if (tokens[idx] == "off") res = 0;
     else {
         error_msg = directive + ": Invalid argument [ " + tokens[idx] + " ]";
         return res;

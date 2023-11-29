@@ -1,5 +1,5 @@
-#ifndef LIBS_HTTP_HTTP_RESPONSE_HPP_
-# define LIBS_HTTP_HTTP_RESPONSE_HPP_
+#ifndef SRC_HTTP_HTTP_RESPONSE_HPP_
+# define SRC_HTTP_HTTP_RESPONSE_HPP_
 # include <map>
 # include <sstream>
 # include "http_code.hpp"
@@ -36,4 +36,4 @@ class HttpResponse
 	std::stringstream body_;
 };
 
-#endif /* LIBS_HTTP_HTTP_RESPONSE_HPP_ */
+#endif /* SRC_HTTP_HTTP_RESPONSE_HPP_ */

@@ -1,5 +1,5 @@
-#ifndef CLIENT_HPP_
-# define CLIENT_HPP_
+#ifndef SRC_CLIENT_HPP_
+# define SRC_CLIENT_HPP_
 # include <stdio.h>
 # include <stdlib.h>
 # include <arpa/inet.h>
@@ -7,7 +7,7 @@
 # include <netinet/tcp.h>
 # include "io_event.hpp"
 
-# include "http.hpp"
+# include "http/http.hpp"
 # include "config.hpp"
 
 class Client : public IOEvent
@@ -35,4 +35,4 @@ class Client : public IOEvent
 	listen_t listen_;
 };
 
-# endif /* CLIENT_HPP_ */
+# endif /* SRC_CLIENT_HPP_ */

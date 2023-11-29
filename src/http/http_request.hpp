@@ -1,5 +1,5 @@
-#ifndef LIBS_HTTP_HTTP_REQUEST_HPP_
-# define LIBS_HTTP_HTTP_REQUEST_HPP_
+#ifndef SRC_HTTP_HTTP_REQUEST_HPP_
+# define SRC_HTTP_HTTP_REQUEST_HPP_
 # include <map>
 # include <sstream>
 # include <cstdlib>
@@ -38,4 +38,4 @@ class HttpRequest
 	std::stringstream body_;
 };
 
-#endif /* LIBS_HTTP_HTTP_REQUEST_HPP_ */
+#endif /* SRC_HTTP_HTTP_REQUEST_HPP_ */

@@ -1,5 +1,5 @@
-#ifndef LIBS_HTTP_HTTP_CODE_HPP_
-# define LIBS_HTTP_HTTP_CODE_HPP_
+#ifndef SRC_HTTP_HTTP_CODE_HPP_
+# define SRC_HTTP_HTTP_CODE_HPP_
 
 enum HttpState{
 	kRequestParse,
@@ -85,5 +85,5 @@ enum HttpStatus {
 	kNetworkConnectTimeoutError = 599
 };
 
-#endif /* LIBS_HTTP_HTTP_CODE_HPP_ */
+#endif /* SRC_HTTP_HTTP_CODE_HPP_ */
 

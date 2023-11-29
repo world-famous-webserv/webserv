@@ -1,5 +1,5 @@
-#ifndef LIBS_INDEX_HPP
-# define LIBS_INDEX_HPP
+#ifndef SRC_HTTP_METHOD_INDEX_HPP
+# define SRC_HTTP_METHOD_INDEX_HPP
 
 # include <string>
 # include <dirent.h>
@@ -53,4 +53,4 @@ void	autoindex()
 	std::string	path = "index/";
 }
 
-#endif /* LIBS_INDEX_HPP */
+#endif /* SRC_HTTP_METHOD_INDEX_HPP */

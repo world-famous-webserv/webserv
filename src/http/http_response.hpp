@@ -1,5 +1,5 @@
-#ifndef LIBS_HTTP_HTTP_RESPONSE_HPP_
-# define LIBS_HTTP_HTTP_RESPONSE_HPP_
+#ifndef SRC_HTTP_HTTP_RESPONSE_HPP_
+# define SRC_HTTP_HTTP_RESPONSE_HPP_
 # include <map>
 # include <sstream>
 # include "http_code.hpp"
@@ -16,6 +16,7 @@ class HttpResponse
 	enum HttpStatus status(void) const;
 	std::string message(enum HttpStatus status) const;
 	std::string header(const std::string& key) const;
+	std::map<std::string, std::string>& headers(void);
 	std::stringstream& body(void);
 
 	void set_done(bool done);
@@ -35,4 +36,4 @@ class HttpResponse
 	std::stringstream body_;
 };
 
-#endif /* LIBS_HTTP_HTTP_RESPONSE_HPP_ */
+#endif /* SRC_HTTP_HTTP_RESPONSE_HPP_ */

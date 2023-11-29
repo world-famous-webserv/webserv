@@ -133,12 +133,21 @@ std::string HttpResponse::message(enum HttpStatus status) const
 
 std::string HttpResponse::header(const std::string& key) const
 {
-	std::map<std::string, std::string>::const_iterator it = headers_.find(key);
+	std::string lower(key);
+	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+	std::map<std::string, std::string>::const_iterator it = headers_.find(lower);
 	return it != headers_.end()? it->second : "";
+}
+
+std::map<std::string, std::string>& HttpResponse::headers(void)
+{
+	return headers_;
 }
 
 void HttpResponse::add_header(const std::string key, const std::string val)
 {
+	std::string lower(key);
+	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
 	headers_[key] = val;
 }
 
@@ -158,6 +167,7 @@ void HttpResponse::Clear(void)
 	version_.clear();
 	headers_.clear();
 	body_.clear();
+	body_.str("");
 }
 
 #include <iostream>

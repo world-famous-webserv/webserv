@@ -1,5 +1,5 @@
-#ifndef LIBS_HTTP_HTTP_HPP_
-# define LIBS_HTTP_HTTP_HPP_
+#ifndef SRC_HTTP_HTTP_HPP_
+# define SRC_HTTP_HTTP_HPP_
 # include "http_request.hpp"
 # include "http_response.hpp"
 
@@ -20,4 +20,4 @@ class Http
 	HttpResponse response_;
 };
 
-#endif /* LIBS_HTTP_HTTP_HPP_ */
+#endif /* SRC_HTTP_HTTP_HPP_ */

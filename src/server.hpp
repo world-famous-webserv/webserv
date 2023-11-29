@@ -1,5 +1,5 @@
-#ifndef SERVER_HPP_
-# define SERVER_HPP_
+#ifndef SRC_SERVER_HPP_
+# define SRC_SERVER_HPP_
 # include <stdio.h>
 # include <stdlib.h>
 # include <arpa/inet.h>
@@ -33,4 +33,4 @@ class Server : public IOEvent
 	listen_t listen_;
 };
 
-# endif /* SERVER_HPP_ */
+# endif /* SRC_SERVER_HPP_ */

@@ -1,5 +1,5 @@
-#ifndef LIBS_DELETE_HPP
-# define LIBS_DELETE_HPP
+#ifndef SRC_HTTP_METHOD_DELETE_HPP
+# define SRC_HTTP_METHOD_DELETE_HPP
 # include <errno>
 # include <cstdio>
 # include <string>
@@ -16,4 +16,4 @@ public:
 	static void	run();
 };
 
-#endif /* LIBS_DELETE_HPP */
+#endif /* SRC_HTTP_METHOD_DELETE_HPP */

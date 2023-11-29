@@ -54,13 +54,22 @@ void HttpRequest::set_version(const std::string version)
 
 std::string HttpRequest::header(const std::string& key) const
 {
-	std::map<std::string, std::string>::const_iterator it = headers_.find(key);
+	std::string lower(key);
+	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+	std::map<std::string, std::string>::const_iterator it = headers_.find(lower);
 	return it != headers_.end()? it->second : "";
+}
+
+std::map<std::string, std::string>& HttpRequest::headers(void)
+{
+	return headers_;
 }
 
 void HttpRequest::add_header(const std::string key, const std::string val)
 {
-	headers_[key] = val;
+	std::string lower(key);
+	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+	headers_[lower] = val;
 }
 
 std::stringstream& HttpRequest::body(void)
@@ -106,7 +115,7 @@ HttpRequest& HttpRequest::operator<<(std::stringstream& req)
 		std::string key, val;
 		std::getline(header, key, ':');
 		std::getline(header, val, '\r');
-		headers_[key] = val;
+		this->add_header(key, val);
 	}
 
 	// body

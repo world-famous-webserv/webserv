@@ -5,11 +5,13 @@ NAME	= webserv
 LIBS	= \
 	$(TOPDIR)/libs/multiplex/libmultiplex.a \
 	$(TOPDIR)/libs/config/libconfig.a \
-	$(TOPDIR)/libs/http/libhttp.a \
 
 SRCS	= \
 	server.cpp \
 	client.cpp \
+	http/http.cpp \
+	http/http_request.cpp \
+	http/http_response.cpp \
 	main.cpp
 
 # **************************************************************************** #

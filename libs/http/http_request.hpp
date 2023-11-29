@@ -16,6 +16,7 @@ class HttpRequest
 	std::string uri(void) const;
 	std::string version(void) const;
 	std::string header(const std::string& key) const;
+	std::map<std::string, std::string>& headers(void);
 	std::stringstream& body(void);
 
 	void set_method(const std::string method);

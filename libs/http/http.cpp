@@ -29,9 +29,8 @@ void Http::Execute(void)
 	std::cout << "Req uri: " << request_.uri() << std::endl;
 	std::cout << "Req version: " << request_.version() << std::endl;
 	std::cout << std::endl;
-	std::cout << "Req Host: " << request_.header("Host") << std::endl;
-	std::cout << "Req Accept: " << request_.header("Accept") << std::endl;
-	std::cout << "Req User-Agent: " << request_.header("User-Agent") << std::endl;
+	for (std::map<std::string, std::string>::iterator it = request_.headers().begin(); it != request_.headers().end(); ++it)
+		std::cout << "Req " << it->first << ": " << it->second << std::endl;
 	std::cout << "######################################" << std::endl;
 #endif
 
@@ -40,7 +39,6 @@ void Http::Execute(void)
 	response_.set_status(kNotFound);
 	response_.set_version(request_.version());
 	response_.add_header("Content-Type", "text/plain");
-	response_.add_header("Content-Length", "0");
 	response_.set_done(true);
 
 #if 1 // response debug
@@ -49,8 +47,8 @@ void Http::Execute(void)
 	std::cout << "Res status: " << response_.status() << std::endl;
 	std::cout << "Res message: " << response_.message(response_.status()) << std::endl;
 	std::cout << std::endl;
-	std::cout << "Res Content-Type: " << response_.header("Content-Type") << std::endl;
-	std::cout << "Res Content-Length: " << response_.header("Content-Length") << std::endl;
+	for (std::map<std::string, std::string>::iterator it = request_.headers().begin(); it != request_.headers().end(); ++it)
+		std::cout << "Res " << it->first << ": " << it->second << std::endl;
 	std::cout << "######################################" << std::endl;
 #endif
 }

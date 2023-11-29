@@ -16,6 +16,7 @@ class HttpResponse
 	enum HttpStatus status(void) const;
 	std::string message(enum HttpStatus status) const;
 	std::string header(const std::string& key) const;
+	std::map<std::string, std::string>& headers(void);
 	std::stringstream& body(void);
 
 	void set_done(bool done);

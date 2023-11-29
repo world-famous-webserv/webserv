@@ -26,6 +26,10 @@ class Client : public IOEvent
 	Client& operator=(const Client &obj);
 
 	void SetSocket(int fd);
+	
+	std::string GetUrl(const std::string &str) const;
+	std::string GetPath(const std::string &url) const;
+	const BlockLocation_t &GetLocation(const std::string &url) const;
 
 	std::stringstream in_;
 	std::stringstream out_;

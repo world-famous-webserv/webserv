@@ -127,3 +127,50 @@ void Client::Update(void)
 		return ;
 	http_.Do(in_, out_);
 }
+
+std::string Client::GetUrl(const std::string &str) const
+{
+    std::vector<std::string> parts;
+    std::istringstream iss(str);
+    for (std::string part; std::getline(iss, part, '/');) {
+		if (part == "" || part == ".")
+            continue;
+		if (part == "..") {
+			if (parts.empty())
+				return "";
+			parts.pop_back();
+		}
+        else
+			parts.push_back(part);
+	}
+    if (parts.empty())
+        return "";
+    std::ostringstream oss;
+    for (std::vector<std::string>::const_iterator i = parts.begin(), end = parts.end(); i != end; ++i)
+        oss << "/" << *i;
+    return oss.str();
+}
+
+std::string Client::GetPath(const std::string &url) const
+{
+    const BlockLocation_t &location = GetLocation(url);
+    const std::string path = location.root + url.substr(location.name.length() - (location.name[0] == '/'));
+    return path;
+}
+
+const BlockLocation_t &Client::GetLocation(const std::string &url) const
+{
+    const BlockLocation_t *ret = NULL;
+    size_t max_location_name_length = 0;
+
+	const std::vector<BlockLocation_t> &locations = server_.locations;
+	for (size_t j = 0, end = locations.size(); j != end; ++j) {
+		const BlockLocation_t &location = locations[j];
+		if (url.length() > max_location_name_length && url.length() >= location.name.length() && url.compare(0, location.name.length(), location.name) == 0) {
+			max_location_name_length = location.name.length();
+			ret = &location;
+		}
+	}
+	// 만약 ret == NULL, 즉 url과 매칭되는 location이 없다면?
+    return *ret;
+}

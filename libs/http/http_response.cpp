@@ -158,6 +158,7 @@ void HttpResponse::Clear(void)
 	version_.clear();
 	headers_.clear();
 	body_.clear();
+	body_.str("");
 }
 
 #include <iostream>

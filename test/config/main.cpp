@@ -207,12 +207,13 @@ int main(int argc, const char *argv[])
     const BlockServer_t server = config.GetServer("localhost:8080");
     print_server(server);
 
-    const std::string url = "/kapouet/pouic/toto/pouet";
-    const std::string path = config.GetPath(url);
-    std::cout << "url: " << url << " path: " << path << '\n';
+    // client로 이동
+    // const std::string url = "/kapouet/pouic/toto/pouet";
+    // const std::string path = config.GetPath(url);
+    // std::cout << "url: " << url << " path: " << path << '\n';
 
-    const BlockLocation_t location = config.GetLocation(url);
-    print_location(location);
+    // const BlockLocation_t location = config.GetLocation(url);
+    // print_location(location);
 
     return EXIT_SUCCESS;
 }

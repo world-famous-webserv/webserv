@@ -5,6 +5,7 @@
 #include <sstream> /* std::stringstream */
 #include <fstream> /* std::ifstream */
 #include <vector>  /* std::vector */
+#include <set>     /* std::set */
 #include "block.hpp" /* Block */
 #include "utils.hpp"
 
@@ -31,6 +32,7 @@ class Config
     private:
         Config();
         void Parse(const std::string &file);
+        void CheckDuplicatedPort();
 
         std::string error_msg_;
         BlockMain_t main_;

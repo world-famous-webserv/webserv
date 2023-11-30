@@ -8,12 +8,12 @@
 # include "io_event.hpp"
 
 # include "http/http.hpp"
-# include "config.hpp"
+# include "conf.hpp"
 
 class Client : public IOEvent
 {
  public:
-	Client(const int fd, const server_t &server);
+	Client(const int fd, const Conf &conf);
 	virtual ~Client(void);
 
 	void Open(void);
@@ -26,17 +26,12 @@ class Client : public IOEvent
 	Client& operator=(const Client &obj);
 
 	void SetSocket(int fd);
-	
-	std::string GetUrl(const std::string &str) const;
-	std::string GetPath(const std::string &url) const;
-	const BlockLocation_t &GetLocation(const std::string &url) const;
 
 	std::stringstream in_;
 	std::stringstream out_;
 
 	Http http_;
-	BlockServer_t *server_;
-	listen_t *listen_;
+	Conf conf_;
 };
 
 # endif /* SRC_CLIENT_HPP_ */

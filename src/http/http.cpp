@@ -17,7 +17,7 @@ Http::Http(void)
 /* ************************************************************************** */
 
 #include <iostream>
-void Http::Execute(void)
+void Http::Execute(const Conf &conf)
 {
 	// TODO: check URI alias
 
@@ -33,6 +33,13 @@ void Http::Execute(void)
 		std::cout << "Req " << it->first << ": " << it->second << std::endl;
 	std::cout << "######################################" << std::endl;
 #endif
+
+	const std::string url = conf.GetUrl(request_.uri());
+	const int location_idx = conf.GetLocationIdx(url);
+	if (location_idx != -1) {
+		location_t location = conf.GetLocation(location_idx);
+		location.print();
+	}
 
 	// temp output
 	response_.Clear();
@@ -53,12 +60,12 @@ void Http::Execute(void)
 #endif
 }
 
-void Http::Do(std::stringstream& in, std::stringstream& out)
+void Http::Do(std::stringstream& in, std::stringstream& out, const Conf &conf)
 {
 	if (response_.done())
 	{
 		response_ >> out;
-std::cout << "Done!" << std::endl;
+		std::cout << "Done!" << std::endl;
 		request_.Clear();
 		response_.Clear();
 		return ;
@@ -67,6 +74,6 @@ std::cout << "Done!" << std::endl;
 	{
 		request_ << in;
 		if (request_.done())
-			this->Execute();
+			this->Execute(conf);
 	}
 }

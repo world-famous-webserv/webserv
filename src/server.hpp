@@ -8,13 +8,12 @@
 # include "io_event.hpp"
 
 # include "client.hpp"
-# include "config.hpp"
-
+# include "conf.hpp"
 
 class Server : public IOEvent
 {
  public:
-	Server(const server_t &server);
+	Server(const Conf &conf);
 	virtual ~Server(void);
 
 	void Open(void);
@@ -30,8 +29,7 @@ class Server : public IOEvent
 	int	GetAddrInfo(struct addrinfo **info);
 	int CreatSocket(struct addrinfo *info);
 
-	BlockServer_t *server_;
-	listen_t *listen_;
+	Conf conf_;
 };
 
 # endif /* SRC_SERVER_HPP_ */

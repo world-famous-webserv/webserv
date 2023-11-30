@@ -11,7 +11,7 @@ void print_return(const return_t &ret)
     std::cout << '\n';
 }
 
-void print_http(const BlockHttp_t &http)
+void print_http(const http_t &http)
 {
     std::cout << "http" << '\n';
     std::cout << "sendfile: " << http.sendfile << '\n';
@@ -78,7 +78,7 @@ void print_listen(const listen_t &listen) {
     std::cout << "unixpath: " << listen.unixpath << '\n';
 }
 
-void print_server(const BlockServer_t &server) {
+void print_server(const server_t &server) {
     std::cout << "server" << '\n';
     std::cout << "sendfile: " << server.sendfile << '\n';
     std::cout << "autoindex: " << server.autoindex << '\n';
@@ -130,57 +130,6 @@ void print_server(const BlockServer_t &server) {
     print_return(server.ret);
 }
 
-void print_location(const BlockLocation_t &location) {
-    std::cout << "location" << '\n';
-    std::cout << "name: " << location.name << '\n';
-    std::cout << "sendfile: " << location.sendfile << '\n';
-    std::cout << "autoindex: " << location.autoindex << '\n';
-    std::cout << "absolute_redirect: " << location.absolute_redirect << '\n';
-    std::cout << "server_name_in_redirect: " << location.server_name_in_redirect << '\n';
-    std::cout << "tcp_nodelay: " << location.tcp_nodelay << '\n';
-    std::cout << "tcp_nopush: " << location.tcp_nopush << '\n';
-    std::cout << "default_type: " << location.default_type << '\n';
-    std::cout << "root: " << location.root << '\n';
-    for (size_t i = 0; i < location.allows.size(); ++i)
-        std::cout << "allow: " << location.allows[i] << '\n';
-    for (size_t i = 0; i < location.denys.size(); ++i)
-        std::cout << "deny: " << location.denys[i] << '\n';
-    std::cout << "lingering_close: " << location.linger.l_onoff << '\n';
-    std::cout << "lingering_timeout: " << location.linger.l_linger << '\n';
-    std::cout << "send_lowat: " << location.send_lowat << '\n';
-    std::cout << "sendfile_max_chunk: " << location.sendfile_max_chunk << '\n';
-    std::cout << "client_max_body_size: " << location.client_max_body_size << '\n';
-    std::cout << "client_body_timeout: " << location.client_body_timeout << '\n';
-    std::cout << "keepalive_requests: " << location.keepalive_requests << '\n';
-    std::cout << "keepalive_time: " << location.keepalive_time << '\n';
-    std::cout << "keepalive_timeout.timeout: " << location.keepalive_timeout.timeout << '\n';
-    std::cout << "keepalive_timeout.header_timeout: " << location.keepalive_timeout.header_timeout << '\n';
-    std::cout << "index:";
-    for (size_t i = 0; i < location.index.size(); i++)
-        std::cout << " " << location.index[i];
-    std::cout << '\n' << '\n';
-    std::cout << "error_page:" << '\n';
-    for (std::map<int, std::string>::const_iterator it = location.error_page.begin(); it != location.error_page.end(); ++it)
-        std::cout << it->first << " = " << it->second << '\n';
-    std::cout << '\n';
-    std::cout << "fastcgi_param:" << '\n';
-    for (std::map<std::string, std::string>::const_iterator it = location.fastcgi_param.begin(); it != location.fastcgi_param.end(); ++it)
-        std::cout << it->first << " = " << it->second << '\n';
-    std::cout << "try_files:" << '\n';
-    std::cout << "    uri: " << location.try_files.uri << '\n';
-    std::cout << "    code: " << location.try_files.code << '\n';
-    std::cout << "    files:";
-    for (size_t i = 0; i < location.try_files.files.size(); i++)
-        std::cout << " " << location.try_files.files[i];
-    std::cout << '\n';
-    std::cout << "fastcgi_pass:" << '\n';
-    std::cout << "    address: " << location.fastcgi_pass.address << '\n';
-    std::cout << "    port: " << location.fastcgi_pass.port << '\n';
-    std::cout << "    unix: " << location.fastcgi_pass.unix << '\n';
-    std::cout << "\n";
-    print_return(location.ret);
-}
-
 int main(int argc, const char *argv[])
 {
     if (argc > 2) {
@@ -201,19 +150,11 @@ int main(int argc, const char *argv[])
         return EXIT_SUCCESS;
     }
     
-    const BlockHttp_t http = config.GetHttp();
+    const http_t http = config.GetHttp();
     print_http(http);
 
-    const BlockServer_t server = config.GetServer("localhost:8080");
+    const server_t server = config.GetServer("localhost:8080");
     print_server(server);
-
-    // client로 이동
-    // const std::string url = "/kapouet/pouic/toto/pouet";
-    // const std::string path = config.GetPath(url);
-    // std::cout << "url: " << url << " path: " << path << '\n';
-
-    // const BlockLocation_t location = config.GetLocation(url);
-    // print_location(location);
 
     return EXIT_SUCCESS;
 }

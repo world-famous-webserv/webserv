@@ -21,10 +21,9 @@ int main(int argc, char **argv)
 	std::vector<BlockServer_t> servers = config.GetServers();
 
 	for (size_t i = 0; i < servers.size(); ++i) {
-		const BlockServer_t &server = servers[i];
-		for (size_t j = 0; j < server.listens.size(); ++j) {
-			const listen_t &listen = server.listens[j];
-			Multiplex::GetInstance().AddItem(new Server(server, listen));
+		for (size_t j = 0; j < servers[i].listens.size(); ++j) {
+			server_t server = {&servers[i], &servers[i].listens[j]};
+			Multiplex::GetInstance().AddItem(new Server(server));
 		}
 	}
 	Multiplex::GetInstance().Loop();

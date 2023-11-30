@@ -8,9 +8,9 @@ Client::~Client(void)
 {
 }
 
-Client::Client(const int fd, const BlockServer_t &server, const listen_t &listen):
-	server_(server),
-	listen_(listen)
+Client::Client(const int fd, const server_t &server):
+	server_(server.server),
+	listen_(server.listen)
 {
 	identifier_ = fd;
 	this->Open();
@@ -24,7 +24,7 @@ void Client::SetSocket(int fd)
 {
 	int on = 1;
 
-	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &server_.linger, sizeof(linger)) == -1)
+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &server_->linger, sizeof(linger)) == -1)
 		std::cerr << "SetSocket::SO_LINGER" << strerror(errno) << std::endl;
 	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1)
 		std::cerr << "SetSocket::SO_REUSEADDR" << strerror(errno) << std::endl;
@@ -34,51 +34,51 @@ void Client::SetSocket(int fd)
 	// quic
 	// proxy_protocol
 #ifdef SO_SETFIB
-	if (listen_.setfib != -1
-		&& setsockopt(fd, SOL_SOCKET, SO_SETFIB, &listen_.setfib, sizeof(listen_.setfib)) == -1)
+	if (listen_->setfib != -1
+		&& setsockopt(fd, SOL_SOCKET, SO_SETFIB, &listen_->setfib, sizeof(listen_->setfib)) == -1)
 		std::cerr << "SetSocket::SO_SETFIB" << strerror(errno) << std::endl;
 #endif
-	if (listen_.fastopen != -1
-		&& setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN, &listen_.fastopen, sizeof(listen_.fastopen)) == -1)
+	if (listen_->fastopen != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN, &listen_->fastopen, sizeof(listen_->fastopen)) == -1)
 		std::cerr << "SetSocket::TCP_FASTOPEN" << strerror(errno) << std::endl;
-	if (listen_.rcvbuf != -1
-		&& setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &listen_.rcvbuf, sizeof(listen_.rcvbuf)) == -1)
+	if (listen_->rcvbuf != -1
+		&& setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &listen_->rcvbuf, sizeof(listen_->rcvbuf)) == -1)
 		std::cerr << "SetSocket::SO_RCVBUF" << strerror(errno) << std::endl;
-	if (listen_.sndbuf != -1
-		&& setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &listen_.sndbuf, sizeof(listen_.sndbuf)) == -1)
+	if (listen_->sndbuf != -1
+		&& setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &listen_->sndbuf, sizeof(listen_->sndbuf)) == -1)
 		std::cerr << "SetSocket::SO_SNDBUF" << strerror(errno) << std::endl;
 #ifdef SO_ACCEPTFILTER
-	if (listen_.accept_filter.length() > 0
-		&& setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, listen_.accept_filter.c_str(), listen_.accept_filter.length()) == -1)
+	if (listen_->accept_filter.length() > 0
+		&& setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, listen_->accept_filter.c_str(), listen_->accept_filter.length()) == -1)
 		std::cerr << "SetSocket::SO_ACCEPTFILTER" << strerror(errno) << std::endl;
 #endif
 #ifdef TCP_DEFER_ACCEPT
 	int timeout = 0;
-	if (listen_.deferred == true
+	if (listen_->deferred == true
 		&& setsockopt(fd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, sizeof(timeout)) == -1)
 		std::cerr << "SetSocket::TCP_DEFER_ACCEPT" << strerror(errno) << std::endl;
 #endif
-	if (listen_.ipv6only == true
-		&& setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &listen_.ipv6only, sizeof(listen_.ipv6only)) == -1)
+	if (listen_->ipv6only == true
+		&& setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &listen_->ipv6only, sizeof(listen_->ipv6only)) == -1)
 		std::cerr << "SetSocket::IPV6_V6ONLY" << strerror(errno) << std::endl;
-	if (listen_.reuseport == true
-		&& setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &listen_.reuseport, sizeof(listen_.reuseport)) == -1)
+	if (listen_->reuseport == true
+		&& setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &listen_->reuseport, sizeof(listen_->reuseport)) == -1)
 		std::cerr << "SetSocket::SO_REUSEPORT" << strerror(errno) << std::endl;
 #ifdef SO_KEEPALIVE
-	if (listen_.so_keepalive == true
-		&& setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &listen_.so_keepalive, sizeof(listen_.so_keepalive)) == -1)
+	if (listen_->so_keepalive == true
+		&& setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &listen_->so_keepalive, sizeof(listen_->so_keepalive)) == -1)
 		std::cerr << "SetSocket::SO_KEEPALIVE" << strerror(errno) << std::endl;
 #endif
 #ifdef TCP_KEEPIDLE
-	if (listen_.keepidle != -1
-		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &listen_.keepidle, sizeof(listen_.keepidle)) == -1)
+	if (listen_->keepidle != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &listen_->keepidle, sizeof(listen_->keepidle)) == -1)
 		std::cerr << "SetSocket::TCP_KEEPIDLE" << strerror(errno) << std::endl;
 #endif
-	if (listen_.keepintvl != -1
-		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &listen_.keepintvl, sizeof(listen_.keepintvl)) == -1)
+	if (listen_->keepintvl != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &listen_->keepintvl, sizeof(listen_->keepintvl)) == -1)
 		std::cerr << "SetSocket::TCP_KEEPINTVL" << strerror(errno) << std::endl;
-	if (listen_.keepcnt != -1
-		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &listen_.keepcnt, sizeof(listen_.keepcnt)) == -1)
+	if (listen_->keepcnt != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &listen_->keepcnt, sizeof(listen_->keepcnt)) == -1)
 		std::cerr << "SetSocket::TCP_KEEPCNT" << strerror(errno) << std::endl;
 }
 
@@ -163,7 +163,7 @@ const BlockLocation_t &Client::GetLocation(const std::string &url) const
     const BlockLocation_t *ret = NULL;
     size_t max_location_name_length = 0;
 
-	const std::vector<BlockLocation_t> &locations = server_.locations;
+	const std::vector<BlockLocation_t> &locations = server_->locations;
 	for (size_t j = 0, end = locations.size(); j != end; ++j) {
 		const BlockLocation_t &location = locations[j];
 		if (url.length() > max_location_name_length && url.length() >= location.name.length() && url.compare(0, location.name.length(), location.name) == 0) {

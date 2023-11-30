@@ -13,7 +13,7 @@
 class Client : public IOEvent
 {
  public:
-	Client(const int fd, const BlockServer_t &server, const listen_t &listen);
+	Client(const int fd, const server_t &server);
 	virtual ~Client(void);
 
 	void Open(void);
@@ -35,8 +35,8 @@ class Client : public IOEvent
 	std::stringstream out_;
 
 	Http http_;
-	BlockServer_t server_;
-	listen_t listen_;
+	BlockServer_t *server_;
+	listen_t *listen_;
 };
 
 # endif /* SRC_CLIENT_HPP_ */

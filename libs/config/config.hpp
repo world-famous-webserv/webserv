@@ -25,10 +25,6 @@ class Config
 
         std::vector<BlockServer_t> GetServers() const { return main_.http.servers; }
 
-        std::string GetUrl(const std::string &str) const;
-        std::string GetPath(const std::string &url) const;
-        BlockLocation_t GetLocation(const std::string &url) const;
-
     private:
         Config();
         void Parse(const std::string &file);
@@ -38,5 +34,10 @@ class Config
         BlockMain_t main_;
 
 };
+
+typedef struct server_s {
+	BlockServer_t *server;
+	listen_t *listen;
+} server_t;
 
 #endif /* LIBS_CONFIG_CONFIG_HPP_ */

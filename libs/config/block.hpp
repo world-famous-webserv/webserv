@@ -4,17 +4,10 @@
 # include <string>       /* std::string */
 # include <algorithm>    /* std::find */
 # include <sys/socket.h> /* struct linger */
-# include "simple.hpp"
-# include "utils.hpp"
 # include <iostream>
+# include "simple.hpp"
 
-struct BlockMain_s;
-struct BlockHttp_s;
-struct BlockServer_s;
-struct BlockLocation_s;
-struct BlockLimitExcept_s;
-
-typedef struct BlockHttp_s
+typedef struct http_s
 {
     bool sendfile;
     bool autoindex;
@@ -37,13 +30,13 @@ typedef struct BlockHttp_s
     int keepalive_time;
     keepalive_timeout_t keepalive_timeout;
     std::vector<std::string> index;
-    std::vector<struct BlockServer_s> servers;
+    std::vector<struct server_s> servers;
     std::map<int, std::string> error_page;
     std::map<std::string, std::string> fastcgi_param;
-    BlockHttp_s();
-} BlockHttp_t;
+    http_s();
+} http_t;
 
-typedef struct BlockServer_s
+typedef struct server_s
 {
     bool sendfile;
     bool autoindex;
@@ -68,15 +61,15 @@ typedef struct BlockServer_s
     std::vector<listen_t> listens;
     std::vector<std::string> index;
     std::vector<std::string> server_name;
-    std::vector<struct BlockLocation_s> locations;
+    std::vector<struct location_s> locations;
     std::map<int, std::string> error_page;
     std::map<std::string, std::string> fastcgi_param;
     try_files_t try_files;
     return_t ret;
-    explicit BlockServer_s(const BlockHttp_t &http);
-} BlockServer_t;
+    explicit server_s(const http_t &http);
+} server_t;
 
-typedef struct BlockLocation_s
+typedef struct location_s
 {
     std::string name;
     bool sendfile;
@@ -98,40 +91,41 @@ typedef struct BlockLocation_s
     int keepalive_time;
     keepalive_timeout_t keepalive_timeout;
     std::vector<std::string> index;
-    std::vector<struct BlockLocation_s> locations;
+    std::vector<struct location_s> locations;
     std::map<int, std::string> error_page;
-    std::map<std::string, struct BlockLimitExcept_s> limit_excepts;
+    std::map<std::string, struct limit_except_s> limit_excepts;
     std::map<std::string, std::string> fastcgi_param;
     fastcgi_pass_t fastcgi_pass;
     try_files_t try_files;
     return_t ret;
-    explicit BlockLocation_s(const BlockServer_t &server);
-} BlockLocation_t;
+    explicit location_s(const server_t &server);
+    void print();
+} location_t;
 
-typedef struct BlockLimitExcept_s
+typedef struct limit_except_s
 {
     std::vector<std::string> allows;
     std::vector<std::string> denys;
-    BlockLimitExcept_s();
-} BlockLimitExcept_t;
+    limit_except_s();
+} limit_except_t;
 
-typedef struct BlockMain_s
+typedef struct main_s
 {
-    struct BlockHttp_s http;
-    BlockMain_s();
-} BlockMain_t;
+    struct http_s http;
+    main_s();
+} main_t;
 
 class Block
 {
     public:
-        static BlockMain_t ParseMain(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
-        static BlockHttp_t ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
-        static BlockServer_t ParseServer(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
-            const BlockHttp_t &http);
-        static BlockLocation_t ParseLocation(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
-            const BlockServer_t &server);
+        static main_t ParseMain(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
+        static http_t ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
+        static server_t ParseServer(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
+            const http_t &http);
+        static location_t ParseLocation(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
+            const server_t &server);
         static void ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
-            std::map<std::string, struct BlockLimitExcept_s> limit_excepts);
+            std::map<std::string, struct limit_except_s> limit_excepts);
 
     private:
         ~Block();

@@ -10,9 +10,9 @@ Block &Block::operator=(const Block &obj)
     return *this;
 }
 
-BlockLimitExcept_s::BlockLimitExcept_s(): allows(), denys() { }
+limit_except_s::limit_except_s(): allows(), denys() { }
 
-BlockLocation_s::BlockLocation_s(const BlockServer_t &server):
+location_s::location_s(const server_t &server):
     name(""),
     sendfile(server.sendfile),
     autoindex(server.autoindex),
@@ -33,9 +33,9 @@ BlockLocation_s::BlockLocation_s(const BlockServer_t &server):
     keepalive_time(server.keepalive_time),
     keepalive_timeout(server.keepalive_timeout),
     index(server.index),
-    locations(std::vector<BlockLocation_t>()),
+    locations(std::vector<location_t>()),
     error_page(server.error_page),
-    limit_excepts(std::map<std::string, BlockLimitExcept_t>()),
+    limit_excepts(std::map<std::string, limit_except_t>()),
     fastcgi_param(server.fastcgi_param),
     fastcgi_pass(),
     try_files(server.try_files),
@@ -43,7 +43,7 @@ BlockLocation_s::BlockLocation_s(const BlockServer_t &server):
 {
 }
 
-BlockServer_s::BlockServer_s(const BlockHttp_t &http):
+server_s::server_s(const http_t &http):
     sendfile(http.sendfile),
     autoindex(http.autoindex),
     absolute_redirect(http.absolute_redirect),
@@ -67,7 +67,7 @@ BlockServer_s::BlockServer_s(const BlockHttp_t &http):
     listens(std::vector<listen_t>()),
     index(http.index),
     server_name(std::vector<std::string>()),
-    locations(std::vector<BlockLocation_t>()),
+    locations(std::vector<location_t>()),
     error_page(http.error_page),
     fastcgi_param(http.fastcgi_param),
     try_files(),
@@ -75,7 +75,7 @@ BlockServer_s::BlockServer_s(const BlockHttp_t &http):
 {
 }
 
-BlockHttp_s::BlockHttp_s():
+http_s::http_s():
     sendfile(Simple::Default.sendfile),
     autoindex(Simple::Default.autoindex),
     absolute_redirect(Simple::Default.absolute_redirect),
@@ -97,17 +97,17 @@ BlockHttp_s::BlockHttp_s():
     keepalive_time(Simple::Default.keepalive_time),
     keepalive_timeout(Simple::Default.keepalive_timeout),
     index(Simple::Default.index),
-    servers(std::vector<BlockServer_t>()),
+    servers(std::vector<server_t>()),
     error_page(std::map<int, std::string>()),
     fastcgi_param(std::map<std::string, std::string>())
 {
 }
 
-BlockMain_s::BlockMain_s(): http() { }
+main_s::main_s(): http() { }
 
-BlockMain_t Block::ParseMain(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)
+main_t Block::ParseMain(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)
 {
-    BlockMain_t main;
+    main_t main;
     while (idx < tokens.size() && error_msg.empty() == true) {
         const std::string directive = tokens[idx++];
         if (directive == "http")
@@ -118,9 +118,9 @@ BlockMain_t Block::ParseMain(const std::vector<std::string> &tokens, size_t &idx
     return main;
 }
 
-BlockHttp_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)
+http_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)
 {
-    BlockHttp_t http;
+    http_t http;
     if (idx == tokens.size() || tokens[idx] != "{") {
         error_msg = "Http: Missing {";
         return http;
@@ -191,10 +191,10 @@ BlockHttp_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx
     return http;
 }
 
-BlockServer_t Block::ParseServer(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
-    const BlockHttp_t &http)
+server_t Block::ParseServer(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
+    const http_t &http)
 {
-    BlockServer_t server(http);
+    server_t server(http);
     if (idx == tokens.size() || tokens[idx] != "{") {
         error_msg = "Server: Missing {";
         return server;
@@ -292,9 +292,9 @@ BlockServer_t Block::ParseServer(const std::vector<std::string> &tokens, size_t 
     return server;
 }
 
-BlockLocation_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const BlockServer_t &server)
+location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const server_t &server)
 {
-    BlockLocation_t location(server);
+    location_t location(server);
 
     if (idx == tokens.size()) {
         error_msg = "Location: Missing location name";
@@ -366,7 +366,7 @@ BlockLocation_t Block::ParseLocation(const std::vector<std::string> &tokens, siz
             location.index = Simple::ParseStringVector(tokens, idx, error_msg, directive);
         else if (directive == "location") {
             if (locations_filled == true) {
-                location.locations = std::vector<BlockLocation_t>();
+                location.locations = std::vector<location_t>();
                 locations_filled = false;
             }
             location.locations.push_back(ParseLocation(tokens, idx, error_msg, server));
@@ -399,7 +399,7 @@ BlockLocation_t Block::ParseLocation(const std::vector<std::string> &tokens, siz
 }
 
 void Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
-    std::map<std::string, struct BlockLimitExcept_s> limit_excepts)
+    std::map<std::string, struct limit_except_s> limit_excepts)
 {
     if (idx == tokens.size()) {
         error_msg = "LimitExcept: Missing method";
@@ -456,8 +456,58 @@ void Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx
 
     for (std::vector<std::string>::const_iterator cur = methods.begin(); cur != methods.end(); ++cur) {
         if (limit_excepts.find(*cur) == limit_excepts.end())
-            limit_excepts[*cur] = BlockLimitExcept_s();
+            limit_excepts[*cur] = limit_except_s();
         limit_excepts[*cur].allows = allows;
         limit_excepts[*cur].denys = denys;
     }
+}
+
+void location_s::print() {
+    std::cout << "location" << '\n';
+    std::cout << "name: " << name << '\n';
+    std::cout << "sendfile: " << sendfile << '\n';
+    std::cout << "autoindex: " << autoindex << '\n';
+    std::cout << "absolute_redirect: " << absolute_redirect << '\n';
+    std::cout << "server_name_in_redirect: " << server_name_in_redirect << '\n';
+    std::cout << "tcp_nodelay: " << tcp_nodelay << '\n';
+    std::cout << "tcp_nopush: " << tcp_nopush << '\n';
+    std::cout << "default_type: " << default_type << '\n';
+    std::cout << "root: " << root << '\n';
+    for (size_t i = 0; i < allows.size(); ++i)
+        std::cout << "allow: " << allows[i] << '\n';
+    for (size_t i = 0; i < denys.size(); ++i)
+        std::cout << "deny: " << denys[i] << '\n';
+    std::cout << "lingering_close: " << linger.l_onoff << '\n';
+    std::cout << "lingering_timeout: " << linger.l_linger << '\n';
+    std::cout << "send_lowat: " << send_lowat << '\n';
+    std::cout << "sendfile_max_chunk: " << sendfile_max_chunk << '\n';
+    std::cout << "client_max_body_size: " << client_max_body_size << '\n';
+    std::cout << "client_body_timeout: " << client_body_timeout << '\n';
+    std::cout << "keepalive_requests: " << keepalive_requests << '\n';
+    std::cout << "keepalive_time: " << keepalive_time << '\n';
+    std::cout << "keepalive_timeout.timeout: " << keepalive_timeout.timeout << '\n';
+    std::cout << "keepalive_timeout.header_timeout: " << keepalive_timeout.header_timeout << '\n';
+    std::cout << "index:";
+    for (size_t i = 0; i < index.size(); i++)
+        std::cout << " " << index[i];
+    std::cout << '\n' << '\n';
+    std::cout << "error_page:" << '\n';
+    for (std::map<int, std::string>::const_iterator it = error_page.begin(); it != error_page.end(); ++it)
+        std::cout << it->first << " = " << it->second << '\n';
+    std::cout << '\n';
+    std::cout << "fastcgi_param:" << '\n';
+    for (std::map<std::string, std::string>::const_iterator it = fastcgi_param.begin(); it != fastcgi_param.end(); ++it)
+        std::cout << it->first << " = " << it->second << '\n';
+    std::cout << "try_files:" << '\n';
+    std::cout << "    uri: " << try_files.uri << '\n';
+    std::cout << "    code: " << try_files.code << '\n';
+    std::cout << "    files:";
+    for (size_t i = 0; i < try_files.files.size(); i++)
+        std::cout << " " << try_files.files[i];
+    std::cout << '\n';
+    std::cout << "fastcgi_pass:" << '\n';
+    std::cout << "    address: " << fastcgi_pass.address << '\n';
+    std::cout << "    port: " << fastcgi_pass.port << '\n';
+    std::cout << "    unix: " << fastcgi_pass.unix << '\n';
+    std::cout << "\n";
 }

@@ -141,7 +141,7 @@ keepalive_timeout_t Simple::ParseKeepaliveTimeout(const std::vector<std::string>
         error_msg =  "keepalive_timeout: Missing argument";
         return keepalive_timeout;
     }
-    keepalive_timeout.timeout = Utils::StringtoTime(tokens[idx], error_msg);
+    keepalive_timeout.timeout = StringtoTime(tokens[idx], error_msg);
     if (error_msg.empty() == false)
         return keepalive_timeout;
     ++idx;
@@ -153,7 +153,7 @@ keepalive_timeout_t Simple::ParseKeepaliveTimeout(const std::vector<std::string>
         ++idx;
         return keepalive_timeout;
     }
-    keepalive_timeout.header_timeout = Utils::StringtoTime(tokens[idx], error_msg);
+    keepalive_timeout.header_timeout = StringtoTime(tokens[idx], error_msg);
     if (error_msg.empty() == false)
         return keepalive_timeout;
     ++idx;
@@ -250,13 +250,13 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
                     error_msg = "listen: so_keepalive: Invalid value";
                     return listen;
                 }
-                listen.keepidle = Utils::StringtoTime(value.substr(0, pos1), error_msg);
+                listen.keepidle = StringtoTime(value.substr(0, pos1), error_msg);
                 if (error_msg.empty() == false)
                     return listen;
-                listen.keepintvl = Utils::StringtoTime(value.substr(pos1 + 1, pos2 - pos1 - 1), error_msg);
+                listen.keepintvl = StringtoTime(value.substr(pos1 + 1, pos2 - pos1 - 1), error_msg);
                 if (error_msg.empty() == false)
                     return listen;
-                listen.keepcnt = Utils::StringtoTime(value.substr(pos2 + 1), error_msg);
+                listen.keepcnt = StringtoTime(value.substr(pos2 + 1), error_msg);
                 if (error_msg.empty() == false)
                     return listen;
             }
@@ -266,7 +266,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
                 error_msg = "listen: setfib: Missing number";
                 return listen;
             }
-            listen.setfib = Utils::StringtoSize(option.substr(7), error_msg);
+            listen.setfib = StringtoSize(option.substr(7), error_msg);
             if (error_msg.empty() == false)
                 return listen;
         } else if (option.substr(0, 8) == "fastopen") {
@@ -274,7 +274,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
                 error_msg = "listen: fastopen: Missing number";
                 return listen;
             }
-            listen.fastopen = Utils::StringtoSize(option.substr(9), error_msg);
+            listen.fastopen = StringtoSize(option.substr(9), error_msg);
             if (error_msg.empty() == false)
                 return listen;
         } else if (option.substr(0, 7) == "backlog") {
@@ -282,7 +282,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
                 error_msg = "listen: backlog: Missing number";
                 return listen;
             }
-            listen.backlog = Utils::StringtoSize(option.substr(8), error_msg);
+            listen.backlog = StringtoSize(option.substr(8), error_msg);
             if (error_msg.empty() == false)
                 return listen;
         } else if (option.substr(0, 6) == "rcvbuf") {
@@ -290,7 +290,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
                 error_msg = "listen: rcvbuf: Missing number";
                 return listen;
             }
-            listen.rcvbuf = Utils::StringtoSize(option.substr(7), error_msg);
+            listen.rcvbuf = StringtoSize(option.substr(7), error_msg);
             if (error_msg.empty() == false)
                 return listen;
         } else if (option.substr(0, 6) == "sndbuf") {
@@ -298,7 +298,7 @@ listen_t Simple::ParseListen(const std::vector<std::string> &tokens, size_t &idx
                 error_msg = "listen: sndbuf: Missing number";
                 return listen;
             }
-            listen.sndbuf = Utils::StringtoSize(option.substr(7), error_msg);
+            listen.sndbuf = StringtoSize(option.substr(7), error_msg);
             if (error_msg.empty() == false)
                 return listen;
         } else if (option.substr(0, 13) == "accept_filter") {
@@ -348,9 +348,9 @@ int Simple::ParseInt(const std::vector<std::string> &tokens, size_t &idx, std::s
         return res;
     }
     if (is_time)
-        res = Utils::StringtoTime(tokens[idx], error_msg);
+        res = StringtoTime(tokens[idx], error_msg);
     else
-        res = Utils::StringtoSize(tokens[idx], error_msg);
+        res = StringtoSize(tokens[idx], error_msg);
     if (error_msg.empty() == false)
         return res;
     ++idx;
@@ -387,7 +387,7 @@ std::map<int, std::string> Simple::ParseErrorPage(const std::vector<std::string>
 
     std::string uri = arguments.back(); arguments.pop_back();
     for (size_t i = 0; i < arguments.size(); ++i) {
-        int status_code = Utils::StringtoSize(arguments[i], error_msg);
+        int status_code = StringtoSize(arguments[i], error_msg);
         if (error_msg.empty() == false)
             return error_page;
         if (status_code < 100 || status_code > 599) {
@@ -430,7 +430,7 @@ try_files_t Simple::ParseTryFiles(const std::vector<std::string> &tokens, size_t
     std::string token = arguments.back(); arguments.pop_back();
 
     if (token[0] == '=') {
-        try_files.code = Utils::StringtoSize(token.substr(1), error_msg);
+        try_files.code = StringtoSize(token.substr(1), error_msg);
         if (error_msg.empty() == false)
             return try_files;
         if (try_files.code < 100 || try_files.code > 599) {
@@ -478,7 +478,7 @@ fastcgi_pass_t Simple::ParseFastcgiPass(const std::vector<std::string> &tokens, 
         fastcgi_pass.port = "8000";
     } else {
         fastcgi_pass.address = argument.substr(0, pos);
-        fastcgi_pass.port = Utils::StringtoSize(argument.substr(pos + 1), error_msg);
+        fastcgi_pass.port = StringtoSize(argument.substr(pos + 1), error_msg);
         if (error_msg.empty() == false)
             return fastcgi_pass;
     }
@@ -498,7 +498,7 @@ return_t Simple::ParseReturn(const std::vector<std::string> &tokens, size_t &idx
     }
     const std::string argument = tokens[idx++];
     if (std::isdigit(argument[0])) { // return code [text] or return code URL
-        ret.code = Utils::StringtoSize(argument, error_msg);
+        ret.code = StringtoSize(argument, error_msg);
         if (error_msg.empty() == false)
             return ret;
         if (ret.code < 100 || ret.code > 599) {
@@ -522,4 +522,48 @@ return_t Simple::ParseReturn(const std::vector<std::string> &tokens, size_t &idx
     else
         ++idx;
     return ret;
+}
+
+int Simple::StringtoSize(const std::string &str, std::string &error_msg)
+{
+    int size = 0;
+    size_t i = 0;
+    while (i < str.size() && std::isdigit(str[i]))
+        size = size * 10 + str[i++] - '0';
+    if (i == str.size())
+        return size;
+    const std::string unit = str.substr(i);
+    if (unit == "b" || unit == "B")
+        return size;
+    else if (unit == "k" || unit == "K")
+        return size * 1024;
+    else if (unit == "m" || unit == "M")
+        return size * 1024 * 1024;
+    else if (unit == "g" || unit == "G")
+        return size * 1024 * 1024 * 1024;
+    else
+        error_msg = "StringtoSize: Invalid Unit: " + unit;
+    return size;
+}
+
+int Simple::StringtoTime(const std::string &str, std::string &error_msg)
+{
+    int time = 0;
+    size_t i = 0;
+    while (i < str.size() && std::isdigit(str[i]))
+        time = time * 10 + str[i++] - '0';
+    if (i == str.size())
+        return time;
+    const std::string unit = str.substr(i);
+    if (unit == "s" || unit == "S")
+        return time;
+    else if (unit == "m" || unit == "M")
+        return time * 60;
+    else if (unit == "h" || unit == "H")
+        return time * 60 * 60;
+    else if (unit == "d" || unit == "D")
+        return time * 60 * 60 * 24;
+    else
+        error_msg = "StringtoTime: Invalid Unit: " + unit;
+    return time;
 }

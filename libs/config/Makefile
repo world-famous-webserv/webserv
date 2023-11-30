@@ -6,9 +6,9 @@ LIBS	= \
 
 SRCS	= \
 	config.cpp \
-	utils.cpp \
 	block.cpp \
 	simple.cpp \
+	conf.cpp \
 
 # **************************************************************************** #
 include $(TOPDIR)/build/Rules.mk

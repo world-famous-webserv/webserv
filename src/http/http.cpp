@@ -80,6 +80,7 @@ void Http::Execute(const Conf &conf)
 			get.close();
 			return;
 		}
+		response_.set_status(kNotFound);
 	}
 	// if error
 	HttpStatus status = response_.status();

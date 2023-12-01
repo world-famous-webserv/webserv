@@ -3,6 +3,7 @@
 
 # include <string>       /* std::string */
 # include <map>          /* std::map */
+# include <vector>       /* std::vector */
 # include <sys/socket.h> /* struct linger */
 
 typedef struct listen_s {

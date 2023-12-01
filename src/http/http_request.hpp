@@ -3,6 +3,7 @@
 # include <map>
 # include <sstream>
 # include <cstdlib>
+# include <algorithm>
 
 class HttpRequest
 {

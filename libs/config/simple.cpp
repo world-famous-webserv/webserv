@@ -46,8 +46,8 @@ default_s::default_s():
 }
 
 listen_s::listen_s():
-    address(""),
-    port(""),
+    address("*"),
+    port("8000"),
     default_server(false),
     ssl(false),
     http2(false),

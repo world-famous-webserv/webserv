@@ -2,6 +2,7 @@
 # define SRC_HTTP_HTTP_RESPONSE_HPP_
 # include <map>
 # include <sstream>
+# include <algorithm>
 # include "http_code.hpp"
 
 class HttpResponse

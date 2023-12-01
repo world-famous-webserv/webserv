@@ -53,8 +53,8 @@ void Server::SetSocket(int fd)
 	// quic
 	// proxy_protocol
 #ifdef SO_SETFIB
-	if (conf_.listen_.setfib != -1
-		&& setsockopt(fd, SOL_SOCKET, SO_SETFIB, &conf_.listen_.setfib, sizeof(conf_.listen_.setfib)) == -1)
+	if (conf_.listen.setfib != -1
+		&& setsockopt(fd, SOL_SOCKET, SO_SETFIB, &conf_.listen.setfib, sizeof(conf_.listen.setfib)) == -1)
 		std::cerr << "SetSocket::SO_SETFIB" << strerror(errno) << std::endl;
 #endif
 	if (conf_.listen.fastopen != -1
@@ -67,13 +67,13 @@ void Server::SetSocket(int fd)
 		&& setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &conf_.listen.sndbuf, sizeof(conf_.listen.sndbuf)) == -1)
 		std::cerr << "SetSocket::SO_SNDBUF" << strerror(errno) << std::endl;
 #ifdef SO_ACCEPTFILTER
-	if (conf_.listen_.accept_filter.length() > 0
-		&& setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, conf_.listen_.accept_filter.c_str(), conf_.listen_.accept_filter.length()) == -1)
+	if (conf_.listen.accept_filter.length() > 0
+		&& setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, conf_.listen.accept_filter.c_str(), conf_.listen.accept_filter.length()) == -1)
 		std::cerr << "SetSocket::SO_ACCEPTFILTER" << strerror(errno) << std::endl;
 #endif
 #ifdef TCP_DEFER_ACCEPT
 	int timeout = 0;
-	if (conf_.listen_.deferred == true
+	if (conf_.listen.deferred == true
 		&& setsockopt(fd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, sizeof(timeout)) == -1)
 		std::cerr << "SetSocket::TCP_DEFER_ACCEPT" << strerror(errno) << std::endl;
 #endif
@@ -89,8 +89,8 @@ void Server::SetSocket(int fd)
 		std::cerr << "SetSocket::SO_KEEPALIVE" << strerror(errno) << std::endl;
 #endif
 #ifdef TCP_KEEPIDLE
-	if (conf_.listen_.keepidle != -1
-		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &conf_.listen_.keepidle, sizeof(conf_.listen_.keepidle)) == -1)
+	if (conf_.listen.keepidle != -1
+		&& setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &conf_.listen.keepidle, sizeof(conf_.listen.keepidle)) == -1)
 		std::cerr << "SetSocket::TCP_KEEPIDLE" << strerror(errno) << std::endl;
 #endif
 	if (conf_.listen.keepintvl != -1

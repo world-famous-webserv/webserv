@@ -105,6 +105,7 @@ std::string Conf::GetUrl(const std::string &str) const
 
     if (str == "/")
         return "/";
+        
     for (std::string part; std::getline(iss, part, '/');) {
 		if (part == "" || part == ".")
             continue;

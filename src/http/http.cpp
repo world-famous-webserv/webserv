@@ -19,45 +19,74 @@ Http::Http(void)
 #include <iostream>
 void Http::Execute(const Conf &conf)
 {
-	// TODO: check URI alias
-
-	// TODO: execute method
-
-#if 1 // request debug
-	std::cout << "######################################" << std::endl;
-	std::cout << "Req method: " << request_.method() << std::endl;
-	std::cout << "Req uri: " << request_.uri() << std::endl;
-	std::cout << "Req version: " << request_.version() << std::endl;
-	std::cout << std::endl;
-	for (std::map<std::string, std::string>::iterator it = request_.headers().begin(); it != request_.headers().end(); ++it)
-		std::cout << "Req " << it->first << ": " << it->second << std::endl;
-	std::cout << "######################################" << std::endl;
-#endif
-
+	// process relative path
 	const std::string url = conf.GetUrl(request_.uri());
-	const int location_idx = conf.GetLocationIdx(url);
-	if (location_idx != -1) {
-		location_t location = conf.GetLocation(location_idx);
-		location.print();
+	if (url.empty())
+	{
+		this->GenerateError(conf, kFound);
+		response_.add_header("Location", "/");
+		response_.set_done(true);
+		return;
 	}
 
-	// temp output
-	response_.Clear();
-	response_.set_status(kNotFound);
-	response_.set_version(request_.version());
-	response_.add_header("Content-Type", "text/plain");
-	response_.set_done(true);
+	// get location
+	const int location_idx = conf.GetLocationIdx(url);
+	if (location_idx == -1)
+	{
+		this->GenerateError(conf, kNotFound);
+		response_.set_done(true);
+		return;
+	}
+	location_t location = conf.GetLocation(location_idx);
 
-#if 1 // response debug
-	std::cout << "######################################" << std::endl;
-	std::cout << "Res version: " << response_.version() << std::endl;
-	std::cout << "Res status: " << response_.status() << std::endl;
-	std::cout << "Res message: " << response_.message(response_.status()) << std::endl;
-	std::cout << std::endl;
-	for (std::map<std::string, std::string>::iterator it = request_.headers().begin(); it != request_.headers().end(); ++it)
-		std::cout << "Res " << it->first << ": " << it->second << std::endl;
-	std::cout << "######################################" << std::endl;
-#endif
+	// check return
+	if (location.ret.code != 0)
+	{
+		this->GenerateError(conf, kFound);
+		switch(location.ret.code)
+		{
+			case kMovedPermanently:
+			case kFound:
+			case kSeeOther:
+			case kTemporaryRedirect:
+			case kPermanentRedirect:
+				response_.add_header("Location", location.ret.url);
+				break;
+			default:
+				response_.add_header("Location", location.ret.text);
+				break;
+		}
+		response_.set_done(true);
+		return;
+	}
+
+	// check limit_except
+
+	// execute method
+	{
+		// temp get
+		std::string path(conf.GetPath(url));
+		std::cout << "path: " << path << std::endl;
+		std::fstream get(path.c_str());
+		if (get.is_open())
+		{
+			std::cout << "read: " << path << std::endl;
+			response_.set_status(kOk);
+			response_.set_version(request_.version());
+			response_.add_header("Content-Type", "text/html");
+			response_.add_header("Connection", "keep-alive");
+			response_.body() << get.rdbuf();
+			response_.set_done(true);
+			get.close();
+			return;
+		}
+	}
+	// if error
+	HttpStatus status = response_.status();
+	if (200 <= status && status <= 299)
+		return ;
+	this->GenerateError(conf, status);
+	response_.set_done(true);
 }
 
 void Http::Do(std::stringstream& in, std::stringstream& out, const Conf &conf)
@@ -65,7 +94,6 @@ void Http::Do(std::stringstream& in, std::stringstream& out, const Conf &conf)
 	if (response_.done())
 	{
 		response_ >> out;
-		std::cout << "Done!" << std::endl;
 		request_.Clear();
 		response_.Clear();
 		return ;

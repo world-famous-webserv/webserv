@@ -17,6 +17,8 @@ class Http
 
 	void Execute(const Conf &conf);
 
+	void GenerateError(const Conf &conf, HttpStatus status);
+
 	HttpRequest request_;
 	HttpResponse response_;
 };

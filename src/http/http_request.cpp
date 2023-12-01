@@ -90,7 +90,7 @@ void HttpRequest::Clear(void)
 	headers_.clear();
 	body_.clear();
 }
-
+#include <iostream>
 HttpRequest& HttpRequest::operator<<(std::stringstream& req)
 {
 	this->Clear();

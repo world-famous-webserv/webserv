@@ -3,6 +3,7 @@
 
 #include "config.hpp"
 #include "server.hpp"
+#include "conf.hpp"
 
 int main(int argc, char **argv)
 {
@@ -18,13 +19,12 @@ int main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	}
 	// 2. service
-	std::vector<BlockServer_t> servers = config.GetServers();
+	std::vector<server_t> servers = config.GetServers();
 
 	for (size_t i = 0; i < servers.size(); ++i) {
-		const BlockServer_t &server = servers[i];
-		for (size_t j = 0; j < server.listens.size(); ++j) {
-			const listen_t &listen = server.listens[j];
-			Multiplex::GetInstance().AddItem(new Server(server, listen));
+		for (size_t j = 0; j < servers[i].listens.size(); ++j) {
+			Conf conf(servers[i], servers[i].listens[j]);
+			Multiplex::GetInstance().AddItem(new Server(conf));
 		}
 	}
 	Multiplex::GetInstance().Loop();

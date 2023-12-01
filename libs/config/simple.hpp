@@ -4,7 +4,6 @@
 # include <string>       /* std::string */
 # include <map>          /* std::map */
 # include <sys/socket.h> /* struct linger */
-# include "utils.hpp"
 
 typedef struct listen_s {
     std::string address;
@@ -102,6 +101,9 @@ class Simple
         static listen_t ParseListen(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
         static try_files_t ParseTryFiles(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
         static return_t ParseReturn(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
+
+        static int StringtoSize(const std::string &str, std::string &error_msg);
+        static int StringtoTime(const std::string &str, std::string &error_msg);
 
         static const default_t Default;
     private:

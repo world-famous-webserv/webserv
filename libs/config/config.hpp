@@ -7,7 +7,6 @@
 #include <vector>  /* std::vector */
 #include <set>     /* std::set */
 #include "block.hpp" /* Block */
-#include "utils.hpp"
 
 class Config
 {
@@ -20,14 +19,13 @@ class Config
         bool IsOpen() const;
         std::string ErrorMsg() const;
 
-        BlockHttp_t GetHttp() const { return main_.http; }
-        BlockServer_t GetServer(const std::string &host) const;
+		static std::vector<std::string> StringSplit(const std::string &str);
+        static bool CheckBrackets(const std::vector<std::string> &tokens);
 
-        std::vector<BlockServer_t> GetServers() const { return main_.http.servers; }
+        http_t GetHttp() const { return main_.http; }
+        server_t GetServer(const std::string &host) const;
 
-        std::string GetUrl(const std::string &str) const;
-        std::string GetPath(const std::string &url) const;
-        BlockLocation_t GetLocation(const std::string &url) const;
+        std::vector<server_t> GetServers() const { return main_.http.servers; }
 
     private:
         Config();
@@ -35,8 +33,7 @@ class Config
         void CheckDuplicatedPort();
 
         std::string error_msg_;
-        BlockMain_t main_;
-
+        main_t main_;
 };
 
 #endif /* LIBS_CONFIG_CONFIG_HPP_ */

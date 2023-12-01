@@ -2,6 +2,7 @@
 # define SRC_HTTP_HTTP_HPP_
 # include "http_request.hpp"
 # include "http_response.hpp"
+# include "conf.hpp"
 
 class Http
 {
@@ -9,12 +10,12 @@ class Http
 	~Http(void);
 	Http(void);
 
-	void Do(std::stringstream& in, std::stringstream& out);
+	void Do(std::stringstream& in, std::stringstream& out, const Conf &conf);
  private:
 	Http(const Http& obj);
 	Http& operator=(const Http& obj);
 
-	void Execute(void);
+	void Execute(const Conf &conf);
 
 	HttpRequest request_;
 	HttpResponse response_;

@@ -1,6 +1,6 @@
 #include "http.hpp"
 
-std::string default_error(HttpStatus status, std::string message)
+static const std::string default_error(const HttpStatus &status, const std::string &message)
 {
 	std::ostringstream oss;
 

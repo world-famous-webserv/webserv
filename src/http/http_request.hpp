@@ -12,19 +12,18 @@ class HttpRequest
 	HttpRequest(void);
 	HttpRequest& operator<<(std::stringstream& req);
 
-	bool done(void) const;
-	std::string method(void) const;
-	std::string uri(void) const;
-	std::string version(void) const;
-	std::string header(const std::string& key) const;
-	std::map<std::string, std::string>& headers(void);
+	const bool &done(void) const;
+	const std::string &method(void) const;
+	const std::string &uri(void) const;
+	const std::string &version(void) const;
+	const std::string header(const std::string& key) const;
+	const std::map<std::string, std::string>& headers(void) const;
 	std::stringstream& body(void);
 
-	void set_method(const std::string method);
-	void set_uri(const std::string uri);
-	void set_version(const std::string version);
-	void add_header(const std::string key, const std::string val);
-	void add_body(const char *buf, ssize_t len);
+	void set_method(const std::string &method);
+	void set_uri(const std::string &uri);
+	void set_version(const std::string &version);
+	void add_header(const std::string &key, const std::string &val);
 
 	void Clear(void);
  private:

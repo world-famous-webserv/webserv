@@ -17,37 +17,37 @@ HttpResponse::HttpResponse(void)
 // get / set
 /* ************************************************************************** */
 
-bool HttpResponse::done(void) const
+const bool &HttpResponse::done(void) const
 {
 	return done_;
 }
 
-void HttpResponse::set_done(bool done)
+void HttpResponse::set_done(const bool &done)
 {
 	done_ = done;
 }
 
-std::string HttpResponse::version(void) const
+const std::string &HttpResponse::version(void) const
 {
 	return version_;
 }
 
-void HttpResponse::set_version(const std::string version)
+void HttpResponse::set_version(const std::string &version)
 {
 	version_ = version;
 }
 
-enum HttpStatus HttpResponse::status(void) const
+const enum HttpStatus &HttpResponse::status(void) const
 {
 	return status_;
 }
 
-void HttpResponse::set_status(enum HttpStatus status)
+void HttpResponse::set_status(const enum HttpStatus &status)
 {
 	status_ = status;
 }
 
-std::string HttpResponse::message(enum HttpStatus status) const
+const std::string HttpResponse::message(const enum HttpStatus &status) const
 {
 	switch (status)
 	{
@@ -131,7 +131,7 @@ std::string HttpResponse::message(enum HttpStatus status) const
 	return "Unkown";
 }
 
-std::string HttpResponse::header(const std::string& key) const
+const std::string HttpResponse::header(const std::string& key) const
 {
 	std::string lower(key);
 	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
@@ -139,12 +139,12 @@ std::string HttpResponse::header(const std::string& key) const
 	return it != headers_.end()? it->second : "";
 }
 
-std::map<std::string, std::string>& HttpResponse::headers(void)
+const std::map<std::string, std::string>& HttpResponse::headers(void) const
 {
 	return headers_;
 }
 
-void HttpResponse::add_header(const std::string key, const std::string val)
+void HttpResponse::add_header(const std::string &key, const std::string &val)
 {
 	std::string lower(key);
 	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
@@ -170,7 +170,6 @@ void HttpResponse::Clear(void)
 	body_.str("");
 }
 
-#include <iostream>
 HttpResponse& HttpResponse::operator>>(std::stringstream& res)
 {
 	// calc body len

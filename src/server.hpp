@@ -13,7 +13,7 @@
 class Server : public IOEvent
 {
  public:
-	Server(const Conf &conf);
+	explicit Server(const Conf &conf);
 	virtual ~Server(void);
 
 	void Open(void);

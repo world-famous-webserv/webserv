@@ -17,55 +17,56 @@ HttpRequest::HttpRequest(void)
 // get / set
 /* ************************************************************************** */
 
-bool HttpRequest::done(void) const
+const bool &HttpRequest::done(void) const
 {
 	return done_;
 }
 
-std::string HttpRequest::method(void) const
+const std::string &HttpRequest::method(void) const
 {
 	return method_;
 }
 
-void HttpRequest::set_method(const std::string method)
+void HttpRequest::set_method(const std::string &method)
 {
 	method_ = method;
 }
 
-std::string HttpRequest::uri(void) const
+const std::string &HttpRequest::uri(void) const
 {
 	return uri_;
 }
 
-void HttpRequest::set_uri(const std::string uri)
+void HttpRequest::set_uri(const std::string &uri)
 {
 	uri_ = uri;
 }
 
-std::string HttpRequest::version(void) const
+const std::string &HttpRequest::version(void) const
 {
 	return version_;
 }
 
-void HttpRequest::set_version(const std::string version)
+void HttpRequest::set_version(const std::string &version)
 {
 	version_ = version;
 }
 
-std::string HttpRequest::header(const std::string& key) const
+const std::string HttpRequest::header(const std::string& key) const
 {
 	std::string lower(key);
 	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
 	std::map<std::string, std::string>::const_iterator it = headers_.find(lower);
+
 	return it != headers_.end()? it->second : "";
 }
 
-std::map<std::string, std::string>& HttpRequest::headers(void)
+const std::map<std::string, std::string>& HttpRequest::headers(void) const
 {
 	return headers_;
 }
 
-void HttpRequest::add_header(const std::string key, const std::string val)
+void HttpRequest::add_header(const std::string &key, const std::string &val)
 {
 	std::string lower(key);
 	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
@@ -111,10 +112,10 @@ HttpRequest& HttpRequest::operator<<(std::stringstream& req)
 			break ;
 		if (line.empty() || line.compare("\r") == 0)
 			break ;
-		std::istringstream header(line);
+		std::istringstream head(line);
 		std::string key, val;
-		std::getline(header, key, ':');
-		std::getline(header, val, '\r');
+		std::getline(head, key, ':');
+		std::getline(head, val, '\r');
 		this->add_header(key, val);
 	}
 

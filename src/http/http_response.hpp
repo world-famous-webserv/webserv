@@ -12,18 +12,18 @@ class HttpResponse
 	HttpResponse(void);
 	HttpResponse& operator>>(std::stringstream& res);
 
-	bool done(void) const;
-	std::string version(void) const;
-	enum HttpStatus status(void) const;
-	std::string message(enum HttpStatus status) const;
-	std::string header(const std::string& key) const;
-	std::map<std::string, std::string>& headers(void);
+	const bool &done(void) const;
+	const std::string &version(void) const;
+	const enum HttpStatus &status(void) const;
+	const std::string message(const enum HttpStatus &status) const;
+	const std::string header(const std::string& key) const;
+	const std::map<std::string, std::string>& headers(void) const;
 	std::stringstream& body(void);
 
-	void set_done(bool done);
-	void set_status(const enum HttpStatus status);
-	void set_version(const std::string version);
-	void add_header(const std::string key, const std::string val);
+	void set_done(const bool &done);
+	void set_status(const enum HttpStatus &status);
+	void set_version(const std::string &version);
+	void add_header(const std::string &key, const std::string &val);
 
 	void Clear(void);
  private:

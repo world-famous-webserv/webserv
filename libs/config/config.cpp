@@ -41,7 +41,10 @@ void Config::Parse(const std::string &file)
             oss << line.substr(0, pos) << '\n';
     }
 	in.close();
-
+    if (oss.str().length() == 0) {
+        error_msg_ = "Config: Cound't read File or directory [ " + file + " ].";
+        return;
+    }
     const std::vector<std::string> tokens = Config::StringSplit(oss.str());
 
     if (Config::CheckBrackets(tokens) == false) {

@@ -39,14 +39,14 @@ default_s::default_s():
     linger.l_onoff = 1;
     linger.l_linger = 5;
 
-    listen.address = "*";
+    listen.address = "0.0.0.0";
     listen.port = "8000";
 
     index.push_back("index.html");
 }
 
 listen_s::listen_s():
-    address("*"),
+    address("0.0.0.0"),
     port("8000"),
     default_server(false),
     ssl(false),

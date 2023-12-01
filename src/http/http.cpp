@@ -53,7 +53,7 @@ void Http::Execute(const Conf &conf)
 				response_.add_header("Location", location.ret.url);
 				break;
 			default:
-				response_.add_header("Location", location.ret.text);
+				response_.body().str(location.ret.text);
 				break;
 		}
 		response_.set_done(true);

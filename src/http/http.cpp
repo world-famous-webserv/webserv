@@ -18,8 +18,15 @@ Http::Http(const Conf &conf):
 /* ************************************************************************** */
 
 #include <iostream>
-void Http::Execute(const Conf &conf)
+void Http::Execute()
 {
+	if (request_.method() == "POST")
+	{
+		this->Post();
+		response_.set_done(true);
+		return;
+	}
+
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
@@ -29,7 +36,6 @@ void Http::Execute(const Conf &conf)
 		response_.set_done(true);
 		return;
 	}
-	std::cout << "url: " << url << "\n";
 
 	// get location
 	const int location_idx = conf_.GetLocationIdx(url);
@@ -66,26 +72,17 @@ void Http::Execute(const Conf &conf)
 
 
 	// execute method
-	{
-		// temp get
-		std::string path(conf.GetPath(url));
-		std::cout << "path: " << path << std::endl;
-		std::fstream get(path.c_str());
-		if (get.is_open())
-		{
-			std::cout << "read: " << path << std::endl;
-			response_.set_status(kOk);
-			response_.set_version(request_.version());
-			response_.add_header("Content-Type", "text/html");
-			response_.add_header("Connection", "keep-alive");
-			response_.body() << get.rdbuf();
-			response_.set_done(true);
-			get.close();
-			return;
-		}
-		response_.set_status(kNotFound);
-		*/
-	}
+	HttpStatus status = kOk;
+	if (request_.method().compare("GET") == 0)
+		status = this->Get(location, url);
+#if 0
+	else if (request_.method().compare("POST") == 0)
+		status = this->Post(location, url);
+	else if (request_.method().compare("DELETE") == 0)
+		status = this->Delete(location, url);
+#endif
+	else
+		status = kMethodNotAllowed;
 	// if error
 	if (200 <= status && status <= 299)
 		return ;
@@ -112,15 +109,15 @@ void Http::Do(std::stringstream& in, std::stringstream& out)
 
 HttpStatus Http::Post()
 {
-    std::cout << request_.method() << std::endl;
-    std::cout << request_.uri() << std::endl;
-    std::cout << request_.version() << std::endl;
+	std::cout << request_.method() << std::endl;
+	std::cout << request_.uri() << std::endl;
+	std::cout << request_.version() << std::endl;
 
-    const std::map<std::string, std::string> &headers = request_.headers();
-    for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
-        std::cout << it->first << ": " << it->second << std::endl;
-    
-    std::cout << "body:" << std::endl;
-    std::cout << request_.body().str() << std::endl;
-    return kOk;
+	const std::map<std::string, std::string> &headers = request_.headers();
+	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
+		std::cout << it->first << ": " << it->second << std::endl;
+	
+	std::cout << "body:" << std::endl;
+	std::cout << request_.body().str() << std::endl;
+	return kOk;
 }

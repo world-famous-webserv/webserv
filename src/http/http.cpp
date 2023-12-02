@@ -17,6 +17,7 @@ Http::Http(void)
 /* ************************************************************************** */
 
 #include <iostream>
+#include "method/index.hpp"
 void Http::Execute(const Conf &conf)
 {
 	// process relative path
@@ -28,6 +29,7 @@ void Http::Execute(const Conf &conf)
 		response_.set_done(true);
 		return;
 	}
+	std::cout << "url: " << url << "\n";
 
 	// get location
 	const int location_idx = conf.GetLocationIdx(url);
@@ -63,9 +65,17 @@ void Http::Execute(const Conf &conf)
 	// check limit_except
 
 	// execute method
-	{
-		// temp get
+	{		
+		response_.set_status(kOk);
+		response_.set_version(request_.version());
+		response_.add_header("Content-Type", "text/html");
+		response_.add_header("Connection", "keep-alive");
 		std::string path(conf.GetPath(url));
+	std::cout << "path: " << path << std::endl;
+		response_.body() << autoindex(path);
+		response_.set_done(true);
+		return ;
+/*		// temp get
 		std::cout << "path: " << path << std::endl;
 		std::fstream get(path.c_str());
 		if (get.is_open())
@@ -81,6 +91,7 @@ void Http::Execute(const Conf &conf)
 			return;
 		}
 		response_.set_status(kNotFound);
+		*/
 	}
 	// if error
 	HttpStatus status = response_.status();

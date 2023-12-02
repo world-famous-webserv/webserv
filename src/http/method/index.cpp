@@ -12,7 +12,6 @@ bool	index(){
 							"/Users/seojo/Desktop/webserv/index.ht", 
 							"/Users/seojo/Desktop/webserv/index.h"};
 	std::string BODY;
-	int			http_status = 0;
 	//////
 
 	int	i = 0;
@@ -27,13 +26,13 @@ bool	index(){
 				std::string line;
 				while (std::getline(file, line))
 					BODY += line + "\n";  // << body 에 입력
-					http_status = kOk;  // <<< status 변경
+					/// kOk;  // <<< status 변경
 					file.close();
 					return EXIT_SUCCESS;
 			}
 			else{
 				if (hasAccess(paths[i], R_OK) == 0) // 파일 읽기권한 확인
-					http_status = kForbidden; // <<< status 변경
+					/// kForbidden; // <<< status 변경
 				return EXIT_FAILURE; ///!@%@#% 다른 파일은 열린다면????
 			}
 		}
@@ -126,8 +125,7 @@ std::string	setHtml(std::string & path) {
 std::string	autoindex(std::string path)
 {
 	/// 지울부분
-	int			http_status = 0;
-	bool		autoindex = true;
+	bool		autoindex = true; /// << config 에서 가져온다.
 	/// 지울부분
 
 	std::cout << path <<"\n";
@@ -137,12 +135,12 @@ std::string	autoindex(std::string path)
 		if (autoindex == true) {
 			if (hasAccess(path, F_OK) && hasAccess(path, R_OK)) {
 				if (is_dir(path)) {
-					http_status = kOk;
+					/// kOk; << status 변경
 					return setHtml(path);
 				}
 			}
 		}
-		http_status = kForbidden;
+		/// kForbidden; << status 변경
 	}
 	catch(const std::exception& e)
 	{

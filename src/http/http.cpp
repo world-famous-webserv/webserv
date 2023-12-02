@@ -18,9 +18,15 @@ Http::Http(const Conf &conf):
 /* ************************************************************************** */
 
 #include <iostream>
-#include "method/index.hpp"
-void Http::Execute(const Conf &conf)
+void Http::Execute()
 {
+	if (request_.method() == "POST")
+	{
+		this->Post();
+		response_.set_done(true);
+		return;
+	}
+
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
@@ -67,8 +73,16 @@ void Http::Execute(const Conf &conf)
 
 	// execute method
 	{
-		// temp get
-		std::string path(conf.GetPath(url));
+		response_.set_status(kOk);
+		response_.set_version(request_.version());
+		response_.add_header("Content-Type", "text/html");
+		response_.add_header("Connection", "keep-alive");
+		std::string path(conf_.GetPath(url));
+	std::cout << "path: " << path << std::endl;
+		response_.body() << autoindex(path);
+		response_.set_done(true);
+		return ;
+/*		// temp get
 		std::cout << "path: " << path << std::endl;
 		std::fstream get(path.c_str());
 		if (get.is_open())

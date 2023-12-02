@@ -9,6 +9,7 @@ Client::~Client(void)
 }
 
 Client::Client(const int fd, const Conf &conf):
+	http_(conf),
 	conf_(conf)
 {
 	identifier_ = fd;
@@ -62,5 +63,5 @@ void Client::Update(void)
 {
 	if (identifier_ == -1)
 		return ;
-	http_.Do(in_, out_, conf_);
+	http_.Do(in_, out_);
 }

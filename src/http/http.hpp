@@ -8,19 +8,21 @@ class Http
 {
  public:
 	~Http(void);
-	Http(void);
+	Http(const Conf &conf);
 
-	void Do(std::stringstream& in, std::stringstream& out, const Conf &conf);
+	void Do(std::stringstream& in, std::stringstream& out);
  private:
 	Http(const Http& obj);
 	Http& operator=(const Http& obj);
 
-	void Execute(const Conf &conf);
+	void Execute();
 
-	void GenerateError(const Conf &conf, HttpStatus status);
+	void GenerateError(HttpStatus status);
+	HttpStatus Post();
 
 	HttpRequest request_;
 	HttpResponse response_;
+	const Conf &conf_;
 };
 
 #endif /* SRC_HTTP_HTTP_HPP_ */

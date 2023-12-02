@@ -4,6 +4,8 @@
 # include "http_response.hpp"
 # include "conf.hpp"
 
+# include "method/index.hpp"
+
 class Http
 {
  public:

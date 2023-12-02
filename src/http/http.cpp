@@ -18,15 +18,8 @@ Http::Http(const Conf &conf):
 /* ************************************************************************** */
 
 #include <iostream>
-void Http::Execute()
+void Http::Execute(const Conf &conf)
 {
-	if (request_.method() == "POST")
-	{
-		this->Post();
-		response_.set_done(true);
-		return;
-	}
-
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
@@ -73,17 +66,25 @@ void Http::Execute()
 
 
 	// execute method
-	HttpStatus status = kOk;
-	if (request_.method().compare("GET") == 0)
-		status = this->Get(location, url);
-#if 0
-	else if (request_.method().compare("POST") == 0)
-		status = this->Post(location, url);
-	else if (request_.method().compare("DELETE") == 0)
-		status = this->Delete(location, url);
-#endif
-	else
-		status = kMethodNotAllowed;
+	{
+		// temp get
+		std::string path(conf.GetPath(url));
+		std::cout << "path: " << path << std::endl;
+		std::fstream get(path.c_str());
+		if (get.is_open())
+		{
+			std::cout << "read: " << path << std::endl;
+			response_.set_status(kOk);
+			response_.set_version(request_.version());
+			response_.add_header("Content-Type", "text/html");
+			response_.add_header("Connection", "keep-alive");
+			response_.body() << get.rdbuf();
+			response_.set_done(true);
+			get.close();
+			return;
+		}
+		response_.set_status(kNotFound);
+	}
 	// if error
 	if (200 <= status && status <= 299)
 		return ;

@@ -36,9 +36,9 @@ bool	index(){
 				std::string line;
 				while (std::getline(file, line))
 					BODY += line + "\n";  // << body 에 입력
-				http_status = kOk;  // <<< status 변경
-				file.close();
-				return EXIT_SUCCESS;
+					http_status = kOk;  // <<< status 변경
+					file.close();
+					return EXIT_SUCCESS;
 			}
 			else{
 				if (hasAccess(paths[i], R_OK) == 0) // 파일 읽기권한 확인
@@ -68,15 +68,18 @@ std::string	setHead(std::string & path) {
 std::string setAtagLine(std::string filename, char * time,  off_t filesize = 0) {
 	std::stringstream ss;
 	std::string line;
-	if (filename == ".."){
-		ss << "<a href=\"" + filename + "\">" << std::left << std::setw(50) << filename + "/</a>";
-		return ss.str();
-	}
-	
-	if (filesize != 0)
-		ss << "<a href=\"" + filename + "\">" << std::left << std::setw(50) << filename + "</a>" << std::setw(25) << time << std::right << std::setw(10) << filesize << " ";
+
+//	if (is_dir(filename)) 
+	if (filesize == 0) 
+		ss << "<a href=\"" + filename + "/\">" 
+			<< std::left << std::setw(50) << filename + "/</a>" 
+			<< std::setw(25) << time 
+			<< std::right << std::setw(10) << "-" << " \r\n";
 	else
-		ss << "<a href=\"" + filename + "\">" << std::left << std::setw(50) << filename + "/</a>" << std::setw(25) << time << std::right << std::setw(10) << "-" << " ";
+		ss << "<a href=\"" + filename + "\">" 
+			<< std::left << std::setw(50) << filename + "</a>" 
+			<< std::setw(25) << time 
+			<< std::right << std::setw(10) << filesize << " \r\n";
 	return ss.str();
 }
 
@@ -87,11 +90,19 @@ std::string	setAtag(std::string pathname, std::string filename) {
 	std::cout << "pathname: " + pathname << "\n";
 	std::cout << "filename: " + filename << "\n";
 	if (stat(pathname.c_str(), &sb) == -1) // << 절대경로를 사용해야 함.
+	{
+		std::cout << "here\n";
 		throw std::runtime_error(strerror(errno));
+	}
+	
+	std::tm *tm = std::localtime(&sb.st_mtime);
+	char mbstr[100];
+	std::strftime(mbstr, sizeof(mbstr), "%d-%b-%Y %H:%M", tm);
+
 	if ((sb.st_mode & S_IFMT) == S_IFDIR)
-		line += setAtagLine(filename, ctime(&sb.st_mtime));
+		line += setAtagLine(filename, mbstr);
 	else
-		line += setAtagLine(filename, ctime(&sb.st_mtime), sb.st_size);
+		line += setAtagLine(filename, mbstr, sb.st_size);
 	return line;
 }
 
@@ -109,9 +120,13 @@ std::string	setHtml(std::string & path) {
 	while ((entry = readdir(dp)) != NULL) {
 		std::string dname(entry->d_name);
 		if (dname == ".")
-			continue;
-		BODY += setAtag(path + dname, dname);
+			continue ;
+		if (dname == "..") {
+			BODY += "<a href=\"../\">../</a>\r\n";
+			continue ;
+		}
 		std::cout << "setAtag path: " << entry->d_name << "\n";
+		BODY += setAtag(path + std::string("/") + dname, dname); // << /  이슈
 	}
 	BODY += setEnd();
 	closedir(dp);
@@ -120,13 +135,14 @@ std::string	setHtml(std::string & path) {
 
 std::string	autoindex(std::string path)
 {
+	/// 지울부분
 	int			http_status = 0;
 	bool		autoindex = true;
+	/// 지울부분
 
 	std::cout << path <<"\n";
 	try
 	{
-		// ^^지울 부분^^
 		std::cout << "\n\n################## START #####################\n";
 		if (autoindex == true) {
 			if (hasAccess(path, F_OK) && hasAccess(path, R_OK)) {

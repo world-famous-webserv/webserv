@@ -153,6 +153,7 @@ void Server::Read(void)
 		return ;
 	}
 	std::cout << "- connection success: " << fd << std::endl;
+	this->SetSocket(fd);
 	Multiplex::GetInstance().AddItem(new Client(fd, conf_));
 }
 

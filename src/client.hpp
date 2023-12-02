@@ -25,8 +25,6 @@ class Client : public IOEvent
 	Client(const Client &obj);
 	Client& operator=(const Client &obj);
 
-	void SetSocket(int fd);
-
 	std::stringstream in_;
 	std::stringstream out_;
 

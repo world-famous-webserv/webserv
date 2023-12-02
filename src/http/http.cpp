@@ -18,15 +18,8 @@ Http::Http(const Conf &conf):
 /* ************************************************************************** */
 
 #include <iostream>
-void Http::Execute()
+void Http::Execute(const Conf &conf)
 {
-	if (request_.method() == "POST")
-	{
-		this->Post();
-		response_.set_done(true);
-		return;
-	}
-
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
@@ -36,6 +29,7 @@ void Http::Execute()
 		response_.set_done(true);
 		return;
 	}
+	std::cout << "url: " << url << "\n";
 
 	// get location
 	const int location_idx = conf_.GetLocationIdx(url);

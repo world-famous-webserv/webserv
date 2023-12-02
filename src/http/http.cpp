@@ -70,28 +70,20 @@ void Http::Execute()
 
 	// check limit_except
 
+
 	// execute method
-	{
-		// temp get
-		std::string path(conf_.GetPath(url));
-		std::cout << "path: " << path << std::endl;
-		std::fstream get(path.c_str());
-		if (get.is_open())
-		{
-			std::cout << "read: " << path << std::endl;
-			response_.set_status(kOk);
-			response_.set_version(request_.version());
-			response_.add_header("Content-Type", "text/html");
-			response_.add_header("Connection", "keep-alive");
-			response_.body() << get.rdbuf();
-			response_.set_done(true);
-			get.close();
-			return;
-		}
-		response_.set_status(kNotFound);
-	}
+	HttpStatus status = kOk;
+	if (request_.method().compare("GET") == 0)
+		status = this->Get(location, url);
+#if 0
+	else if (request_.method().compare("POST") == 0)
+		status = this->Post(location, url);
+	else if (request_.method().compare("DELETE") == 0)
+		status = this->Delete(location, url);
+#endif
+	else
+		status = kMethodNotAllowed;
 	// if error
-	HttpStatus status = response_.status();
 	if (200 <= status && status <= 299)
 		return ;
 	this->GenerateError(status);

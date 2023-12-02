@@ -13,6 +13,7 @@ SRCS	= \
 	http/http_request.cpp \
 	http/http_response.cpp \
 	http/http_error.cpp \
+	http/method/get.cpp \
 	main.cpp
 
 # **************************************************************************** #

@@ -163,7 +163,7 @@ std::stringstream& HttpResponse::body(void)
 void HttpResponse::Clear(void)
 {
 	done_ = false;
-	status_ = kNotFound;
+	status_ = kOk;
 	version_.clear();
 	headers_.clear();
 	body_.clear();

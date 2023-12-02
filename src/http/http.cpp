@@ -84,6 +84,7 @@ void Http::Execute(const Conf &conf)
 			return;
 		}
 		response_.set_status(kNotFound);
+		*/
 	}
 	// if error
 	if (200 <= status && status <= 299)

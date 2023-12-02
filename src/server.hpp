@@ -29,7 +29,7 @@ class Server : public IOEvent
 	int	GetAddrInfo(struct addrinfo **info);
 	int CreatSocket(struct addrinfo *info);
 
-	Conf conf_;
+	const Conf conf_;
 };
 
 # endif /* SRC_SERVER_HPP_ */

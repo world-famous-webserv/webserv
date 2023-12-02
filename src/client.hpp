@@ -29,7 +29,7 @@ class Client : public IOEvent
 	std::stringstream out_;
 
 	Http http_;
-	Conf conf_;
+	const Conf conf_;
 };
 
 # endif /* SRC_CLIENT_HPP_ */

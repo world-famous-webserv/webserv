@@ -15,7 +15,7 @@ static const std::string default_error(const HttpStatus &status, const std::stri
 	return oss.str();
 }
 
-void Http::GenerateError(const Conf& conf, HttpStatus status)
+void Http::GenerateError(HttpStatus status)
 {
 	response_.Clear();
 	response_.set_status(status);
@@ -23,10 +23,10 @@ void Http::GenerateError(const Conf& conf, HttpStatus status)
 	response_.add_header("Content-Type", "text/html");
 	response_.add_header("Connection", "close");
 
-	std::map<int, std::string>::const_iterator it = conf.error_page.find(status);
-	if (it != conf.error_page.end())
+	std::map<int, std::string>::const_iterator it = conf_.error_page.find(status);
+	if (it != conf_.error_page.end())
 	{
-		std::string path = conf.GetPath(it->second);
+		std::string path = conf_.GetPath(it->second);
 		std::ifstream page(path.c_str(), std::ios_base::in);
 		if (page.is_open())
 		{

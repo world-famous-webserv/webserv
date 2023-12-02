@@ -20,6 +20,13 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
+	if (request_.method() == "POST")
+	{
+		this->Post();
+		response_.set_done(true);
+		return;
+	}
+
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())

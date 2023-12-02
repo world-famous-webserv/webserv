@@ -100,12 +100,11 @@ Conf &Conf::operator=(const Conf &other)
 
 std::string Conf::GetUrl(const std::string &str) const
 {
-    std::vector<std::string> parts;
-    std::istringstream iss(str);
-
     if (str == "/")
         return "/";
-        
+
+    std::vector<std::string> parts;
+    std::istringstream iss(str);
     for (std::string part; std::getline(iss, part, '/');) {
 		if (part == "" || part == ".")
             continue;
@@ -117,11 +116,9 @@ std::string Conf::GetUrl(const std::string &str) const
         else
 			parts.push_back(part);
 	}
-    if (parts.empty())
-        return "";
     std::ostringstream oss;
     for (std::vector<std::string>::const_iterator i = parts.begin(), end = parts.end(); i != end; ++i)
-        oss << "/" << *i;
+        oss << *i << '/';
     return oss.str();
 }
 
@@ -131,7 +128,18 @@ std::string Conf::GetPath(const std::string &url) const
     if (idx == -1)
         return "";
     const location_t &location = GetLocation(idx);
-    const std::string path = location.root + url.substr(location.name.length() - (location.name[0] == '/'));
+    std::cout << "GetPath: url: [" << url << "]" << '\n';
+    std::cout << "GetPath: location.name: [" << location.name << "]" << '\n';
+    std::cout << "GetPath: location.root: [" << location.root << "]" << '\n';
+    if (url.length() == location.name.length() + 1)
+        return location.root.length() == 0 ? "/" : location.root;
+    std::string path = location.root.length() == 0 ? "" : location.root + "/";
+    if (location.name.length() == 0)
+        path += url.substr(0, url.length() - 1);
+    else
+        path += url.substr(location.name.length() + 1, url.length() - location.name.length() - 2);
+    if (path == "")
+        path = "/";
     return path;
 }
 
@@ -140,13 +148,20 @@ int Conf::GetLocationIdx(const std::string &url) const
     size_t max_location_name_length = 0;
 
     int idx = -1;
+    const std::string tmp = url.substr(url.length() - 1); // remove last '/'
+
 	for (size_t i = 0, end = locations.size(); i != end; ++i) {
 		const location_t &location = locations[i];
-		if (url.length() > max_location_name_length && url.length() >= location.name.length() && url.compare(0, location.name.length(), location.name) == 0) {
+		if (tmp.length() > max_location_name_length && \
+            tmp.length() >= location.name.length() && \
+            tmp.compare(0, location.name.length(), location.name) == 0)
+        {
 			max_location_name_length = location.name.length();
             idx = (int)i;
 		}
 	}
+    std::cout << "GetLocationIdx: idx: [" << idx << "]" << '\n';
+    std::cout << "GetLocationIdx: url: [" << url << "]" << '\n';
     return idx;
 }
 

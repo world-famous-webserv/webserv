@@ -143,8 +143,13 @@ http_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std
             http.tcp_nopush = Simple::ParseBool(tokens, idx, error_msg, directive);
         else if (directive == "default_type")
             http.default_type = Simple::ParseString(tokens, idx, error_msg, directive);
-        else if (directive == "root")
+        else if (directive == "root") {
             http.root = Simple::ParseString(tokens, idx, error_msg, directive);
+            if (http.root[0] == '/')
+                http.root.erase(0, 1);
+            if (http.root[http.root.size() - 1] == '/')
+                http.root.erase(http.root.size() - 1);
+        }
         else if (directive == "allow")
             http.allows.push_back(Simple::ParseString(tokens, idx, error_msg, directive));
         else if (directive == "deny")
@@ -221,8 +226,13 @@ server_t Block::ParseServer(const std::vector<std::string> &tokens, size_t &idx,
             server.tcp_nopush = Simple::ParseBool(tokens, idx, error_msg, directive);
         else if (directive == "default_type")
             server.default_type = Simple::ParseString(tokens, idx, error_msg, directive);
-        else if (directive == "root")
+        else if (directive == "root") {
             server.root = Simple::ParseString(tokens, idx, error_msg, directive);
+            if (server.root[0] == '/')
+                server.root.erase(0, 1);
+            if (server.root[server.root.size() - 1] == '/')
+                server.root.erase(server.root.size() - 1);
+        }
         else if (directive == "allow") {
             if (allows_filled == true) {
                 server.allows = std::vector<std::string>();
@@ -300,12 +310,15 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
         error_msg = "Location: Missing location name";
         return location;
     }
-    const std::string &tmp_name = tokens[idx++];
-    if (tmp_name[tmp_name.size() - 1] == '/')
-        location.name = tmp_name.substr(0, tmp_name.size() - 1);
-    else
-        location.name = tmp_name;
+    location.name = tokens[idx];
 
+    if (location.name[0] == '/')
+        location.name.erase(0, 1);
+
+    if (location.name[location.name.size() - 1] == '/')
+        location.name.erase(location.name.size() - 1);
+
+    ++idx;
     if (idx == tokens.size() || tokens[idx] != "{") {
         error_msg = "Location: Missing {";
         return location;
@@ -333,8 +346,13 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
             location.tcp_nopush = Simple::ParseBool(tokens, idx, error_msg, directive);
         else if (directive == "default_type")
             location.default_type = Simple::ParseString(tokens, idx, error_msg, directive);
-        else if (directive == "root")
+        else if (directive == "root") {
             location.root = Simple::ParseString(tokens, idx, error_msg, directive);
+            if (location.root[0] == '/')
+                location.root.erase(0, 1);
+            if (location.root[location.root.size() - 1] == '/')
+                location.root.erase(location.root.size() - 1);
+        }
         else if (directive == "allow") {
             if (allows_filled == true) {
                 location.allows = std::vector<std::string>();

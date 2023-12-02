@@ -18,6 +18,7 @@ class Http
 	void Execute();
 
 	void GenerateError(HttpStatus status);
+	HttpStatus Get(const location_t& location, const std::string path);
 	HttpStatus Post();
 
 	HttpRequest request_;

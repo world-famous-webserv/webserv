@@ -18,7 +18,7 @@ Http::Http(const Conf &conf):
 /* ************************************************************************** */
 
 #include <iostream>
-void Http::Execute(const Conf &conf)
+void Http::Execute()
 {
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());

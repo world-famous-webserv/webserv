@@ -18,15 +18,9 @@ Http::Http(const Conf &conf):
 /* ************************************************************************** */
 
 #include <iostream>
-void Http::Execute()
+#include "method/index.hpp"
+void Http::Execute(const Conf &conf)
 {
-	if (request_.method() == "POST")
-	{
-		this->Post();
-		response_.set_done(true);
-		return;
-	}
-
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
@@ -36,6 +30,7 @@ void Http::Execute()
 		response_.set_done(true);
 		return;
 	}
+	std::cout << "url: " << url << "\n";
 
 	// get location
 	const int location_idx = conf_.GetLocationIdx(url);
@@ -73,7 +68,7 @@ void Http::Execute()
 	// execute method
 	{
 		// temp get
-		std::string path(conf_.GetPath(url));
+		std::string path(conf.GetPath(url));
 		std::cout << "path: " << path << std::endl;
 		std::fstream get(path.c_str());
 		if (get.is_open())
@@ -89,6 +84,7 @@ void Http::Execute()
 			return;
 		}
 		response_.set_status(kNotFound);
+		*/
 	}
 	// if error
 	HttpStatus status = response_.status();

@@ -20,9 +20,9 @@ class Http
 	void Execute();
 
 	void GenerateError(HttpStatus status);
-	HttpStatus Get(const location_t& location, const std::string path);
+	HttpStatus Get(const location_t& location, const std::string url);
 	HttpStatus Post();
-	HttpStatus Delete(const std::string path);
+	HttpStatus Delete(const std::string url);
 
 	HttpRequest request_;
 	HttpResponse response_;

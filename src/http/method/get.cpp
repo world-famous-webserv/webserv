@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include "index.hpp"
 #include "../http.hpp"
 
 static HttpStatus FileProcess(const HttpRequest& req, HttpResponse& res, std::string path)
@@ -25,7 +26,7 @@ static HttpStatus CgiProcess(const HttpRequest& req, HttpResponse& res, const lo
 	(void)path;
 	return kForbidden;
 }
-#include "index.hpp"
+
 static HttpStatus DirectoryProcess(const HttpRequest& req, HttpResponse& res, const location_t &location, std::string path)
 {
 	// index

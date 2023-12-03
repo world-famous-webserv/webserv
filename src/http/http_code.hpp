@@ -1,11 +1,16 @@
 #ifndef SRC_HTTP_HTTP_CODE_HPP_
 # define SRC_HTTP_HTTP_CODE_HPP_
 
-enum HttpState{
-	kRequestParse,
-	kRequestRun,
-	kResponseWait,
-	kResponseEnd
+enum HttpStep {
+	kParseStart,
+	kParseHeader,
+	kParseBodyStart,
+	kParseBody,
+	kParseChunkStart,
+	kParseChunkLen,
+	kParseChunkBody,
+	kParseDone,
+	kParseFail
 };
 
 enum HttpStatus {

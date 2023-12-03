@@ -20,13 +20,6 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
-	if (request_.method() == "POST")
-	{
-		this->Post();
-		response_.set_done(true);
-		return;
-	}
-
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
@@ -70,17 +63,14 @@ void Http::Execute()
 
 	// check limit_except
 
-
 	// execute method
 	HttpStatus status = kOk;
 	if (request_.method().compare("GET") == 0)
 		status = this->Get(location, url);
 	else if (request_.method().compare("DELETE") == 0)
 		status = this->Delete(url);
-#if 0
 	else if (request_.method().compare("POST") == 0)
-		status = this->Post(location, url);
-#endif
+		status = this->Post();
 	else
 		status = kMethodNotAllowed;
 	// if error
@@ -89,6 +79,7 @@ void Http::Execute()
 	this->GenerateError(status);
 	response_.set_done(true);
 }
+
 
 void Http::Do(std::stringstream& in, std::stringstream& out)
 {
@@ -99,25 +90,26 @@ void Http::Do(std::stringstream& in, std::stringstream& out)
 		response_.Clear();
 		return ;
 	}
-	if (!request_.done())
+	request_ << in;
+	if (request_.step() == kParseDone)
+		response_.set_done(true);
+	if (request_.step() == kParseFail)
 	{
-		request_ << in;
-		if (request_.done())
-			this->Execute();
+		this->GenerateError(kBadRequest);
+		response_.set_done(true);
 	}
-}
-
-HttpStatus Http::Post()
-{
-	std::cout << request_.method() << std::endl;
-	std::cout << request_.uri() << std::endl;
-	std::cout << request_.version() << std::endl;
-
-	const std::map<std::string, std::string> &headers = request_.headers();
-	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
-		std::cout << it->first << ": " << it->second << std::endl;
-	
-	std::cout << "body:" << std::endl;
-	std::cout << request_.body().str() << std::endl;
-	return kOk;
+	if (request_.step() == 	kParseBodyStart)
+	{
+		this->Execute();
+		request_.set_step(kParseBody);
+	}
+	else if (request_.step() == kParseChunkStart)
+	{
+		this->Execute();
+		request_.set_step(kParseChunkLen);
+	}
+	else if (request_.step() == kParseBody || request_.step() == kParseChunkLen)
+	{
+		std::cout << "### " << request_.body().rdbuf() << std::endl;
+	}
 }

@@ -75,11 +75,11 @@ void Http::Execute()
 	HttpStatus status = kOk;
 	if (request_.method().compare("GET") == 0)
 		status = this->Get(location, url);
+	else if (request_.method().compare("DELETE") == 0)
+		status = this->Delete(url);
 #if 0
 	else if (request_.method().compare("POST") == 0)
 		status = this->Post(location, url);
-	else if (request_.method().compare("DELETE") == 0)
-		status = this->Delete(location, url);
 #endif
 	else
 		status = kMethodNotAllowed;

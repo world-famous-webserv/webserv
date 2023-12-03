@@ -1,20 +1,33 @@
+#include <sys/stat.h>
 #include "../http.hpp"
 
-#include <iostream>
-HttpStatus Http::Post()
+HttpStatus Http::Post(const location_t& location, const std::string url)
 {
-	std::cout << request_.method() << std::endl;
-	std::cout << request_.uri() << std::endl;
-	std::cout << request_.version() << std::endl;
+    (void)location;
+	const std::string path = conf_.GetPath(url);
 
-	const std::map<std::string, std::string> &headers = request_.headers();
-	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
-		std::cout << it->first << ": " << it->second << std::endl;
+	// struct stat sb;
+	// if (stat(path.c_str(), &sb) == -1) {
+    //     std::cout << "Post: stat: [" + path + " ] error" << '\n';
+    //     return kForbidden;
+    // }
+	// if (S_ISDIR(sb.st_mode) == false) {
+    //     std::cout << "Post: S_ISDIR: [" + path + " ] error" << '\n';
+    //     return kForbidden;
+    // }
 
-	std::cout << "body:" << std::endl;
-	std::cout << request_.body().str() << std::endl;
-
-	if (request_.step() == kParseDone)
-		response_.set_done(true);
+	response_.set_status(kOk);
+	response_.set_version(request_.version());
+	response_.add_header("Content-Type", "text/html");
+	response_.add_header("Connection", "keep-alive");
+	response_.body()
+        << "<html>"
+        << "<head><title>POST</title></head>"
+        << "<body>"
+        << "<h1>POST</h1>"
+        << "<p>BODY: " << request_.body().rdbuf() << "</p>"
+        << "</body>"
+        << "</html>";
+	response_.set_done(true);
 	return kOk;
 }

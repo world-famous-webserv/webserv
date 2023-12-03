@@ -10,7 +10,7 @@ bool	index(const HttpRequest& req, HttpResponse& res, const location_t &location
 	
 	for (size_t i = 0; i < index.size(); ++i) {
 		std::string tmp = path + std::string("/") + index[i];
-		if (access(tmp.c_str(), F_OK) == 0)
+		if (access(tmp.c_str(), F_OK) == -1)
 			continue;
 		std::fstream file(tmp.c_str());
 		if (file.is_open() == false) 

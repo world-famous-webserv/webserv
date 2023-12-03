@@ -80,6 +80,7 @@ void Http::Execute()
 	response_.set_done(true);
 }
 
+
 void Http::Do(std::stringstream& in, std::stringstream& out)
 {
 	if (response_.done())
@@ -89,10 +90,26 @@ void Http::Do(std::stringstream& in, std::stringstream& out)
 		response_.Clear();
 		return ;
 	}
-	if (!request_.done())
+	request_ << in;
+	if (request_.step() == kParseDone)
+		response_.set_done(true);
+	if (request_.step() == kParseFail)
 	{
-		request_ << in;
-		if (request_.done())
-			this->Execute();
+		this->GenerateError(kBadRequest);
+		response_.set_done(true);
+	}
+	if (request_.step() == 	kParseBodyStart)
+	{
+		this->Execute();
+		request_.set_step(kParseBody);
+	}
+	else if (request_.step() == kParseChunkStart)
+	{
+		this->Execute();
+		request_.set_step(kParseChunkLen);
+	}
+	else if (request_.step() == kParseBody || request_.step() == kParseChunkLen)
+	{
+		std::cout << "### " << request_.body().rdbuf() << std::endl;
 	}
 }

@@ -1,4 +1,5 @@
 #include "http_request.hpp"
+#include <iostream>
 
 /* ************************************************************************** */
 // Orthodox Canonical Form
@@ -17,9 +18,14 @@ HttpRequest::HttpRequest(void)
 // get / set
 /* ************************************************************************** */
 
-const bool &HttpRequest::done(void) const
+void HttpRequest::set_step(const HttpStep &step)
 {
-	return done_;
+	step_ = step;
+}
+
+const HttpStep &HttpRequest::step(void) const
+{
+	return step_;
 }
 
 const std::string &HttpRequest::method(void) const
@@ -79,59 +85,158 @@ std::stringstream& HttpRequest::body(void)
 }
 
 /* ************************************************************************** */
+// Parse
+/* ************************************************************************** */
+
+bool HttpRequest::GetLine(std::stringstream& req, std::string& line)
+{
+	req.clear();
+	while (req.good())
+	{
+		char ch = req.get();
+		if (!req.good())
+			return false;
+		if (ch != '\n')
+		{
+			buf_.put(ch);
+			continue;
+		}
+		std::getline(buf_, line);
+		if (line[line.length() - 1] == '\r')
+			line.erase(line.length() - 1);
+		buf_.str();
+		buf_.clear();
+		return true;
+	}
+	return false;
+}
+
+void HttpRequest::ParseStartLine(const std::string& line)
+{
+	std::istringstream iss(line);
+
+	std::string method;
+	std::getline(iss, method, ' ');
+	this->set_method(method);
+
+	std::string uri;
+	std::getline(iss, uri, ' ');
+	this->set_uri(uri);
+
+	std::string version;
+	std::getline(iss, version);
+	this->set_version(version);
+
+	step_ = kParseHeader;
+}
+
+void HttpRequest::ParseHeader(const std::string& line)
+{
+	if (line.empty())
+	{
+		std::string len = this->header("Content-Length");
+		if (!len.empty())
+		{
+			std::stringstream ss(len);
+			ss >> remain_;
+			step_ = kParseBodyStart;
+			return;
+		}
+		std::string chunk = this->header("Transfer-Encoding");
+		std::transform(chunk.begin(), chunk.end(), chunk.begin(), ::tolower);
+		if (!chunk.empty() && chunk == "chunked")
+		{
+			step_ = kParseChunkStart;
+			return;
+		}
+		remain_ = 0;
+		step_ = kParseBodyStart;
+		return;
+	}
+	std::istringstream iss(line);
+	std::string key, val;
+	std::getline(iss, key, ':');
+	std::getline(iss, val);
+	this->add_header(key, val);
+	std::cout << "Header: " << key << " = " << val << std::endl;
+}
+
+void HttpRequest::ParseBody(std::stringstream& req)
+{
+	char buf[1024];
+
+	req.clear();
+	while (req.good() && remain_ > 0)
+	{
+		std::size_t len = std::min(remain_, sizeof(buf));
+		if (req.read(buf, len))
+			body_.write(buf, req.gcount());
+		remain_ -= req.gcount();
+	}
+	if (remain_ == 0)
+		step_ = kParseDone;
+}
+
+void HttpRequest::ParseChunkLen(const std::string& line)
+{
+	std::stringstream ss;
+	ss << std::hex << line;
+	ss >> remain_;
+	if (remain_ == 0)
+		step_ = kParseDone;
+	else
+		step_ = kParseChunkBody;
+}
+
+void HttpRequest::ParseChunk(std::stringstream& req)
+{
+	char buf[1024];
+
+	req.clear();
+	while (req.good() && remain_ > 0)
+	{
+		std::size_t len = std::min(remain_, sizeof(buf));
+		if (req.read(buf, len))
+			body_.write(buf, req.gcount());
+		remain_ -= req.gcount();
+	}
+	if (remain_ == 0)
+		step_ = kParseChunkLen;
+}
+
+
+/* ************************************************************************** */
 // Main
 /* ************************************************************************** */
 
 void HttpRequest::Clear(void)
 {
-	done_ = false;
 	method_.clear();
 	uri_.clear();
 	version_.clear();
 	headers_.clear();
 	body_.clear();
+
+	// for parse
+	step_ = kParseStart;
+	buf_.str();
+	buf_.clear();
+	remain_ = 0;
 }
-#include <iostream>
+
 HttpRequest& HttpRequest::operator<<(std::stringstream& req)
 {
-	this->Clear();
 	req.clear();
-	std::streampos curr = req.tellg();
-
-	// start line
-	std::getline(req, method_, ' ');
-	std::getline(req, uri_, ' ');
-	std::getline(req, version_, '\n');
-	if (version_[version_.length() - 1] == '\r')
-		version_.erase(version_.length() - 1);
-
-	// header
 	std::string line;
-	while (std::getline(req, line)) {
-		if (req.eof())
-			break ;
-		if (line.empty() || line.compare("\r") == 0)
-			break ;
-		std::istringstream head(line);
-		std::string key, val;
-		std::getline(head, key, ':');
-		std::getline(head, val, '\r');
-		this->add_header(key, val);
-	}
-
-	// body
-	int len = std::atoi(header("Content-Length").c_str());
-	if (len > 0) {
-		char *buffer = new char[len];
-		req.read(buffer, len);
-		body_.write(buffer, len);
-		delete[] buffer;
-	}
-	if (!req.good()) {
-		req.clear();
-		req.seekg(curr);
-		return *this;
-	}
-	done_ = true;
+	if (step_ == kParseStart && this->GetLine(req, line) == true)
+		this->ParseStartLine(line);
+	if (step_ == kParseHeader && this->GetLine(req, line) == true)
+		this->ParseHeader(line);
+	if (step_ == kParseChunkLen && this->GetLine(req, line) == true)
+		this->ParseChunkLen(line);
+	else if (step_ == kParseBody)
+		this->ParseBody(req);
+	else if (step_ == kParseChunkBody)
+		this->ParseChunk(req);
 	return *this;
 }

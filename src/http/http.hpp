@@ -22,6 +22,7 @@ class Http
 	void GenerateError(HttpStatus status);
 	HttpStatus Get(const location_t& location, const std::string path);
 	HttpStatus Post();
+	HttpStatus Delete(const std::string path);
 
 	HttpRequest request_;
 	HttpResponse response_;

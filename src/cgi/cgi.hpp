@@ -7,23 +7,19 @@
 # include <unistd.h>
 # include <cstdio>
 
+# include "config.hpp"
 # include "http/http_request.hpp"
 # include "http/http_response.hpp"
-# include "config.hpp"
 
 class Cgi {
 	public:
+		static std::string run(HttpRequest &request, const location_t &location, const std::string &script);
+	private:
 		~Cgi(void);
-		explicit Cgi(HttpRequest &request, const location_t &location);
+		Cgi(void);
 		Cgi(const Cgi &obj);
 		Cgi &operator=(const Cgi &obj);
-		std::string run(std::string script);
-	private:
-		Cgi(void);
-		std::map<std::string, std::string>	env_;
-		std::string							request_body_;
-
-		std::string to_string(const int i);
+		static std::string to_string(const int i);
 };
 
 #endif // LIBS_CGI_CGI_HPP_ */

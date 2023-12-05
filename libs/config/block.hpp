@@ -7,6 +7,14 @@
 # include <iostream>
 # include "simple.hpp"
 
+typedef struct limit_except_s
+{
+    std::vector<std::string> methods;
+    std::vector<std::string> allows;
+    std::vector<std::string> denys;
+    limit_except_s();
+} limit_except_t;
+
 typedef struct http_s
 {
     bool sendfile;
@@ -33,8 +41,6 @@ typedef struct http_s
     std::vector<struct server_s> servers;
     std::map<int, std::string> error_page;
     std::map<std::string, std::string> fastcgi_param;
-    std::string cgi_pass;
-    std::string cgi_ext;
     http_s();
 } http_t;
 
@@ -68,8 +74,6 @@ typedef struct server_s
     std::map<std::string, std::string> fastcgi_param;
     try_files_t try_files;
     return_t ret;
-    std::string cgi_pass;
-    std::string cgi_ext;
     explicit server_s(const http_t &http);
 } server_t;
 
@@ -97,23 +101,14 @@ typedef struct location_s
     std::vector<std::string> index;
     std::vector<struct location_s> locations;
     std::map<int, std::string> error_page;
-    std::map<std::string, struct limit_except_s> limit_excepts;
+    struct limit_except_s limit_except;
     std::map<std::string, std::string> fastcgi_param;
     fastcgi_pass_t fastcgi_pass;
     try_files_t try_files;
     return_t ret;
-    std::string cgi_pass;
-    std::string cgi_ext;
     explicit location_s(const server_t &server);
     void print();
 } location_t;
-
-typedef struct limit_except_s
-{
-    std::vector<std::string> allows;
-    std::vector<std::string> denys;
-    limit_except_s();
-} limit_except_t;
 
 typedef struct main_s
 {
@@ -130,8 +125,7 @@ class Block
             const http_t &http);
         static location_t ParseLocation(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
             const server_t &server);
-        static void ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
-            std::map<std::string, struct limit_except_s> limit_excepts);
+        static limit_except_t ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
 
     private:
         ~Block();

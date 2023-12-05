@@ -20,7 +20,15 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
-	// process relative path
+	// check http version, only support HTTP/1.1
+	if (request_.version().compare("HTTP/1.1") != 0)
+	{
+		this->GenerateError(kHttpVersionNotSupported);
+		response_.set_done(true);
+		return;
+	}
+
+	// check if url is valid
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
 	{
@@ -38,9 +46,9 @@ void Http::Execute()
 		response_.set_done(true);
 		return;
 	}
-	location_t location = conf_.GetLocation(location_idx);
+	const location_t location = conf_.GetLocation(location_idx);
 
-	// check return
+	// If return code is non-zero, it means that the request is redirected.
 	if (location.ret.code != 0)
 	{
 		this->GenerateError(kFound);
@@ -60,20 +68,47 @@ void Http::Execute()
 		response_.set_done(true);
 		return;
 	}
+
 	std::cout << "Request Recived Method[" << request_.method() <<
 				"] uri[" << request_.uri() <<
 				"] url[" << url <<
 				"] path[" << conf_.GetPath(url) <<
 				"]" << std::endl;
 
-	// check limit_except
+	// check limit_except.methods
+	const std::vector<std::string> allowed_methods = location.limit_except.methods;
+	if (std::find(allowed_methods.begin(), allowed_methods.end(), request_.method()) == allowed_methods.end())
+	{
+		this->GenerateError(kMethodNotAllowed);
+		response_.set_done(true);
+		return;
+	}
+
+	// if (std::find(allowed_ips.begin(), allowed_ips.end(), request_.client_ip()) == allowed_ips.end())
+	// check limit_except.allows
+	const std::vector<std::string> allowed_ips = location.limit_except.allows;
+	if (std::find(allowed_ips.begin(), allowed_ips.end(), "all") == allowed_ips.end())
+	{
+		this->GenerateError(kForbidden);
+		response_.set_done(true);
+		return;
+	}
+
+	// check limit_except.denys
+	// const std::vector<std::string> denied_ips = location.limit_except.denys;
+	// if (std::find(denied_ips.begin(), denied_ips.end(), request_.client_ip()) != denied_ips.end())
+	// {
+	// 	this->GenerateError(kForbidden);
+	// 	response_.set_done(true);
+	// 	return;
+	// }
 
 	// execute method
-	HttpStatus status = kOk;
+	HttpStatus status;
 	if (request_.method().compare("GET") == 0)
 		status = this->Get(location, url);
 	else if (request_.method().compare("POST") == 0)
-		status = this->Post(location, url);
+		status = this->Post(location);
 #if 0
 	else if (request_.method().compare("DELETE") == 0)
 		status = this->Delete(url);

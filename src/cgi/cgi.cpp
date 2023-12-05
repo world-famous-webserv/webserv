@@ -1,52 +1,33 @@
 #include "cgi.hpp"
 
-Cgi::~Cgi(void) { }
-
-Cgi::Cgi(HttpRequest &request, const location_t &location):
-    request_body_(request.body().str())
+std::string Cgi::to_string(const int i)
 {
+    std::ostringstream oss;
+    oss << i;
+    return oss.str();
+}
+
+std::string Cgi::run(HttpRequest &request, const location_t &location, const std::string &script)
+{
+	std::map<std::string, std::string> env_map;
 	if (request.header("Auth-Scheme") != "")
-		env_["AUTH_TYPE"] = request.header("Authorization");
+		env_map["AUTH_TYPE"] = request.header("Authorization");
+	env_map["CONTENT_LENGTH"] = to_string(request.body().str().size());
+	env_map["CONTENT_TYPE"] = request.header("Content-Type");
+	env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
+	env_map["QUERY_STRING"] = request.header("Query");
+	env_map["REMOTE_HOST"] = request.header("Authorization");
+	env_map["REMOTE_USER"] = request.header("Authorization");
+	env_map["REQUEST_METHOD"] = request.method();
+	env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
+	env_map["SERVER_SOFTWARE"] = "Webserv/1.0";
 
-	env_["CONTENT_LENGTH"] = to_string(request_body_.size());
-	env_["CONTENT_TYPE"] = request.header("Content-Type");
-	env_["GATEWAY_INTERFACE"] = "CGI/1.1";
-	env_["PATH_INFO"] = location.cgi_pass;
-	env_["PATH_TRANSLATED"] = location.cgi_pass;
-	env_["QUERY_STRING"] = request.header("Query");
-	env_["REMOTE_HOST"] = request.header("Authorization");
-	env_["REMOTE_USER"] = request.header("Authorization");
-	env_["REQUEST_METHOD"] = request.method();
-	env_["SCRIPT_NAME"] = location.cgi_pass;
-	env_["SERVER_PROTOCOL"] = "HTTP/1.1";
-	env_["SERVER_SOFTWARE"] = "Webserv/1.0";
-}
-
-Cgi::Cgi(const Cgi &obj)
-{
-	if (this == &obj)
-        return;
-    env_ = obj.env_;
-    request_body_ = obj.request_body_;
-	return;
-}
-
-Cgi	&Cgi::operator=(const Cgi &obj) {
-	if (this == &obj)
-        return *this;
-    env_ = obj.env_;
-    request_body_ = obj.request_body_;
-	return *this;
-}
-
-std::string Cgi::run(std::string script)
-{
 	char **env;
 	try {
-        env = new char*[env_.size() + 1];
-        env[env_.size()] = NULL;
+        env = new char*[env_map.size() + 1];
+        env[env_map.size()] = NULL;
         int	i = 0;
-        for (std::map<std::string, std::string>::const_iterator it = env_.begin(); it != env_.end(); ++it) {
+        for (std::map<std::string, std::string>::const_iterator it = env_map.begin(); it != env_map.end(); ++it) {
             const std::string element = it->first + "=" + it->second;
             env[i] = new char[element.size() + 1];
             env[i] = strcpy(env[i], element.c_str());
@@ -66,7 +47,7 @@ std::string Cgi::run(std::string script)
 	const int in = fileno(fin);
 	const int out = fileno(fout);
 
-    fwrite(request_body_.c_str(), 1, request_body_.size(), fin);
+    fwrite(request.body().str().c_str(), 1, request.body().str().size(), fin);
     fseek(fin, 0, SEEK_SET);
 
 	const pid_t pid = fork();
@@ -75,12 +56,19 @@ std::string Cgi::run(std::string script)
 		std::cerr << "Cgi fork failed." << '\n';
 		return "500";
 	} else if (pid == 0) {
-		static const char *python = "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3";
-		const char *argv[3] = {python, (char *)script.c_str(), NULL};
+		const std::string ext = script.substr(script.find_last_of('.') + 1);
+		const std::map<std::string, std::string>::const_iterator it = location.fastcgi_param.find(ext);
+
+		if (it == location.fastcgi_param.end()) {
+			std::cerr << "Cgi: extension not found." << '\n';
+			return "501";
+		}
+		const char *const ext_path = it->second.c_str();
+		const char *const script_path = script.c_str();
+		const char *const argv[3] = {ext_path, script_path, NULL};
 		dup2(in, STDIN_FILENO);
 		dup2(out, STDOUT_FILENO);
-		std::string line; std::cin >> line;
-		execve(python, (char **)argv, env);
+		execve(ext_path, (char *const *)argv, env);
 		std::cerr << "Cgi execve failed." << '\n';
 		write(STDOUT_FILENO, "500", 3);
 	} else {
@@ -110,11 +98,4 @@ std::string Cgi::run(std::string script)
 	delete[] env;
 
 	return oss.str();
-}
-
-std::string Cgi::to_string(const int i)
-{
-    std::ostringstream oss;
-    oss << i;
-    return oss.str();
 }

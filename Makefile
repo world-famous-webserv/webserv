@@ -33,6 +33,6 @@ chunk:
 	curl --http1.1 -X POST -H "Transfer-Encoding:chunked" --data-binary @Makefile localhost:8080/dump
 
 conf:
-	@cat data/juwon_model.conf | sed 's=PWD=$(PWD)=g' > data/juwon.conf
+	sed 's=PWD=$(shell pwd)=g; s=PYTHON=$(shell which python3)=g' data/juwon_template.conf > data/juwon.conf
 
 .PHONY: all clean fclean re bonus conf

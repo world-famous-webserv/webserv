@@ -1,37 +1,23 @@
 #include <sys/stat.h>
 #include "../http.hpp"
 
-HttpStatus Http::Post(const location_t& location, const std::string url)
+HttpStatus Http::Post(const location_t& location)
 {
-    (void)location;
-	const std::string path = conf_.GetPath(url);
-
-	struct stat sb;
-	if (stat(path.c_str(), &sb) == -1) {
-        std::cout << "Post: stat: [" + path + " ] stat error" << '\n';
-        return kForbidden;
-    }
-	// if (S_ISDIR(sb.st_mode) == false) {
-    //     std::cout << "Post: S_ISDIR: [" + path + " ] error" << '\n';
-    //     return kForbidden;
-    // }
-
-    if (location.cgi_pass.empty()) {
-        std::cout << "Post: cgi_pass: [" + path + " ] cgi_pass expty error" << '\n';
+    std::map<std::string, std::string>::const_iterator it = location.fastcgi_param.find("PATH_INFO");
+    if (it == location.fastcgi_param.end()) {
+        std::cout << "Post: PATH_INFO: empty" << '\n';
         return kNoContent;
     }
 
-    Cgi cgi(request_, location);
-    std::string response_body = cgi.run(location.cgi_pass);
+    std::string response_body = Cgi::run(request_, location, it->second);
     if (response_body.empty()) {
-        std::cout << "Post: cgi.run: [" + path + " ] NoContent error" << '\n';
+        std::cout << "Post: cgi.run: NoContent error" << '\n';
         return kNoContent;
     }
     if (response_body == "500") {
-        std::cout << "Post: cgi.run: [" + path + " ] InternalServer error" << '\n';
+        std::cout << "Post: cgi.run: InternalServer error" << '\n';
         return kInternalServerError;
     }
-
     response_.body() << response_body;
 	response_.set_version(request_.version());
 	response_.add_header("Content-Type", "text/html");

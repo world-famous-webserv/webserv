@@ -3,13 +3,13 @@ import os
 import cgi
 
 form = cgi.FieldStorage()
-object = form["file"]
+object = form["filename"]
 
 file = object.file
 dir_name = os.path.join(os.getcwd(), "files")
 file_name = os.path.basename(object.filename)
 
-if not file:
+if not file_name:
     message = "No file was uploaded"
 else:
     if not os.path.exists(dir_name):

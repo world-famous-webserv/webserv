@@ -66,8 +66,6 @@ std::string Cgi::run(std::string script)
 	const int in = fileno(fin);
 	const int out = fileno(fout);
 
-	std::cout << "request_body_: " << request_body_ << std::endl;
-
     fwrite(request_body_.c_str(), 1, request_body_.size(), fin);
     fseek(fin, 0, SEEK_SET);
 
@@ -82,7 +80,6 @@ std::string Cgi::run(std::string script)
 		dup2(in, STDIN_FILENO);
 		dup2(out, STDOUT_FILENO);
 		std::string line; std::cin >> line;
-		std::cout << "test: " << line << std::endl;
 		execve(python, (char **)argv, env);
 		std::cerr << "Cgi execve failed." << '\n';
 		write(STDOUT_FILENO, "500", 3);

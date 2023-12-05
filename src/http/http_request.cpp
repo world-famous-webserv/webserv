@@ -165,7 +165,6 @@ void HttpRequest::ParseBody(std::stringstream& req)
 {
 	char buf[1024];
 
-	std::cout << "ParseBody: remain_ = " << req.str() << std::endl;
 	req.clear();
 	while (req.good() && remain_ > 0)
 	{

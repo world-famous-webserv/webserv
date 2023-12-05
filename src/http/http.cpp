@@ -66,7 +66,6 @@ void Http::Execute()
 				"] path[" << conf_.GetPath(url) <<
 				"]" << std::endl;
 
-	std::cout << "http: request_.body().str(): " << request_.body().str() << std::endl;
 	// check limit_except
 
 	// execute method

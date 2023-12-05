@@ -20,7 +20,6 @@ HttpStatus Http::Post(const location_t& location, const std::string url)
         std::cout << "Post: cgi_pass: [" + path + " ] cgi_pass expty error" << '\n';
         return kNoContent;
     }
-    std::cout << "Bofore Cgi: " << request_.body().str() << '\n';
 
     Cgi cgi(request_, location);
     std::string response_body = cgi.run(location.cgi_pass);

@@ -6,6 +6,8 @@
 # include <sstream>
 # include <unistd.h>
 # include <cstdio>
+# include <cstring>
+# include <sys/wait.h>
 
 # include "config.hpp"
 # include "http/http_request.hpp"

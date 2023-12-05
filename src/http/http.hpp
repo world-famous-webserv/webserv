@@ -3,7 +3,7 @@
 # include "http_request.hpp"
 # include "http_response.hpp"
 # include "conf.hpp"
-
+# include "cgi/cgi.hpp"
 # include "method/index.hpp"
 
 class Http
@@ -22,7 +22,7 @@ class Http
 	void GenerateError(HttpStatus status);
 	HttpStatus Get(const location_t& location, const std::string url);
 	HttpStatus Post(const location_t& location, const std::string url);
-
+	HttpStatus Delete(const std::string url);
 	HttpRequest request_;
 	HttpResponse response_;
 	const Conf &conf_;

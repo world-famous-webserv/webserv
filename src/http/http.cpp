@@ -60,7 +60,13 @@ void Http::Execute()
 		response_.set_done(true);
 		return;
 	}
+	std::cout << "Request Recived Method[" << request_.method() <<
+				"] uri[" << request_.uri() <<
+				"] url[" << url <<
+				"] path[" << conf_.GetPath(url) <<
+				"]" << std::endl;
 
+	std::cout << "http: request_.body().str(): " << request_.body().str() << std::endl;
 	// check limit_except
 
 	// execute method
@@ -72,8 +78,7 @@ void Http::Execute()
 #if 0
 	else if (request_.method().compare("DELETE") == 0)
 		status = this->Delete(url);
-	else if (request_.method().compare("POST") == 0)
-		status = this->Post();
+#endif
 	else
 		status = kMethodNotAllowed;
 	// if error

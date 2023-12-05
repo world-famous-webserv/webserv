@@ -33,6 +33,8 @@ typedef struct http_s
     std::vector<struct server_s> servers;
     std::map<int, std::string> error_page;
     std::map<std::string, std::string> fastcgi_param;
+    std::string cgi_pass;
+    std::string cgi_ext;
     http_s();
 } http_t;
 
@@ -66,6 +68,8 @@ typedef struct server_s
     std::map<std::string, std::string> fastcgi_param;
     try_files_t try_files;
     return_t ret;
+    std::string cgi_pass;
+    std::string cgi_ext;
     explicit server_s(const http_t &http);
 } server_t;
 
@@ -98,6 +102,8 @@ typedef struct location_s
     fastcgi_pass_t fastcgi_pass;
     try_files_t try_files;
     return_t ret;
+    std::string cgi_pass;
+    std::string cgi_ext;
     explicit location_s(const server_t &server);
     void print();
 } location_t;

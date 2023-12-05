@@ -39,7 +39,9 @@ location_s::location_s(const server_t &server):
     fastcgi_param(server.fastcgi_param),
     fastcgi_pass(),
     try_files(server.try_files),
-    ret(server.ret)
+    ret(server.ret),
+    cgi_pass(server.cgi_pass),
+    cgi_ext(server.cgi_ext)
 {
 }
 
@@ -71,7 +73,9 @@ server_s::server_s(const http_t &http):
     error_page(http.error_page),
     fastcgi_param(http.fastcgi_param),
     try_files(),
-    ret()
+    ret(),
+    cgi_pass(http.cgi_pass),
+    cgi_ext(http.cgi_ext)
 {
 }
 
@@ -99,7 +103,9 @@ http_s::http_s():
     index(Simple::Default.index),
     servers(std::vector<server_t>()),
     error_page(std::map<int, std::string>()),
-    fastcgi_param(std::map<std::string, std::string>())
+    fastcgi_param(std::map<std::string, std::string>()),
+    cgi_pass(),
+    cgi_ext()
 {
 }
 
@@ -143,13 +149,8 @@ http_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std
             http.tcp_nopush = Simple::ParseBool(tokens, idx, error_msg, directive);
         else if (directive == "default_type")
             http.default_type = Simple::ParseString(tokens, idx, error_msg, directive);
-        else if (directive == "root") {
+        else if (directive == "root")
             http.root = Simple::ParseString(tokens, idx, error_msg, directive);
-            if (http.root[0] == '/')
-                http.root.erase(0, 1);
-            if (http.root[http.root.size() - 1] == '/')
-                http.root.erase(http.root.size() - 1);
-        }
         else if (directive == "allow")
             http.allows.push_back(Simple::ParseString(tokens, idx, error_msg, directive));
         else if (directive == "deny")
@@ -184,6 +185,10 @@ http_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std
             http.error_page = Simple::ParseErrorPage(tokens, idx, error_msg);
         else if (directive == "fastcgi_param")
             Simple::ParseFastcgiParam(tokens, idx, error_msg, http.fastcgi_param);
+        else if (directive == "cgi_pass")
+            http.cgi_pass = Simple::ParseString(tokens, idx, error_msg, directive);
+        else if (directive == "cgi_ext")
+            http.cgi_ext = Simple::ParseString(tokens, idx, error_msg, directive);
         else
             error_msg = "Http: Unknown directive [ " + directive + " ]";
     }
@@ -226,13 +231,8 @@ server_t Block::ParseServer(const std::vector<std::string> &tokens, size_t &idx,
             server.tcp_nopush = Simple::ParseBool(tokens, idx, error_msg, directive);
         else if (directive == "default_type")
             server.default_type = Simple::ParseString(tokens, idx, error_msg, directive);
-        else if (directive == "root") {
+        else if (directive == "root")
             server.root = Simple::ParseString(tokens, idx, error_msg, directive);
-            if (server.root[0] == '/')
-                server.root.erase(0, 1);
-            if (server.root[server.root.size() - 1] == '/')
-                server.root.erase(server.root.size() - 1);
-        }
         else if (directive == "allow") {
             if (allows_filled == true) {
                 server.allows = std::vector<std::string>();
@@ -290,6 +290,10 @@ server_t Block::ParseServer(const std::vector<std::string> &tokens, size_t &idx,
             server.try_files = Simple::ParseTryFiles(tokens, idx, error_msg);
         else if (directive == "return")
             server.ret = Simple::ParseReturn(tokens, idx, error_msg);
+        else if (directive == "cgi_pass")
+            server.cgi_pass = Simple::ParseString(tokens, idx, error_msg, directive);
+        else if (directive == "cgi_ext")
+            server.cgi_ext = Simple::ParseString(tokens, idx, error_msg, directive);
         else
             error_msg = "Server: Unknown directive [ " + directive + " ]";
     }
@@ -311,12 +315,6 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
         return location;
     }
     location.name = tokens[idx];
-
-    if (location.name[0] == '/')
-        location.name.erase(0, 1);
-
-    if (location.name[location.name.size() - 1] == '/')
-        location.name.erase(location.name.size() - 1);
 
     ++idx;
     if (idx == tokens.size() || tokens[idx] != "{") {
@@ -346,13 +344,8 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
             location.tcp_nopush = Simple::ParseBool(tokens, idx, error_msg, directive);
         else if (directive == "default_type")
             location.default_type = Simple::ParseString(tokens, idx, error_msg, directive);
-        else if (directive == "root") {
+        else if (directive == "root")
             location.root = Simple::ParseString(tokens, idx, error_msg, directive);
-            if (location.root[0] == '/')
-                location.root.erase(0, 1);
-            if (location.root[location.root.size() - 1] == '/')
-                location.root.erase(location.root.size() - 1);
-        }
         else if (directive == "allow") {
             if (allows_filled == true) {
                 location.allows = std::vector<std::string>();
@@ -411,6 +404,10 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
             location.try_files = Simple::ParseTryFiles(tokens, idx, error_msg);
         else if (directive == "return")
             location.ret = Simple::ParseReturn(tokens, idx, error_msg);
+        else if (directive == "cgi_pass")
+            location.cgi_pass = Simple::ParseString(tokens, idx, error_msg, directive);
+        else if (directive == "cgi_ext")
+            location.cgi_ext = Simple::ParseString(tokens, idx, error_msg, directive);
         else
             error_msg = "Location: Unknown directive [ " + directive + " ] at location [ " + location.name + " ]";
     }

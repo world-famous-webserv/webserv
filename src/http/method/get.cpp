@@ -44,13 +44,10 @@ HttpStatus Http::Get(const location_t& location, const std::string url)
 	std::string path(conf_.GetPath(url));
 
 	struct stat sb;
-	std::cout << "Get: path: [" + path + "]" << '\n';
 	if (stat(path.c_str(), &sb) == -1)
 		return kForbidden;
-	std::cout << "Get: S_ISDIR: [" + path + "]" << '\n';
 	if (S_ISDIR(sb.st_mode))
 		return DirectoryProcess(request_, response_, location, path);
-	std::cout << "Get: S_ISREG: [" + path + "]" << '\n';
 	if (!S_ISREG(sb.st_mode))
 		return kForbidden;
 	

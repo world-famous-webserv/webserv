@@ -9,7 +9,7 @@ bool	index(const HttpRequest& req, HttpResponse& res, const location_t &location
 	std::vector<std::string> index = location.index;
 	
 	for (size_t i = 0; i < index.size(); ++i) {
-		std::string tmp = path + std::string("/") + index[i];
+		std::string tmp = path + index[i];
 		if (access(tmp.c_str(), F_OK) == -1)
 			continue;
 		std::fstream file(tmp.c_str());

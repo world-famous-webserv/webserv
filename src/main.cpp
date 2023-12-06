@@ -1,9 +1,13 @@
 #include <cstdlib>
 #include <iostream>
+#include <csignal>
 
 #include "config.hpp"
 #include "server.hpp"
 #include "conf.hpp"
+#include "cgi/cgi.hpp"
+
+void SigpipeHandler(int signal) { (void)signal; }
 
 int main(int argc, char **argv)
 {
@@ -27,6 +31,7 @@ int main(int argc, char **argv)
 			Multiplex::GetInstance().AddItem(new Server(conf));
 		}
 	}
+	signal(SIGPIPE, SigpipeHandler);
 	Multiplex::GetInstance().Loop();
     return (EXIT_SUCCESS);
 }

@@ -90,6 +90,7 @@ void Multiplex::AddItem(IOEvent* event)
 	EV_SET(&changes[1], event->identifier(), EVFILT_WRITE, EV_ADD, 0, 0, event);
     if (kevent(handler_, changes, 2, NULL, 0, NULL) == -1)
 		std::cerr << "Multiplex: " << strerror(errno) << std::endl;
+	
 #endif
 	ios_[event->identifier()] = event;
 }

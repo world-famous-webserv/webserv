@@ -17,12 +17,13 @@ SRCS	= \
 	http/method/post.cpp \
 	http/method/delete.cpp \
 	http/method/index.cpp \
+	cgi/cgi.cpp \
 	main.cpp
 
 # **************************************************************************** #
 include $(TOPDIR)/build/Rules.mk
 
-CPPFLAGS	+=
+CPPFLAGS	+= -I$(TOPDIR)/src
 CXXFLAGS	+=
 LDFLAGS		+=
 LDLIBS		+=

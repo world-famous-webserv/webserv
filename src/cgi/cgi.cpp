@@ -30,7 +30,7 @@ std::string Cgi::run(HttpRequest &request, const location_t &location, const std
         for (std::map<std::string, std::string>::const_iterator it = env_map.begin(); it != env_map.end(); ++it) {
             const std::string element = it->first + "=" + it->second;
             env[i] = new char[element.size() + 1];
-            env[i] = strcpy(env[i], element.c_str());
+            env[i] = std::strcpy(env[i], element.c_str());
             ++i;
         }
 	}

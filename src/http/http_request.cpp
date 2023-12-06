@@ -139,18 +139,18 @@ void HttpRequest::ParseHeader(const std::string& line)
 		{
 			std::stringstream ss(len);
 			ss >> remain_;
-			step_ = kParseBodyStart;
+			step_ = kParseBody;
 			return;
 		}
 		std::string chunk = this->header("Transfer-Encoding");
 		std::transform(chunk.begin(), chunk.end(), chunk.begin(), ::tolower);
 		if (!chunk.empty() && chunk == "chunked")
 		{
-			step_ = kParseChunkStart;
+			step_ = kParseChunkLen;
 			return;
 		}
 		remain_ = 0;
-		step_ = kParseBodyStart;
+		step_ = kParseBody;
 		return;
 	}
 	std::istringstream iss(line);
@@ -183,7 +183,10 @@ void HttpRequest::ParseChunkLen(const std::string& line)
 	ss << std::hex << line;
 	ss >> remain_;
 	if (remain_ == 0)
+	{
+		ss << std::ends;
 		step_ = kParseDone;
+	}
 	else
 		step_ = kParseChunkBody;
 }

@@ -4,9 +4,7 @@
 enum HttpStep {
 	kParseStart,
 	kParseHeader,
-	kParseBodyStart,
 	kParseBody,
-	kParseChunkStart,
 	kParseChunkLen,
 	kParseChunkBody,
 	kParseDone,

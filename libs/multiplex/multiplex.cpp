@@ -82,15 +82,20 @@ void Multiplex::AddItem(IOEvent* event)
 	struct epoll_event changes;
 	changes.events = EPOLLIN | EPOLLOUT;
 	changes.data.ptr = event;
-	if (epoll_ctl(handler_, EPOLL_CTL_ADD, event->identifier(), &changes) == -1)
+	if (epoll_ctl(handler_, EPOLL_CTL_ADD, event->identifier(), &changes) == -1) {
 		std::cerr << "Multiplex: " << strerror(errno) << std::endl;
+		delete event;
+		return;
+	}
 #else
 	struct kevent changes[2];
 	EV_SET(&changes[0], event->identifier(), EVFILT_READ, EV_ADD, 0, 0, event);
 	EV_SET(&changes[1], event->identifier(), EVFILT_WRITE, EV_ADD, 0, 0, event);
-    if (kevent(handler_, changes, 2, NULL, 0, NULL) == -1)
+    if (kevent(handler_, changes, 2, NULL, 0, NULL) == -1) {
 		std::cerr << "Multiplex: " << strerror(errno) << std::endl;
-	
+		delete event;
+		return;
+	}
 #endif
 	ios_[event->identifier()] = event;
 }

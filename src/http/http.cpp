@@ -92,24 +92,13 @@ void Http::Do(std::stringstream& in, std::stringstream& out)
 	}
 	request_ << in;
 	if (request_.step() == kParseDone)
-		response_.set_done(true);
+	{
+		this->Execute();
+std::cout << "### " << request_.body().rdbuf() << std::endl;
+	}
 	if (request_.step() == kParseFail)
 	{
 		this->GenerateError(kBadRequest);
 		response_.set_done(true);
-	}
-	if (request_.step() == 	kParseBodyStart)
-	{
-		this->Execute();
-		request_.set_step(kParseBody);
-	}
-	else if (request_.step() == kParseChunkStart)
-	{
-		this->Execute();
-		request_.set_step(kParseChunkLen);
-	}
-	else if (request_.step() == kParseBody || request_.step() == kParseChunkLen)
-	{
-		std::cout << "### " << request_.body().rdbuf() << std::endl;
 	}
 }

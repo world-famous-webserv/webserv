@@ -109,10 +109,8 @@ void Http::Execute()
 		status = this->Get(location, url);
 	else if (request_.method().compare("POST") == 0)
 		status = this->Post(location);
-#if 0
 	else if (request_.method().compare("DELETE") == 0)
 		status = this->Delete(url);
-#endif
 	else
 		status = kMethodNotAllowed;
 	// if error

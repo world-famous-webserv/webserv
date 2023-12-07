@@ -10,6 +10,8 @@ SRCS	= \
 	server.cpp \
 	client.cpp \
 	http/http.cpp \
+	http/session.cpp \
+	http/cookie.cpp \
 	http/http_request.cpp \
 	http/http_response.cpp \
 	http/http_error.cpp \

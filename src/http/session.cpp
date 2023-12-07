@@ -5,7 +5,7 @@ Session & Session::GetInstance(void) {
 	return instance;
 }
 
-std::string setSessionId() {
+std::string makeSessionId() {
 	std::ostringstream sessionIdStream;
 	std::srand(static_cast<unsigned int>(std::time(NULL)));
 
@@ -15,7 +15,9 @@ std::string setSessionId() {
 }
 
 std::string	Session::createSession() {
-	std::string sessionId = setSessionId();
+	std::string sessionId = makeSessionId();
+	while (sessionMap.find(sessionId) != sessionMap.end())
+		sessionId = makeSessionId();
 	time_t now = time(NULL);
 	t_session newSession = {sessionId, now + SESSION_TIMEOUT}; // 만료시간 지정
 	sessionMap[sessionId] = newSession;

@@ -133,7 +133,13 @@ std::string Conf::GetPath(const std::string &url) const
     if (idx == -1)
         return "";
     const location_t &location = GetLocation(idx);
-    const std::string path = location.root + url.substr(location.name.length(), url.length() - location.name.length());
+	std::string path(url);
+	path.erase(0, location.name.length());
+	if (location.root[location.root.length() - 1] == '/' && path[0] == '/')
+		path.erase(0, 1);
+	else if (location.root[location.root.length() - 1] != '/' && path[0] != '/')
+		path.insert(0, "/");
+	path.insert(0, location.root);
     return path;
 }
 

@@ -4,6 +4,7 @@
 # include <sstream>
 # include <algorithm>
 # include "http_code.hpp"
+# include "cookie.hpp"
 
 class HttpResponse
 {

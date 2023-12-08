@@ -300,11 +300,7 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
         error_msg = "Location: Missing location name";
         return location;
     }
-    const std::string &tmp_name = tokens[idx++];
-    if (tmp_name[tmp_name.size() - 1] == '/')
-        location.name = tmp_name.substr(0, tmp_name.size() - 1);
-    else
-        location.name = tmp_name;
+    location.name = tokens[idx++];
 
     if (idx == tokens.size() || tokens[idx] != "{") {
         error_msg = "Location: Missing {";

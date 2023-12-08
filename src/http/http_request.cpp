@@ -45,7 +45,14 @@ const std::string &HttpRequest::uri(void) const
 
 void HttpRequest::set_uri(const std::string &uri)
 {
-	uri_ = uri;
+	std::size_t query_pos = uri.find('?');
+
+	if (query_pos == std::string::npos)
+		uri_ = uri;
+	else {
+		uri_ = uri.substr(0, query_pos);
+		this->add_header("Query", uri);
+	}
 }
 
 const std::string &HttpRequest::version(void) const

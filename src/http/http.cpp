@@ -20,10 +20,11 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
+	request_.set_step(kExecuteDone);
 	if (request_.body().str().length() > static_cast<size_t>(conf_.client_max_body_size))
 	{
 		this->GenerateError(kPayloadTooLarge);
-		response_.set_done(true);
+		return response_.set_done(true);
 	}
 
 	std::cout << "EXECUTE!" << std::endl;
@@ -33,8 +34,7 @@ void Http::Execute()
 	{
 		this->GenerateError(kFound);
 		response_.add_header("Location", "/");
-		response_.set_done(true);
-		return;
+		return response_.set_done(true);
 	}
 
 	// get location
@@ -42,8 +42,7 @@ void Http::Execute()
 	if (location_idx == -1)
 	{
 		this->GenerateError(kNotFound);
-		response_.set_done(true);
-		return;
+		return response_.set_done(true);
 	}
 	location_t location = conf_.GetLocation(location_idx);
 
@@ -64,8 +63,7 @@ void Http::Execute()
 				response_.body().str(location.ret.text);
 				break;
 		}
-		response_.set_done(true);
-		return;
+		return response_.set_done(true);
 	}
 
 	// check limit_except
@@ -82,7 +80,7 @@ void Http::Execute()
 		status = kMethodNotAllowed;
 	// if error
 	if (200 <= status && status <= 299)
-		return ;
+		return;
 	this->GenerateError(status);
 	response_.set_done(true);
 }

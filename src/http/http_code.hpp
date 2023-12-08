@@ -8,7 +8,8 @@ enum HttpStep {
 	kParseChunkLen,
 	kParseChunkBody,
 	kParseDone,
-	kParseFail
+	kParseFail,
+	kExecuteDone
 };
 
 enum HttpStatus {

@@ -95,7 +95,7 @@ typedef struct location_s
     std::map<int, std::string> error_page;
     std::map<std::string, struct limit_except_s> limit_excepts;
     std::map<std::string, std::string> fastcgi_param;
-    fastcgi_pass_t fastcgi_pass;
+    std::string fastcgi_pass;
     try_files_t try_files;
     return_t ret;
     explicit location_s(const server_t &server);

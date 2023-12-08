@@ -384,7 +384,7 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
             Simple::ParseFastcgiParam(tokens, idx, error_msg, location.fastcgi_param);
         }
         else if (directive == "fastcgi_pass")
-            location.fastcgi_pass = Simple::ParseFastcgiPass(tokens, idx, error_msg);
+            location.fastcgi_pass = Simple::ParseString(tokens, idx, error_msg, directive);
         else if (directive == "try_files")
             location.try_files = Simple::ParseTryFiles(tokens, idx, error_msg);
         else if (directive == "return")
@@ -505,10 +505,5 @@ void location_s::print() {
     std::cout << "    files:";
     for (size_t i = 0; i < try_files.files.size(); i++)
         std::cout << " " << try_files.files[i];
-    std::cout << '\n';
-    std::cout << "fastcgi_pass:" << '\n';
-    std::cout << "    address: " << fastcgi_pass.address << '\n';
-    std::cout << "    port: " << fastcgi_pass.port << '\n';
-    std::cout << "    unix: " << fastcgi_pass.unix << '\n';
     std::cout << "\n";
 }

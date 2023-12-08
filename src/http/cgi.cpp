@@ -24,7 +24,11 @@ void Cgi::Child(void)
 {
 	// args
 	std::vector<std::string> args;
-	args.push_back("/var/www/webserv/ubuntu_cgi_tester");
+	args.push_back(location_.fastcgi_pass);
+
+	const std::map<std::string, std::string>::const_iterator it = location_.fastcgi_param.find("PATH_INFO");
+	if (it != location_.fastcgi_param.end())
+		args.push_back(it->second);
 
 	std::vector<char*> args_p;
 	for (std::size_t i = 0; i < args.size(); ++i)
@@ -50,7 +54,7 @@ void Cgi::Child(void)
 	std::vector<char*> envp_p;
 	for (std::size_t i = 0; i < envp.size(); ++i)
 		envp_p.push_back(const_cast<char*>(envp[i].c_str()));
-	args_p.push_back(NULL);
+	envp_p.push_back(NULL);
 
 	execve(args[0].c_str(), &args_p[0], &envp_p[0]);
 	std::exit(EXIT_FAILURE);

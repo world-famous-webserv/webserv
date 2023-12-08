@@ -52,19 +52,12 @@ typedef struct try_files_s {
     try_files_s();
 } try_files_t;
 
-typedef struct fastcgi_pass_s {
-    std::string address;
-    std::string port;
-    int unix;
-    fastcgi_pass_s();
-} fastcgi_pass_t;
-
 typedef struct default_s {
     listen_t listen;
     return_t ret;
     keepalive_timeout_t keepalive_timeout;
     try_files_t try_files;
-    fastcgi_pass_t fastcgi_pass;
+    std::string fastcgi_pass;
     bool sendfile;
     bool autoindex;
     bool absolute_redirect;
@@ -95,7 +88,6 @@ class Simple
         static std::vector<std::string> ParseStringVector(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive);
         static int ParseInt(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, const std::string &directive, const bool is_time);
 
-        static fastcgi_pass_t ParseFastcgiPass(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
         static void ParseFastcgiParam(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, std::map<std::string, std::string> &fastcgi_param);
         static std::map<int, std::string> ParseErrorPage(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
         static keepalive_timeout_t ParseKeepaliveTimeout(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);

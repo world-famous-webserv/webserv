@@ -14,6 +14,7 @@ SRCS	= \
 	http/cookie.cpp \
 	http/http_request.cpp \
 	http/http_response.cpp \
+	http/cgi.cpp \
 	http/http_error.cpp \
 	http/method/get.cpp \
 	http/method/post.cpp \

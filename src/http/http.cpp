@@ -20,6 +20,7 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
+	std::cout << "EXECUTE!" << std::endl;
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
@@ -83,6 +84,22 @@ void Http::Execute()
 
 void Http::Do(std::stringstream& in, std::stringstream& out)
 {
+	if (request_.step() == kParseStart)
+		std::cout << "kParseStart" << std::endl;
+	if (request_.step() == kParseHeader)
+		std::cout << "kParseHeader" << std::endl;
+	if (request_.step() == kParseBody)
+		std::cout << "kParseBody" << std::endl;
+	if (request_.step() == kParseChunkLen)
+		std::cout << "kParseChunkLen" << std::endl;
+	if (request_.step() == kParseChunkBody)
+		std::cout << "kParseChunkBody" << std::endl;
+	if (request_.step() == kParseDone)
+		std::cout << "kParseDone" << std::endl;
+	if (request_.step() == kParseFail)
+		std::cout << "kParseFail" << std::endl;
+
+
 	if (response_.done())
 	{
 		response_ >> out;

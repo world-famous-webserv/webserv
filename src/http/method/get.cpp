@@ -1,6 +1,7 @@
 #include <sys/stat.h>
 #include "index.hpp"
 #include "../http.hpp"
+#include "../cgi.hpp"
 
 static HttpStatus FileProcess(const HttpRequest& req, HttpResponse& res, std::string path)
 {
@@ -16,15 +17,6 @@ static HttpStatus FileProcess(const HttpRequest& req, HttpResponse& res, std::st
 	res.set_done(true);
 	file.close();
 	return kOk;
-}
-
-static HttpStatus CgiProcess(const HttpRequest& req, HttpResponse& res, const location_t &location, std::string path)
-{
-	(void)req;
-	(void)res;
-	(void)location;
-	(void)path;
-	return kForbidden;
 }
 
 static HttpStatus DirectoryProcess(const HttpRequest& req, HttpResponse& res, const location_t &location, std::string path)
@@ -48,13 +40,13 @@ HttpStatus Http::Get(const location_t& location, const std::string url)
 		return kForbidden;
 	if (S_ISDIR(sb.st_mode))
 		return DirectoryProcess(request_, response_, location, path);
-	if (!S_ISREG(sb.st_mode))
-		return kForbidden;
-	
-	bool is_cgi = false;
-#if 1
-	if (is_cgi)
-		return CgiProcess(request_, response_, location, path);
-#endif
-	return FileProcess(request_, response_, path);
+
+	std::cout << "location.name = " << location.name << std::endl;
+	std::cout << "location.root = " << location.root << std::endl;
+	std::cout << "location.fastcgi_param empty = " << location.fastcgi_param.empty() << std::endl;
+	std::cout << "location.fastcgi_param cnt = " << location.fastcgi_param.size() << std::endl;
+	if (location.fastcgi_param.empty())
+		return FileProcess(request_, response_, path);
+	Multiplex::GetInstance().AddItem(new Cgi(location, request_, response_));
+	return kOk;
 }

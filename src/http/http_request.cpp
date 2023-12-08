@@ -142,6 +142,11 @@ void HttpRequest::ParseHeader(const std::string& line)
 			step_ = kParseBody;
 			return;
 		}
+		if (method_.compare("POST") != 0)
+		{
+			step_ = kParseDone;
+			return;
+		}
 		std::string chunk = this->header("Transfer-Encoding");
 		std::transform(chunk.begin(), chunk.end(), chunk.begin(), ::tolower);
 		if (!chunk.empty() && chunk == "chunked")

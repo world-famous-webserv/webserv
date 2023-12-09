@@ -27,7 +27,7 @@ bool	index(const HttpRequest& req, HttpResponse& res, const location_t &location
 	return EXIT_FAILURE;
 }
 
-std::string	setHead(std::string & path) {
+std::string	setHead(const std::string & path) {
 	return "<html><head><title>Index of " + path + "</title></head>\n<body>\n<h1>Index of " + path + "</h1><hr><pre>\n";
 }
 
@@ -68,7 +68,7 @@ void	autoindex(const HttpRequest& req, HttpResponse& res, std::string & path) {
 	struct dirent	*entry;
 	DIR 			*dp = opendir(path.c_str());
 
-	res.body() << setHead(path);
+	res.body() << setHead(req.uri());
 	while ((entry = readdir(dp)) != NULL) {
 		std::string dname(entry->d_name);
 		if (dname == ".")

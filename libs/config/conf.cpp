@@ -137,6 +137,12 @@ std::string Conf::GetPath(const std::string &url) const
     return path;
 }
 
+std::string Conf::GetExt(const std::string &url) const
+{
+    const std::string ext = url.substr(url.find_last_of('.') + 1);
+    return ext;
+}
+
 int Conf::GetLocationIdx(const std::string &url) const
 {
     size_t max_location_name_length = 0;

@@ -17,7 +17,7 @@ default_s::default_s():
     ret(),
     keepalive_timeout(),
     try_files(),
-    fastcgi_pass(),
+    fastcgi_extension(),
     sendfile(false),
     autoindex(false),
     absolute_redirect(true),
@@ -436,23 +436,23 @@ try_files_t Simple::ParseTryFiles(const std::vector<std::string> &tokens, size_t
     return try_files;
 }
 
-void Simple::ParseFastcgiParam(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, std::map<std::string, std::string> &fastcgi_param)
+void Simple::ParseMap(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, std::map<std::string, std::string> &map, const std::string &directive)
 {
     if (idx == tokens.size()) {
-        error_msg = "fastcgi_param: Missing parameter";
+        error_msg = directive + ": Missing parameter";
         return;
     }
     if (idx + 1 == tokens.size()) {
-        error_msg = "fastcgi_param: Missing value";
+        error_msg = directive + ": Missing value";
         return;
     }
     if (idx + 2 == tokens.size() || tokens[idx + 2] != ";") {
-        error_msg = "fastcgi_param: Missing ;";
+        error_msg = directive + ": Missing ;";
         return;
     }
     const std::string parameter = tokens[idx++];
     const std::string value = tokens[idx++];
-    fastcgi_param[parameter] = value;
+    map[parameter] = value;
     ++idx;
     return;
 }

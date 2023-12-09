@@ -20,6 +20,9 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
+	std::cout << "Uri = " << request_.uri() << std::endl;
+	std::cout << "Url = " << conf_.GetUrl(request_.uri()) << std::endl;
+	std::cout << "Path = " << conf_.GetPath(conf_.GetUrl(request_.uri())) << std::endl;
 	if (request_.body().str().length() > static_cast<size_t>(conf_.client_max_body_size))
 	{
 		this->GenerateError(kPayloadTooLarge);

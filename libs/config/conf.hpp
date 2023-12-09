@@ -13,6 +13,7 @@ class Conf
 
         std::string GetUrl(const std::string &str) const;
         std::string GetPath(const std::string &url) const;
+        std::string GetExt(const std::string &url) const;
 
         int GetLocationIdx(const std::string &url) const;
         location_t GetLocation(const int idx) const;

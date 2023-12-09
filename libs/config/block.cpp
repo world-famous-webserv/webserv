@@ -178,7 +178,7 @@ http_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std
         else if (directive == "error_page")
             http.error_page = Simple::ParseErrorPage(tokens, idx, error_msg);
         else if (directive == "fastcgi_param")
-            Simple::ParseFastcgiParam(tokens, idx, error_msg, http.fastcgi_param);
+            Simple::ParseMap(tokens, idx, error_msg, http.fastcgi_param, directive);
         else
             error_msg = "Http: Unknown directive [ " + directive + " ]";
     }
@@ -274,7 +274,7 @@ server_t Block::ParseServer(const std::vector<std::string> &tokens, size_t &idx,
                 server.fastcgi_param = std::map<std::string, std::string>();
                 factcgi_param_filled = false;
             }
-            Simple::ParseFastcgiParam(tokens, idx, error_msg, server.fastcgi_param);
+            Simple::ParseMap(tokens, idx, error_msg, server.fastcgi_param, directive);
         }
         else if (directive == "try_files")
             server.try_files = Simple::ParseTryFiles(tokens, idx, error_msg);
@@ -381,10 +381,10 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
                 location.fastcgi_param = std::map<std::string, std::string>();
                 factcgi_param_filled = false;
             }
-            Simple::ParseFastcgiParam(tokens, idx, error_msg, location.fastcgi_param);
+            Simple::ParseMap(tokens, idx, error_msg, location.fastcgi_param, directive);
         }
         else if (directive == "fastcgi_pass")
-            location.fastcgi_pass = Simple::ParseString(tokens, idx, error_msg, directive);
+            Simple::ParseMap(tokens, idx, error_msg, location.fastcgi_pass, directive);
         else if (directive == "try_files")
             location.try_files = Simple::ParseTryFiles(tokens, idx, error_msg);
         else if (directive == "return")

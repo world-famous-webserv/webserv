@@ -7,6 +7,14 @@
 # include <iostream>
 # include "simple.hpp"
 
+typedef struct limit_except_s
+{
+    std::vector<std::string> methods;
+    std::vector<std::string> allows;
+    std::vector<std::string> denys;
+    limit_except_s();
+} limit_except_t;
+
 typedef struct http_s
 {
     bool sendfile;
@@ -101,14 +109,6 @@ typedef struct location_s
     explicit location_s(const server_t &server);
     void print();
 } location_t;
-
-typedef struct limit_except_s
-{
-    std::vector<std::string> methods;
-    std::vector<std::string> allows;
-    std::vector<std::string> denys;
-    limit_except_s();
-} limit_except_t;
 
 typedef struct main_s
 {

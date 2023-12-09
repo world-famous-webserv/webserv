@@ -93,7 +93,7 @@ typedef struct location_s
     std::vector<std::string> index;
     std::vector<struct location_s> locations;
     std::map<int, std::string> error_page;
-    std::map<std::string, struct limit_except_s> limit_excepts;
+    struct limit_except_s limit_except;
     std::map<std::string, std::string> fastcgi_param;
     std::map<std::string, std::string> fastcgi_pass;
     try_files_t try_files;
@@ -104,6 +104,7 @@ typedef struct location_s
 
 typedef struct limit_except_s
 {
+    std::vector<std::string> methods;
     std::vector<std::string> allows;
     std::vector<std::string> denys;
     limit_except_s();
@@ -124,8 +125,7 @@ class Block
             const http_t &http);
         static location_t ParseLocation(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
             const server_t &server);
-        static void ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
-            std::map<std::string, struct limit_except_s> limit_excepts);
+        static limit_except_t ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg);
 
     private:
         ~Block();

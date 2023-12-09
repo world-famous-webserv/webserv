@@ -146,7 +146,10 @@ void HttpRequest::ParseHeader(const std::string& line)
 		{
 			std::stringstream ss(len);
 			ss >> remain_;
-			step_ = kParseBody;
+			if (remain_ == 0)
+				step_ = kParseDone;
+			else
+				step_ = kParseBody;
 			return;
 		}
 		if (method_.compare("POST") != 0)

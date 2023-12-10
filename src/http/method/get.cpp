@@ -40,13 +40,9 @@ HttpStatus Http::Get(const location_t& location, const std::string url)
 		return kForbidden;
 	if (S_ISDIR(sb.st_mode))
 		return DirectoryProcess(request_, response_, location, path);
-
-	std::cout << "location.name = " << location.name << std::endl;
-	std::cout << "location.root = " << location.root << std::endl;
-	std::cout << "location.fastcgi_param empty = " << location.fastcgi_param.empty() << std::endl;
-	std::cout << "location.fastcgi_param cnt = " << location.fastcgi_param.size() << std::endl;
-	if (location.fastcgi_param.empty())
+	std::string cgi = Cgi::GetCgi(location, path);
+	if (cgi.empty())
 		return FileProcess(request_, response_, path);
-	Multiplex::GetInstance().AddItem(new Cgi(conf_, url, request_, response_));
+	Multiplex::GetInstance().AddItem(new Cgi(location, request_, response_));
 	return kOk;
 }

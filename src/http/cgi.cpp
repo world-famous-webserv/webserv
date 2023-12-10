@@ -8,9 +8,8 @@ Cgi::~Cgi(void)
 {
 }
 
-Cgi::Cgi(const Conf &conf, const std::string &url, HttpRequest& req, HttpResponse& res):
-	conf_(conf),
-	url_(url),
+Cgi::Cgi(const location_t& location, HttpRequest& req, HttpResponse& res):
+	location_(location),
 	request_(req),
 	response_(res)
 {
@@ -21,12 +20,28 @@ Cgi::Cgi(const Conf &conf, const std::string &url, HttpRequest& req, HttpRespons
 // Utility
 /* ************************************************************************** */
 
+std::string Cgi::GetCgi(const location_t& location, const std::string path)
+{
+	std::string::size_type idx = path.rfind('.');
+	if (idx == std::string::npos)
+		return "";
+	std::string extension = path.substr(idx + 1);
+	std::map<std::string, std::string>::const_iterator it = location.fastcgi_pass.find(extension);
+	if (it == location.fastcgi_pass.end())
+		return "";
+	return it->second;
+}
+
 void Cgi::Child(void)
 {
+	const std::string url = request_.uri();
+    const std::string file = location_.root + url.substr(location_.name.length(), url.length() - location_.name.length());
+	const std::string program = GetCgi(location_, file);
+
 	// args
 	std::vector<std::string> args;
-	args.push_back(this->cgipass_);
-	args.push_back(this->cgifile_);
+	args.push_back(program);
+	args.push_back(file);
 
 	std::vector<char*> args_p;
 	for (std::size_t i = 0; i < args.size(); ++i)
@@ -65,39 +80,6 @@ void Cgi::Child(void)
 void Cgi::Open()
 {
 	std::cout << "Cgi::Open" << std::endl;
-
-	const int location_idx = conf_.GetLocationIdx(url_);
-	if (location_idx == -1) {
-		std::cerr << "Cgi Open - Invalid location" << std::endl;
-		response_.set_status(kNotFound);
-		return;
-	}
-
-	const std::string path = conf_.GetPath(url_);
-	if (path == "") {
-		std::cerr << "Cgi Open - Invalid path" << std::endl;
-		response_.set_status(kNotFound);
-		return;
-	}
-
-	const std::string ext = conf_.GetExt(url_);
-	if (ext == "") {
-		std::cerr << "Cgi Open - Extension Missing" << std::endl;
-		response_.set_status(kNotFound);
-		return;
-	}
-
-	const location_t &location = conf_.GetLocation(location_idx);
-	const std::map<std::string, std::string>::const_iterator it = location.fastcgi_pass.find(ext);
-	if (it == location.fastcgi_pass.end()) {
-		std::cerr << "Cgi Open - Not supproted extension" << std::endl;
-		response_.set_status(kNotFound);
-		return;
-	}
-
-	// set cgi pass
-	cgipass_ = it->second;
-	cgifile_ = path;
 
 	int fd[2];
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd) == -1) {

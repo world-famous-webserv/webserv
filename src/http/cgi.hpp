@@ -9,13 +9,15 @@
 class Cgi : public IOEvent
 {
  public:
-	Cgi(const Conf &conf, const std::string &uri, HttpRequest& req, HttpResponse& res);
+	Cgi(const location_t& location, HttpRequest& req, HttpResponse& res);
 	virtual ~Cgi(void);
 
 	void Open(void);
 	void Read(void);
 	void Write(void);
 	void Update(void);
+
+	static std::string GetCgi(const location_t& location, const std::string path);
  private:
 	Cgi(void);
 	Cgi(const Cgi &obj);
@@ -24,12 +26,7 @@ class Cgi : public IOEvent
 	void Child(void);
 
 	pid_t pid_;
-
-	std::string cgipass_;
-	std::string cgifile_;
-
-	Conf conf_;
-	std::string url_;
+	const location_t& location_;
 	HttpRequest& request_;
 	HttpResponse& response_;
 };

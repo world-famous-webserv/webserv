@@ -24,17 +24,17 @@ HttpStatus Http::Post(const location_t& location, const std::string url)
 {
 	std::string path(conf_.GetPath(url));
 
-	std::cout << "location.name = " << location.name << std::endl;
-	std::cout << "location.root = " << location.root << std::endl;
-	std::cout << "location.fastcgi_param empty = " << location.fastcgi_param.empty() << std::endl;
-	std::cout << "location.fastcgi_param cnt = " << location.fastcgi_param.size() << std::endl;
-	if (location.fastcgi_param.empty()) {
-		if (access(path.c_str(), F_OK) != -1) {
-			std::cout << "Post: File already exists" << std::endl;
-			return kSeeOther;
-		}
-		return FileProcess(request_, response_, path);
+	std::string cgi = Cgi::GetCgi(location, path);
+	if (cgi.empty() == false) {
+		Multiplex::GetInstance().AddItem(new Cgi(location, request_, response_));
+		return kOk;
 	}
-	Multiplex::GetInstance().AddItem(new Cgi(conf_, url, request_, response_));
-	return kCreated;
+	struct stat sb;
+	if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
+		return kForbidden;
+	if (access(path.c_str(), F_OK) == -1)
+		return FileProcess(request_, response_, path);
+	response_.add_header("Location", request_.uri());
+	response_.set_done(true);
+	return kSeeOther;
 }

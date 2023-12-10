@@ -6,6 +6,7 @@
 
 Cgi::~Cgi(void)
 {
+	this->Update();
 }
 
 Cgi::Cgi(const location_t& location, HttpRequest& req, HttpResponse& res):
@@ -13,6 +14,7 @@ Cgi::Cgi(const location_t& location, HttpRequest& req, HttpResponse& res):
 	request_(req),
 	response_(res)
 {
+	std::cout << "Cgi::Open" << std::endl;
 	this->Open();
 }
 
@@ -102,7 +104,6 @@ void Cgi::Open()
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
 		this->Child();
-		std::exit(EXIT_FAILURE);
 	}
 	else
 	{
@@ -130,15 +131,29 @@ void Cgi::Write(void)
 {
 	if (identifier_ == -1)
 		return;
+	// get
+	char buf[1024] = {0};
+	request_.body().clear();
+	request_.body().read(buf, sizeof(buf));
+	if (request_.body().gcount() <= 0) return;
+	// send
+	ssize_t nbytes = send(identifier_, buf, request_.body().gcount(), 0);
+	if (nbytes < 0) {
+		response_.set_status(kInternalServerError);
+		return this->Broken(errno);
+	}
+	if (nbytes == 0) return this->Update();
+	request_.body().seekg(nbytes, std::ios::cur);
 }
 
 void Cgi::Update(void)
 {
-	if (identifier_ == -1)
-		return;
-	int status;
-	if (waitpid(pid_, &status, WNOHANG) != 0)
-	{
+	int status = 0;
+	int ret = waitpid(pid_, &status, WNOHANG);
+	if (ret < 0) {
+		std::cerr << "waitpid error: " << strerror(errno) << std::endl;
+		return response_.set_status(kInternalServerError);
+	} else if (ret != 0) {
 		if (WIFEXITED(status))
 			response_.set_done(true);
 		else

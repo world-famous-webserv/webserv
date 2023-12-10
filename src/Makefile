@@ -17,6 +17,7 @@ SRCS	= \
 	http/cgi.cpp \
 	http/http_error.cpp \
 	http/method/get.cpp \
+	http/method/put.cpp \
 	http/method/post.cpp \
 	http/method/delete.cpp \
 	http/method/index.cpp \

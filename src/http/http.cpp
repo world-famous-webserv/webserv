@@ -89,12 +89,15 @@ void Http::Execute()
 	HttpStatus status = kOk;
 	if (request_.method().compare("GET") == 0)
 		status = this->Get(location, url);
-	else if (request_.method().compare("DELETE") == 0)
-		status = this->Delete(url);
+	else if (request_.method().compare("PUT") == 0)
+		status = this->Put(location, url);
 	else if (request_.method().compare("POST") == 0)
 		status = this->Post(location, url);
+	else if (request_.method().compare("DELETE") == 0)
+		status = this->Delete(url);
 	else
 		status = kMethodNotAllowed;
+	response_.set_status(status);
 	// if error
 	if (200 <= status && status <= 299) {
 		response_.set_status(status);

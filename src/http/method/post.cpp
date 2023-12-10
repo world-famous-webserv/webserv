@@ -24,17 +24,24 @@ HttpStatus Http::Post(const location_t& location, const std::string url)
 {
 	std::string path(conf_.GetPath(url));
 
-	std::cout << "location.name = " << location.name << std::endl;
-	std::cout << "location.root = " << location.root << std::endl;
-	std::cout << "location.fastcgi_param empty = " << location.fastcgi_param.empty() << std::endl;
-	std::cout << "location.fastcgi_param cnt = " << location.fastcgi_param.size() << std::endl;
-	if (location.fastcgi_param.empty()) {
+	struct stat sb;
+	std::cerr << "Post: " << path << std::endl;
+	if (stat(path.c_str(), &sb) != -1) {
+		if (S_ISDIR(sb.st_mode))
+			return kForbidden;
 		if (access(path.c_str(), F_OK) != -1) {
-			std::cout << "Post: File already exists" << std::endl;
-			return kSeeOther;
+			std::cerr << "Post: File already exists" << std::endl;
+			return kNoContent;
 		}
-		return FileProcess(request_, response_, path);
+		return kInternalServerError;
 	}
-	Multiplex::GetInstance().AddItem(new Cgi(conf_, url, request_, response_));
+	if (location.fastcgi_pass.empty())
+		return FileProcess(request_, response_, path);
+	const std::string &cgipass = Cgi::GetCgiPass(location, path);
+	if (cgipass.empty()) {
+		response_.set_status(kNotFound);
+		return kNotFound;
+	}
+	Multiplex::GetInstance().AddItem(new Cgi(cgipass, request_, response_));
 	return kCreated;
 }

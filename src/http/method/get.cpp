@@ -45,8 +45,13 @@ HttpStatus Http::Get(const location_t& location, const std::string url)
 	std::cout << "location.root = " << location.root << std::endl;
 	std::cout << "location.fastcgi_param empty = " << location.fastcgi_param.empty() << std::endl;
 	std::cout << "location.fastcgi_param cnt = " << location.fastcgi_param.size() << std::endl;
-	if (location.fastcgi_param.empty())
+	if (location.fastcgi_pass.empty())
 		return FileProcess(request_, response_, path);
-	Multiplex::GetInstance().AddItem(new Cgi(conf_, url, request_, response_));
+	const std::string &cgipass = Cgi::GetCgiPass(location, path);
+	if (cgipass.empty()) {
+		response_.set_status(kNotFound);
+		return kNotFound;
+	}
+	Multiplex::GetInstance().AddItem(new Cgi(cgipass, request_, response_));
 	return kOk;
 }

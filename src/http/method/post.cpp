@@ -24,14 +24,15 @@ HttpStatus Http::Post(const location_t& location, const std::string url)
 {
 	std::string path(conf_.GetPath(url));
 
-	std::cout << "location.name = " << location.name << std::endl;
-	std::cout << "location.root = " << location.root << std::endl;
-	std::cout << "location.fastcgi_param empty = " << location.fastcgi_param.empty() << std::endl;
-	std::cout << "location.fastcgi_param cnt = " << location.fastcgi_param.size() << std::endl;
-	if (location.fastcgi_param.empty()) {
+	struct stat sb;
+	if (stat(path.c_str(), &sb) == -1)
+		return kForbidden;
+	if (S_ISDIR(sb.st_mode))
+		return kForbidden;
+	if (location.fastcgi_pass.empty()) {
 		if (access(path.c_str(), F_OK) != -1) {
 			std::cout << "Post: File already exists" << std::endl;
-			return kSeeOther;
+			return kNoContent;
 		}
 		return FileProcess(request_, response_, path);
 	}

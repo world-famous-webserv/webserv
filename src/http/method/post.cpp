@@ -26,7 +26,7 @@ HttpStatus Http::Post(const location_t& location, const std::string url)
 
 	struct stat sb;
 	if (stat(path.c_str(), &sb) == -1)
-		return kForbidden;
+		return kInternalServerError;
 	if (S_ISDIR(sb.st_mode))
 		return kForbidden;
 	if (location.fastcgi_pass.empty()) {

@@ -96,8 +96,10 @@ void Http::Execute()
 	else
 		status = kMethodNotAllowed;
 	// if error
-	if (200 <= status && status <= 299)
+	if (200 <= status && status <= 299) {
+		response_.set_status(status);
 		return;
+	}
 	this->GenerateError(status);
 	response_.set_done(true);
 }

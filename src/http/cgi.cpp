@@ -8,8 +8,9 @@ Cgi::~Cgi(void)
 {
 }
 
-Cgi::Cgi(const location_t& location, HttpRequest& req, HttpResponse& res):
-	location_(location),
+Cgi::Cgi(const Conf &conf, const std::string &url, HttpRequest& req, HttpResponse& res):
+	conf_(conf),
+	url_(url),
 	request_(req),
 	response_(res)
 {
@@ -24,7 +25,8 @@ void Cgi::Child(void)
 {
 	// args
 	std::vector<std::string> args;
-	args.push_back("/var/www/webserv/ubuntu_cgi_tester");
+	args.push_back(this->cgipass_);
+	args.push_back(this->cgifile_);
 
 	std::vector<char*> args_p;
 	for (std::size_t i = 0; i < args.size(); ++i)
@@ -50,7 +52,7 @@ void Cgi::Child(void)
 	std::vector<char*> envp_p;
 	for (std::size_t i = 0; i < envp.size(); ++i)
 		envp_p.push_back(const_cast<char*>(envp[i].c_str()));
-	args_p.push_back(NULL);
+	envp_p.push_back(NULL);
 
 	execve(args[0].c_str(), &args_p[0], &envp_p[0]);
 	std::exit(EXIT_FAILURE);
@@ -60,9 +62,42 @@ void Cgi::Child(void)
 // Main
 /* ************************************************************************** */
 
-void Cgi::Open(void)
+void Cgi::Open()
 {
 	std::cout << "Cgi::Open" << std::endl;
+
+	const int location_idx = conf_.GetLocationIdx(url_);
+	if (location_idx == -1) {
+		std::cerr << "Cgi Open - Invalid location" << std::endl;
+		response_.set_status(kNotFound);
+		return;
+	}
+
+	const std::string path = conf_.GetPath(url_);
+	if (path == "") {
+		std::cerr << "Cgi Open - Invalid path" << std::endl;
+		response_.set_status(kNotFound);
+		return;
+	}
+
+	const std::string ext = conf_.GetExt(url_);
+	if (ext == "") {
+		std::cerr << "Cgi Open - Extension Missing" << std::endl;
+		response_.set_status(kNotFound);
+		return;
+	}
+
+	const location_t &location = conf_.GetLocation(location_idx);
+	const std::map<std::string, std::string>::const_iterator it = location.fastcgi_pass.find(ext);
+	if (it == location.fastcgi_pass.end()) {
+		std::cerr << "Cgi Open - Not supproted extension" << std::endl;
+		response_.set_status(kNotFound);
+		return;
+	}
+
+	// set cgi pass
+	cgipass_ = it->second;
+	cgifile_ = path;
 
 	int fd[2];
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd) == -1) {

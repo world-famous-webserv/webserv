@@ -20,6 +20,9 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
+	std::cout << "Uri = " << request_.uri() << std::endl;
+	std::cout << "Url = " << conf_.GetUrl(request_.uri()) << std::endl;
+	std::cout << "Path = " << conf_.GetPath(conf_.GetUrl(request_.uri())) << std::endl;
 	request_.set_step(kExecuteDone);
 	if (request_.body().str().length() > static_cast<size_t>(conf_.client_max_body_size))
 	{
@@ -67,6 +70,20 @@ void Http::Execute()
 	}
 
 	// check limit_except
+	const std::vector<std::string> &methods = location.limit_except.methods;
+	if (std::find(methods.begin(), methods.end(), request_.method()) == methods.end())
+	{
+		const std::vector<std::string> &allows = location.allows;
+		const std::vector<std::string> &denys = location.denys;
+
+		if (std::find(allows.begin(), allows.end(), "all") == allows.end() && \
+			std::find(denys.begin(), denys.end(), "all") != denys.end())
+		{
+			this->GenerateError(kMethodNotAllowed);
+			response_.set_done(true);
+			return;
+		}
+	}
 
 	// execute method
 	HttpStatus status = kOk;

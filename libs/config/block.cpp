@@ -12,6 +12,26 @@ Block &Block::operator=(const Block &obj)
 
 limit_except_s::limit_except_s(): allows(), denys() { }
 
+static std::vector<std::string> init_methods() {
+    // GET, HEAD, POST, PUT, DELETE, MKCOL, COPY, MOVE, OPTIONS, PROPFIND, PROPPATCH, LOCK, UNLOCK, PATCH
+    std::vector<std::string> methods;
+    methods.push_back("GET");
+    methods.push_back("HEAD");
+    methods.push_back("POST");
+    methods.push_back("PUT");
+    methods.push_back("DELETE");
+    methods.push_back("MKCOL");
+    methods.push_back("COPY");
+    methods.push_back("MOVE");
+    methods.push_back("OPTIONS");
+    methods.push_back("PROPFIND");
+    methods.push_back("PROPPATCH");
+    methods.push_back("LOCK");
+    methods.push_back("UNLOCK");
+    methods.push_back("PATCH");
+    return methods;
+}
+
 location_s::location_s(const server_t &server):
     name(""),
     sendfile(server.sendfile),
@@ -35,7 +55,7 @@ location_s::location_s(const server_t &server):
     index(server.index),
     locations(std::vector<location_t>()),
     error_page(server.error_page),
-    limit_excepts(std::map<std::string, limit_except_t>()),
+    limit_except(),
     fastcgi_param(server.fastcgi_param),
     fastcgi_pass(),
     try_files(server.try_files),
@@ -178,7 +198,7 @@ http_t Block::ParseHttp(const std::vector<std::string> &tokens, size_t &idx, std
         else if (directive == "error_page")
             http.error_page = Simple::ParseErrorPage(tokens, idx, error_msg);
         else if (directive == "fastcgi_param")
-            Simple::ParseFastcgiParam(tokens, idx, error_msg, http.fastcgi_param);
+            Simple::ParseMap(tokens, idx, error_msg, http.fastcgi_param, directive);
         else
             error_msg = "Http: Unknown directive [ " + directive + " ]";
     }
@@ -274,7 +294,7 @@ server_t Block::ParseServer(const std::vector<std::string> &tokens, size_t &idx,
                 server.fastcgi_param = std::map<std::string, std::string>();
                 factcgi_param_filled = false;
             }
-            Simple::ParseFastcgiParam(tokens, idx, error_msg, server.fastcgi_param);
+            Simple::ParseMap(tokens, idx, error_msg, server.fastcgi_param, directive);
         }
         else if (directive == "try_files")
             server.try_files = Simple::ParseTryFiles(tokens, idx, error_msg);
@@ -375,16 +395,16 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
         else if (directive == "error_page")
             location.error_page = Simple::ParseErrorPage(tokens, idx, error_msg);
         else if (directive == "limit_except")
-            ParseLimitExcept(tokens, idx, error_msg, location.limit_excepts);
+            location.limit_except = Block::ParseLimitExcept(tokens, idx, error_msg);
         else if (directive == "fastcgi_param") {
             if (factcgi_param_filled == true) {
                 location.fastcgi_param = std::map<std::string, std::string>();
                 factcgi_param_filled = false;
             }
-            Simple::ParseFastcgiParam(tokens, idx, error_msg, location.fastcgi_param);
+            Simple::ParseMap(tokens, idx, error_msg, location.fastcgi_param, directive);
         }
         else if (directive == "fastcgi_pass")
-            location.fastcgi_pass = Simple::ParseFastcgiPass(tokens, idx, error_msg);
+            Simple::ParseMap(tokens, idx, error_msg, location.fastcgi_pass, directive);
         else if (directive == "try_files")
             location.try_files = Simple::ParseTryFiles(tokens, idx, error_msg);
         else if (directive == "return")
@@ -399,37 +419,35 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
     return location;
 }
 
-void Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, \
-    std::map<std::string, struct limit_except_s> limit_excepts)
+limit_except_t Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)
 {
+    limit_except_t limit_except;
+
     if (idx == tokens.size()) {
         error_msg = "LimitExcept: Missing method";
-        return;
+        return limit_except;
     }
-    // GET, HEAD, POST, PUT, DELETE, MKCOL, COPY, MOVE, OPTIONS, PROPFIND, PROPPATCH, LOCK, UNLOCK, PATCH
+    std::vector<std::string> all_methods = init_methods();
     std::vector<std::string> methods;
     while (idx < tokens.size() && tokens[idx] != "{" && error_msg.empty() == true) {
         const std::string &method = tokens[idx];
-        if (method == "GET" || method == "HEAD" || method == "POST" || method == "PUT" || \
-            method == "DELETE" || method == "MKCOL" || method == "COPY" || method == "MOVE" || \
-            method == "OPTIONS" || method == "PROPFIND" || method == "PROPPATCH" || method == "LOCK" || \
-            method == "UNLOCK" || method == "PATCH")
+        if (std::find(all_methods.begin(), all_methods.end(), method) != all_methods.end())
         {
             if (std::find(methods.begin(), methods.end(), method) == methods.end())
                 methods.push_back(method);
             ++idx;
         } else {
             error_msg = "LimitExcept: Unknown method [ " + method + " ]";
-            return;
+            return limit_except;
         }
     }
     if (methods.empty() == true) {
         error_msg = "LimitExcept: Missing method";
-        return;
+        return limit_except;
     }
     if (idx == tokens.size() || tokens[idx] != "{") {
         error_msg = "LimitExcept: Missing {";
-        return;
+        return limit_except;
     }
     ++idx;
 
@@ -443,24 +461,29 @@ void Block::ParseLimitExcept(const std::vector<std::string> &tokens, size_t &idx
             denys.push_back(Simple::ParseString(tokens, idx, error_msg, directive));
         else {
             error_msg = "LimitExcept: Unknown directive [ " + directive + " ]";
-            return;
+            return limit_except;
         }
+    }
+    if (std::find(allows.begin(), allows.end(), "all") != allows.end() && \
+        std::find(denys.begin(), denys.end(), "all") != denys.end())
+    {
+        error_msg = "LimitExcept: allow and deny cannot be used together";
+        return limit_except;
     }
 
     if (idx == tokens.size()) {
         error_msg = "LimitExcept: Missing }";
-        return;
+        return limit_except;
     } else if (error_msg.empty() == false)
-        return;
+        return limit_except;
     else
         ++idx;
 
-    for (std::vector<std::string>::const_iterator cur = methods.begin(); cur != methods.end(); ++cur) {
-        if (limit_excepts.find(*cur) == limit_excepts.end())
-            limit_excepts[*cur] = limit_except_s();
-        limit_excepts[*cur].allows = allows;
-        limit_excepts[*cur].denys = denys;
-    }
+    limit_except.methods = methods;
+    limit_except.allows = allows;
+    limit_except.denys = denys;
+
+    return limit_except;
 }
 
 void location_s::print() {
@@ -505,10 +528,5 @@ void location_s::print() {
     std::cout << "    files:";
     for (size_t i = 0; i < try_files.files.size(); i++)
         std::cout << " " << try_files.files[i];
-    std::cout << '\n';
-    std::cout << "fastcgi_pass:" << '\n';
-    std::cout << "    address: " << fastcgi_pass.address << '\n';
-    std::cout << "    port: " << fastcgi_pass.port << '\n';
-    std::cout << "    unix: " << fastcgi_pass.unix << '\n';
     std::cout << "\n";
 }

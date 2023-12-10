@@ -17,7 +17,7 @@ default_s::default_s():
     ret(),
     keepalive_timeout(),
     try_files(),
-    fastcgi_pass(),
+    fastcgi_extension(),
     sendfile(false),
     autoindex(false),
     absolute_redirect(true),
@@ -88,13 +88,6 @@ try_files_s::try_files_s():
     files(),
     uri(""),
     code(0)
-{
-}
-
-fastcgi_pass_s::fastcgi_pass_s():
-    address(""),
-    port(""),
-    unix(false)
 {
 }
 
@@ -443,50 +436,25 @@ try_files_t Simple::ParseTryFiles(const std::vector<std::string> &tokens, size_t
     return try_files;
 }
 
-void Simple::ParseFastcgiParam(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, std::map<std::string, std::string> &fastcgi_param)
+void Simple::ParseMap(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg, std::map<std::string, std::string> &map, const std::string &directive)
 {
     if (idx == tokens.size()) {
-        error_msg = "fastcgi_param: Missing parameter";
+        error_msg = directive + ": Missing parameter";
         return;
     }
     if (idx + 1 == tokens.size()) {
-        error_msg = "fastcgi_param: Missing value";
+        error_msg = directive + ": Missing value";
         return;
     }
     if (idx + 2 == tokens.size() || tokens[idx + 2] != ";") {
-        error_msg = "fastcgi_param: Missing ;";
+        error_msg = directive + ": Missing ;";
         return;
     }
     const std::string parameter = tokens[idx++];
     const std::string value = tokens[idx++];
-    fastcgi_param[parameter] = value;
+    map[parameter] = value;
     ++idx;
     return;
-}
-
-fastcgi_pass_t Simple::ParseFastcgiPass(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)
-{
-    fastcgi_pass_t fastcgi_pass;
-    if (idx == tokens.size()) {
-        error_msg = "fastcgi_pass: Missing argument";
-        return fastcgi_pass;
-    }
-    const std::string argument = tokens[idx++];
-    size_t pos = argument.find_first_of(":");
-    if (pos == std::string::npos) {
-        fastcgi_pass.address = argument;
-        fastcgi_pass.port = "8000";
-    } else {
-        fastcgi_pass.address = argument.substr(0, pos);
-        fastcgi_pass.port = StringtoSize(argument.substr(pos + 1), error_msg);
-        if (error_msg.empty() == false)
-            return fastcgi_pass;
-    }
-    if (idx == tokens.size() || tokens[idx] != ";")
-        error_msg = "fastcgi_pass: Missing ;";
-    else
-        ++idx;
-    return fastcgi_pass;
 }
 
 return_t Simple::ParseReturn(const std::vector<std::string> &tokens, size_t &idx, std::string &error_msg)

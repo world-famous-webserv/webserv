@@ -92,7 +92,7 @@ void Http::Execute()
 	else if (request_.method().compare("DELETE") == 0)
 		status = this->Delete(url);
 	else if (request_.method().compare("POST") == 0)
-		status = this->Post();
+		status = this->Post(location, url);
 	else
 		status = kMethodNotAllowed;
 	// if error

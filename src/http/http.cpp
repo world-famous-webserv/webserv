@@ -74,8 +74,8 @@ void Http::Execute()
 	const std::vector<std::string> &methods = location.limit_except.methods;
 	if (std::find(methods.begin(), methods.end(), request_.method()) == methods.end())
 	{
-		const std::vector<std::string> &allows = location.allows;
-		const std::vector<std::string> &denys = location.denys;
+		const std::vector<std::string> &allows = location.limit_except.allows;
+		const std::vector<std::string> &denys = location.limit_except.denys;
 
 		if (std::find(allows.begin(), allows.end(), "all") == allows.end() && \
 			std::find(denys.begin(), denys.end(), "all") != denys.end())

@@ -454,7 +454,7 @@ limit_except_t Block::ParseLimitExcept(const std::vector<std::string> &tokens, s
     std::vector<std::string> allows;
     std::vector<std::string> denys;
     while (idx < tokens.size() && tokens[idx] != "}" && error_msg.empty() == true) {
-        const std::string directive = tokens[idx++];
+        const std::string &directive = tokens[idx++];
         if (directive == "allow")
             allows.push_back(Simple::ParseString(tokens, idx, error_msg, directive));
         else if (directive == "deny")
@@ -482,7 +482,6 @@ limit_except_t Block::ParseLimitExcept(const std::vector<std::string> &tokens, s
     limit_except.methods = methods;
     limit_except.allows = allows;
     limit_except.denys = denys;
-
     return limit_except;
 }
 

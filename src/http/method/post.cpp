@@ -29,9 +29,13 @@ void Http::Post(const location_t& location, const std::string url)
 		Multiplex::GetInstance().AddItem(new Cgi(location, request_, response_));
 		return;
 	}
+
 	struct stat sb;
-	if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
-		return response_.set_status(kForbidden);
+	if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
+		std::cout << "POST: " << path << std::endl;
+		response_.set_done(true);
+		return response_.set_status(kLengthRequired);
+	}
 	if (access(path.c_str(), F_OK) == -1)
 		return FileProcess(request_, response_, path);
 	response_.add_header("Location", request_.uri());

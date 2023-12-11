@@ -30,7 +30,8 @@ Conf::Conf(const server_t &server, const listen_t &listen):
     try_files(server.try_files),
     ret(server.ret),
     listen(listen)
-{ }
+{
+}
 
 Conf::Conf(const Conf &other):
     sendfile(other.sendfile),

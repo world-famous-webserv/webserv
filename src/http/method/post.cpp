@@ -3,12 +3,12 @@
 #include "../http.hpp"
 #include "../cgi.hpp"
 
-static HttpStatus FileProcess(HttpRequest& req, HttpResponse& res, std::string path)
+static void FileProcess(HttpRequest& req, HttpResponse& res, std::string path)
 {
 	// open file and write request body
 	std::ofstream ofs(path.c_str(), std::ios::out);
 	if (ofs.is_open() == false)
-		return kInternalServerError;
+		return res.set_status(kInternalServerError);
 	ofs << req.body().str();
 	ofs.close();
 
@@ -16,25 +16,25 @@ static HttpStatus FileProcess(HttpRequest& req, HttpResponse& res, std::string p
 	res.add_header("Content-Type", "text/html");
 	res.add_header("Connection", "keep-alive");
 	res.body() << "<html><body><h1>File created</h1></body></html>";
+	res.set_status(kCreated);
 	res.set_done(true);
-	return kCreated;
 }
 
-HttpStatus Http::Post(const location_t& location, const std::string url)
+void Http::Post(const location_t& location, const std::string url)
 {
 	std::string path(conf_.GetPath(url));
 
-	std::cout << "location.name = " << location.name << std::endl;
-	std::cout << "location.root = " << location.root << std::endl;
-	std::cout << "location.fastcgi_param empty = " << location.fastcgi_param.empty() << std::endl;
-	std::cout << "location.fastcgi_param cnt = " << location.fastcgi_param.size() << std::endl;
-	if (location.fastcgi_param.empty()) {
-		if (access(path.c_str(), F_OK) != -1) {
-			std::cout << "Post: File already exists" << std::endl;
-			return kSeeOther;
-		}
-		return FileProcess(request_, response_, path);
+	std::string cgi = Cgi::GetCgi(location, path);
+	if (cgi.empty() == false) {
+		Multiplex::GetInstance().AddItem(new Cgi(location, request_, response_));
+		return;
 	}
-	Multiplex::GetInstance().AddItem(new Cgi(conf_, url, request_, response_));
-	return kCreated;
+	struct stat sb;
+	if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
+		return response_.set_status(kForbidden);
+	if (access(path.c_str(), F_OK) == -1)
+		return FileProcess(request_, response_, path);
+	response_.add_header("Location", request_.uri());
+	response_.set_status(kSeeOther);
+	response_.set_done(true);
 }

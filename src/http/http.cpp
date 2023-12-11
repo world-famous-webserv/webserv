@@ -20,6 +20,7 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
+	response_.set_version(request_.version());
 	std::cout << "Uri = " << request_.uri() << std::endl;
 	std::cout << "Url = " << conf_.GetUrl(request_.uri()) << std::endl;
 	std::cout << "Path = " << conf_.GetPath(conf_.GetUrl(request_.uri())) << std::endl;
@@ -86,43 +87,20 @@ void Http::Execute()
 	}
 
 	// execute method
-	HttpStatus status = kOk;
 	if (request_.method().compare("GET") == 0)
-		status = this->Get(location, url);
-	else if (request_.method().compare("DELETE") == 0)
-		status = this->Delete(url);
+		return this->Get(location, url);
+	else if (request_.method().compare("PUT") == 0)
+		return this->Put(location, url);
 	else if (request_.method().compare("POST") == 0)
-		status = this->Post(location, url);
-	else
-		status = kMethodNotAllowed;
-	// if error
-	if (200 <= status && status <= 299) {
-		response_.set_status(status);
-		return;
-	}
-	this->GenerateError(status);
-	response_.set_done(true);
+		return this->Post(location, url);
+	else if (request_.method().compare("DELETE") == 0)
+		return this->Delete(url);
+	response_.set_status(kMethodNotAllowed);
 }
 
 
 void Http::Do(std::stringstream& in, std::stringstream& out)
 {
-	if (request_.step() == kParseStart)
-		std::cout << "kParseStart" << std::endl;
-	if (request_.step() == kParseHeader)
-		std::cout << "kParseHeader" << std::endl;
-	if (request_.step() == kParseBody)
-		std::cout << "kParseBody" << std::endl;
-	if (request_.step() == kParseChunkLen)
-		std::cout << "kParseChunkLen" << std::endl;
-	if (request_.step() == kParseChunkBody)
-		std::cout << "kParseChunkBody" << std::endl;
-	if (request_.step() == kParseDone)
-		std::cout << "kParseDone" << std::endl;
-	if (request_.step() == kParseFail)
-		std::cout << "kParseFail" << std::endl;
-
-
 	if (response_.done())
 	{
 		response_ >> out;
@@ -131,14 +109,14 @@ void Http::Do(std::stringstream& in, std::stringstream& out)
 		return ;
 	}
 	request_ << in;
-	if (request_.step() == kParseDone)
-	{
-		this->Execute();
-std::cout << "### " << request_.body().rdbuf() << std::endl;
-	}
 	if (request_.step() == kParseFail)
-	{
-		this->GenerateError(kBadRequest);
+		response_.set_status(kBadRequest);
+	else if (request_.step() == kParseDone)
+		this->Execute();
+
+	// error page
+	if (!(200 <= response_.status() && response_.status() <= 299)) {
+		this->GenerateError(response_.status());
 		response_.set_done(true);
 	}
 }

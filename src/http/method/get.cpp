@@ -3,50 +3,44 @@
 #include "../http.hpp"
 #include "../cgi.hpp"
 
-static HttpStatus FileProcess(const HttpRequest& req, HttpResponse& res, std::string path)
+static void FileProcess(const HttpRequest& req, HttpResponse& res, std::string path)
 {
 	std::fstream file(path.c_str());
 
 	if (file.is_open() == false)
-		return kForbidden;
+		return res.set_status(kForbidden);
+	res.body() << file.rdbuf();
+	file.close();
 	res.set_status(kOk);
 	res.set_version(req.version());
 	res.add_header("Content-Type", "text/html");
 	res.add_header("Connection", "keep-alive");
-	res.body() << file.rdbuf();
 	res.set_done(true);
-	file.close();
-	return kOk;
 }
 
-static HttpStatus DirectoryProcess(const HttpRequest& req, HttpResponse& res, const location_t &location, std::string path)
+static void DirectoryProcess(const HttpRequest& req, HttpResponse& res, const location_t &location, std::string path)
 {
 	// index
 	if (index(req, res, location, path) == EXIT_SUCCESS)
-		return kOk;
+		return res.set_status(kOk);
 	// autoindex
 	if (location.autoindex == false)
-		return kForbidden;
+		return res.set_status(kForbidden);
 	autoindex(req, res, path);
-	return kOk;
+	return res.set_status(kOk);
 }
 
-HttpStatus Http::Get(const location_t& location, const std::string url)
+void Http::Get(const location_t& location, const std::string url)
 {
 	std::string path(conf_.GetPath(url));
 
 	struct stat sb;
 	if (stat(path.c_str(), &sb) == -1)
-		return kForbidden;
+		return response_.set_status(kForbidden);
 	if (S_ISDIR(sb.st_mode))
 		return DirectoryProcess(request_, response_, location, path);
-
-	std::cout << "location.name = " << location.name << std::endl;
-	std::cout << "location.root = " << location.root << std::endl;
-	std::cout << "location.fastcgi_param empty = " << location.fastcgi_param.empty() << std::endl;
-	std::cout << "location.fastcgi_param cnt = " << location.fastcgi_param.size() << std::endl;
-	if (location.fastcgi_param.empty())
+	std::string cgi = Cgi::GetCgi(location, path);
+	if (cgi.empty())
 		return FileProcess(request_, response_, path);
-	Multiplex::GetInstance().AddItem(new Cgi(conf_, url, request_, response_));
-	return kOk;
+	Multiplex::GetInstance().AddItem(new Cgi(location, request_, response_));
 }

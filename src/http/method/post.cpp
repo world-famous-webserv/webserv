@@ -32,7 +32,6 @@ void Http::Post(const location_t& location, const std::string url)
 
 	struct stat sb;
 	if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
-		std::cout << "POST: " << path << std::endl;
 		response_.set_done(true);
 		return response_.set_status(kLengthRequired);
 	}

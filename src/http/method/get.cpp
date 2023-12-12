@@ -25,7 +25,7 @@ static void DirectoryProcess(const HttpRequest& req, HttpResponse& res, const lo
 		return res.set_status(kOk);
 	// autoindex
 	if (location.autoindex == false)
-		return res.set_status(kForbidden);
+		return res.set_status(kNotFound);
 	autoindex(req, res, path);
 	return res.set_status(kOk);
 }
@@ -36,7 +36,7 @@ void Http::Get(const location_t& location, const std::string url)
 
 	struct stat sb;
 	if (stat(path.c_str(), &sb) == -1)
-		return response_.set_status(kForbidden);
+		return response_.set_status(kNotFound);
 	if (S_ISDIR(sb.st_mode))
 		return DirectoryProcess(request_, response_, location, path);
 	std::string cgi = Cgi::GetCgi(location, path);

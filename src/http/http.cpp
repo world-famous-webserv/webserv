@@ -85,7 +85,7 @@ void Http::Execute()
 			return;
 		}
 	}
-
+	
 	// execute method
 	if (request_.method().compare("GET") == 0)
 		return this->Get(location, url);

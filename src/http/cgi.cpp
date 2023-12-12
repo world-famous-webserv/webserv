@@ -39,7 +39,8 @@ void Cgi::Child(void)
 	const std::string url = request_.uri();
     const std::string file = location_.root + url.substr(location_.name.length(), url.length() - location_.name.length());
 	const std::string program = GetCgi(location_, file);
-
+	std::cout << "program = " << program << std::endl;
+	std::cout << "file = " << file << std::endl;
 	// args
 	std::vector<std::string> args;
 	args.push_back(program);

@@ -18,6 +18,14 @@ HttpRequest::HttpRequest(void)
 // get / set
 /* ************************************************************************** */
 
+static std::string Trim(const std::string &str)
+{
+	std::string trim(str);
+	trim.erase(0, trim.find_first_not_of(" \t\n\r\f\v"));
+	trim.erase(trim.find_last_not_of(" \t\n\r\f\v") + 1);
+	return trim;
+}
+
 void HttpRequest::set_step(const HttpStep &step)
 {
 	step_ = step;
@@ -67,7 +75,7 @@ void HttpRequest::set_version(const std::string &version)
 
 const std::string HttpRequest::header(const std::string& key) const
 {
-	std::string lower(key);
+	std::string lower(Trim(key));
 	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
 	std::map<std::string, std::string>::const_iterator it = headers_.find(lower);
 
@@ -81,9 +89,9 @@ const std::map<std::string, std::string>& HttpRequest::headers(void) const
 
 void HttpRequest::add_header(const std::string &key, const std::string &val)
 {
-	std::string lower(key);
+	std::string lower(Trim(key));
 	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-	headers_[lower] = val;
+	headers_[lower] = Trim(val);
 }
 
 std::stringstream& HttpRequest::body(void)
@@ -152,11 +160,6 @@ void HttpRequest::ParseHeader(const std::string& line)
 				step_ = kParseBody;
 			return;
 		}
-		if (method_.compare("POST") != 0)
-		{
-			step_ = kParseDone;
-			return;
-		}
 		std::string chunk = this->header("Transfer-Encoding");
 		std::transform(chunk.begin(), chunk.end(), chunk.begin(), ::tolower);
 		if (!chunk.empty() && chunk == "chunked")
@@ -165,7 +168,10 @@ void HttpRequest::ParseHeader(const std::string& line)
 			return;
 		}
 		remain_ = 0;
-		step_ = kParseBody;
+		if (method_ == "GET")
+			step_ = kParseDone;
+		else
+			step_ = kParseBody;
 		return;
 	}
 	std::istringstream iss(line);
@@ -190,10 +196,12 @@ void HttpRequest::ParseBody(std::stringstream& req)
 	}
 	if (remain_ == 0)
 		step_ = kParseDone;
-}
+ }
 
 void HttpRequest::ParseChunkLen(const std::string& line)
 {
+	if (line.empty())
+		return;
 	std::stringstream ss;
 	ss << std::hex << line;
 	ss >> remain_;
@@ -208,16 +216,18 @@ void HttpRequest::ParseChunkLen(const std::string& line)
 
 void HttpRequest::ParseChunk(std::stringstream& req)
 {
-	char buf[1024];
+	std::streampos start = req.tellg();
+	std::streampos end = req.tellp();
+	std::size_t total = end - start;
 
+	char buf[1024];
+	std::size_t len = std::min(remain_, sizeof(buf));
+	if (end <= start || total < len)
+		return;
 	req.clear();
-	while (req.good() && remain_ > 0)
-	{
-		std::size_t len = std::min(remain_, sizeof(buf));
-		if (req.read(buf, len))
-			body_.write(buf, req.gcount());
-		remain_ -= req.gcount();
-	}
+	if (req.read(buf, len))
+		body_.write(buf, req.gcount());
+	remain_ -= req.gcount();
 	if (remain_ == 0)
 		step_ = kParseChunkLen;
 }

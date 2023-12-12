@@ -452,6 +452,10 @@ void Simple::ParseMap(const std::vector<std::string> &tokens, size_t &idx, std::
     }
     const std::string parameter = tokens[idx++];
     const std::string value = tokens[idx++];
+    if (value[0] != '/') {
+        error_msg = "Config: " + directive + ": [ " + value + " ] is not absolute";
+        return;
+    }
     map[parameter] = value;
     ++idx;
     return;

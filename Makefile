@@ -32,4 +32,7 @@ testcurl:
 chunk:
 	curl --http1.1 -X POST -H "Transfer-Encoding:chunked" --data-binary @Makefile localhost:8080/dump
 
+testconf:
+	sed 's=PWD=$(shell pwd)=g;' data/test_template.conf > data/test.conf
+
 .PHONY: all clean fclean re bonus

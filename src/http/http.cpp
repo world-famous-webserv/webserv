@@ -25,6 +25,7 @@ void Http::Execute()
 	std::cout << "Url = " << conf_.GetUrl(request_.uri()) << std::endl;
 	std::cout << "Path = " << conf_.GetPath(conf_.GetUrl(request_.uri())) << std::endl;
 	request_.set_step(kExecuteDone);
+
 	if (request_.body().str().length() > static_cast<size_t>(conf_.client_max_body_size))
 	{
 		this->GenerateError(kPayloadTooLarge);

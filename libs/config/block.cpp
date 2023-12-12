@@ -403,8 +403,11 @@ location_t Block::ParseLocation(const std::vector<std::string> &tokens, size_t &
             }
             Simple::ParseMap(tokens, idx, error_msg, location.fastcgi_param, directive);
         }
-        else if (directive == "fastcgi_pass")
+        else if (directive == "fastcgi_pass") {
             Simple::ParseMap(tokens, idx, error_msg, location.fastcgi_pass, directive);
+            if (error_msg.empty() == false)
+                return location;
+        }
         else if (directive == "try_files")
             location.try_files = Simple::ParseTryFiles(tokens, idx, error_msg);
         else if (directive == "return")

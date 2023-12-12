@@ -149,12 +149,13 @@ void Cgi::Write(void)
 
 void Cgi::Update(void)
 {
+	if (pid_ == -1) return;
 	int status = 0;
-	int ret = waitpid(pid_, &status, WNOHANG);
+	const pid_t ret = waitpid(pid_, &status, WNOHANG);
 	if (ret < 0) {
-		std::cerr << "waitpid error: " << strerror(errno) << std::endl;
 		return response_.set_status(kInternalServerError);
 	} else if (ret != 0) {
+		pid_ = -1;
 		if (WIFEXITED(status))
 			response_.set_done(true);
 		else

@@ -34,7 +34,7 @@ void Client::Read(void)
 	if (identifier_ == -1)
 		return ;
 	// recv
-	char buf[1024] = {0};
+	char buf[1024 * 1024] = {0};
 	ssize_t nbytes = recv(identifier_, buf, sizeof(buf), 0);
 	if (nbytes < 0) return this->Broken(errno);
 	if (nbytes == 0) return this->Close();
@@ -48,7 +48,7 @@ void Client::Write(void)
 	if (identifier_ == -1)
 		return ;
 	// get
-	char buf[1024] = {0};
+	char buf[1024 * 1024] = {0};
 	out_.clear();
 	out_.read(buf, sizeof(buf));
 	if (out_.gcount() <= 0) return;

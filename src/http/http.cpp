@@ -26,12 +26,6 @@ void Http::Execute()
 	std::cout << "Path = " << conf_.GetPath(conf_.GetUrl(request_.uri())) << std::endl;
 	request_.set_step(kExecuteDone);
 
-	if (request_.body().str().length() > static_cast<size_t>(conf_.client_max_body_size))
-	{
-		this->GenerateError(kPayloadTooLarge);
-		return response_.set_done(true);
-	}
-
 	std::cout << "EXECUTE!" << std::endl;
 	// process relative path
 	const std::string url = conf_.GetUrl(request_.uri());
@@ -50,6 +44,15 @@ void Http::Execute()
 		return response_.set_done(true);
 	}
 	location_t location = conf_.GetLocation(location_idx);
+
+	// client_max_body_size
+	if (request_.body().str().length() > static_cast<size_t>(location.client_max_body_size))
+	{
+std::cerr << "body len : " << request_.body().tellp() << std::endl;
+std::cerr << "max body : " << location.client_max_body_size << std::endl;
+		this->GenerateError(kPayloadTooLarge);
+		return response_.set_done(true);
+	}
 
 	// check return
 	if (location.ret.code != 0)

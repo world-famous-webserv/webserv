@@ -42,5 +42,8 @@ void Http::Get(const location_t& location, const std::string url)
 	std::string cgi = Cgi::GetCgi(location, path);
 	if (cgi.empty())
 		return FileProcess(request_, response_, path);
+	if (access(cgi.c_str(), F_OK) == -1
+		|| access(cgi.c_str(), X_OK) == -1)
+		return response_.set_status(kInternalServerError);
 	Multiplex::GetInstance().AddItem(new Cgi(location, request_, response_));
 }

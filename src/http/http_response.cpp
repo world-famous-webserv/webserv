@@ -179,13 +179,14 @@ void HttpResponse::Clear(void)
 	body_.str("");
 }
 
+#include <iostream>
 HttpResponse& HttpResponse::operator>>(std::stringstream& res)
 {
 	// calc body len
 	body_.clear();
 	std::stringstream len;
 	len << body_.tellp();
-	headers_["Content-Length"] = len.str();
+	this->add_header("Content-Length", len.str());
 
 	// generate
 	res.clear();
@@ -193,7 +194,19 @@ HttpResponse& HttpResponse::operator>>(std::stringstream& res)
 	for (std::map<std::string, std::string>::const_iterator it = headers_.begin(); it != headers_.end(); ++it)
 		res << it->first << ": " << it->second << "\r\n";
 	res << "\r\n";
-	res << body_.str();
+	res << body_.rdbuf();
+
+#if 1
+	// log
+std::cerr.clear();
+std::cerr << body_.tellp() << "###########################" << std::endl;
+	std::cerr << version_ << " " << status_ << " " << message(status_) << "\r\n";
+	for (std::map<std::string, std::string>::const_iterator it = headers_.begin(); it != headers_.end(); ++it)
+		std::cerr << it->first << ": " << it->second << "\r\n";
+	std::cerr << "\r\n";
+	std::cerr << body_.rdbuf()->str().substr(0, 500) << "..." << std::endl;
+std::cerr << "###########################" << std::endl;
+#endif
 	this->Clear();
 	return *this;
 }

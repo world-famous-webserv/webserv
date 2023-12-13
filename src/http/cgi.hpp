@@ -32,6 +32,20 @@ class Cgi : public IOEvent
 	const location_t& location_;
 	HttpRequest& request_;
 	HttpResponse& response_;
+
+	// for cgi parse
+	const std::string header(const std::string& key) const;
+	void add_header(const std::string &key, const std::string &val);
+
+	bool GetLine(std::stringstream& in, std::string& line);
+	void ParseHeader(const std::string& line);
+	void ParseBody(void);
+	void ParseDone(void);
+
+	HttpStep step_;
+	std::stringstream buf_;
+	std::map<std::string, std::string> headers_;
+	std::stringstream analyzer_;
 };
 
 # endif /* SRC_HTTP_CGI_HPP_ */

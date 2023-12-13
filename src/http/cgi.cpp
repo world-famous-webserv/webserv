@@ -6,23 +6,22 @@
 
 Cgi::~Cgi(void)
 {
-	std::cerr << "Cgi::Close - " << request_.method() << std::endl;
+	std::cerr << "Cgi::Close - " << request_.method() << "(" << pid_ << ")" <<std::endl;
 	int status = 0;
 	int ret = waitpid(pid_, &status, WNOHANG);
 	if (pid_ != -1 && ret == 0) {
 		kill(pid_, SIGKILL);
-		ret = waitpid(pid_, &status, WNOHANG);
+		ret = waitpid(pid_, &status, 0);
 		pid_ = -1;
 	}
-	response_.set_done(true);
 }
 
 Cgi::Cgi(const location_t& location, HttpRequest& req, HttpResponse& res):
 	location_(location),
 	request_(req),
-	response_(res)
+	response_(res),
+	step_(kParseHeader)
 {
-	std::cerr << "Cgi::Open - " << request_.method() << std::endl;
 }
 
 /* ************************************************************************** */
@@ -94,6 +93,102 @@ std::cerr << "execute fail" << std::endl;
 }
 
 /* ************************************************************************** */
+// Parse
+/* ************************************************************************** */
+
+static std::string Trim(const std::string &str)
+{
+	std::string trim(str);
+	trim.erase(0, trim.find_first_not_of(" \t\n\r\f\v"));
+	trim.erase(trim.find_last_not_of(" \t\n\r\f\v") + 1);
+	return trim;
+}
+
+const std::string Cgi::header(const std::string& key) const
+{
+	std::string lower(Trim(key));
+	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+	std::map<std::string, std::string>::const_iterator it = headers_.find(lower);
+	return it != headers_.end()? it->second : "";
+}
+
+void Cgi::add_header(const std::string &key, const std::string &val)
+{
+	std::string lower(Trim(key));
+	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+	headers_[lower] = Trim(val);
+}
+
+bool Cgi::GetLine(std::stringstream& in, std::string& line)
+{
+	in.clear();
+	while (in.good())
+	{
+		char ch = in.get();
+		if (!in.good())
+			return false;
+		if (ch != '\n')
+		{
+			buf_.put(ch);
+			continue;
+		}
+		std::getline(buf_, line);
+		if (line[line.length() - 1] == '\r')
+			line.erase(line.length() - 1);
+		buf_.str();
+		buf_.clear();
+		return true;
+	}
+	return false;
+}
+
+void Cgi::ParseHeader(const std::string& line)
+{
+	if (line.empty())
+	{
+		step_ = kParseBody;
+		return;
+	}
+	std::istringstream iss(line);
+	std::string key, val;
+	std::getline(iss, key, ':');
+	std::getline(iss, val);
+
+	this->add_header(key, val);
+	std::cerr << "CGI Header: " << key << " = " << val << std::endl;
+}
+
+void Cgi::ParseBody(void)
+{
+	char buf[1024 * 1024];
+
+	analyzer_.clear();
+	response_.body().clear();
+	while (analyzer_.read(buf, sizeof(buf)) || analyzer_.gcount() > 0)
+		response_.body().write(buf, analyzer_.gcount());
+//std::cerr << "move total: " << response_.body().tellp() << std::endl;
+	analyzer_.clear();
+	response_.body().clear();
+}
+
+void Cgi::ParseDone(void)
+{
+	std::map<std::string, std::string>::iterator it;
+	it = headers_.find("status");
+	if (it != headers_.end()) {
+		int status = kOk;
+		std::istringstream iss(it->second);
+		iss >> status;
+		response_.set_status(static_cast<HttpStatus>(status));
+		headers_.erase(it);
+	}
+	for (it = headers_.begin(); it != headers_.end(); ++it)
+		response_.add_header(it->first, it->second);
+	response_.set_done(true);
+	this->Close();
+}
+
+/* ************************************************************************** */
 // Main
 /* ************************************************************************** */
 
@@ -127,6 +222,7 @@ void Cgi::Open()
 		identifier_ = fd[0];
 		close(fd[1]);
 	}
+	std::cerr << "Cgi::Open - " << request_.method() << "(" << pid_ << ")" <<std::endl;
 }
 
 void Cgi::Read(void)
@@ -139,11 +235,11 @@ void Cgi::Read(void)
 		response_.set_status(kInternalServerError);
 		return this->Broken(errno);
 	}
-	if (nbytes == 0) return this->Close();
+	if (nbytes == 0) return this->ParseDone();
 	// put
-	response_.body().clear();
-	response_.body().write(buf, nbytes);
-//	std::cerr << "read total: " << response_.body().tellp() << std::endl;
+	analyzer_.clear();
+	analyzer_.write(buf, nbytes);
+//	std::cerr << "read total: " << analyzer_.tellp() << std::endl;
 }
 
 void Cgi::Write(void)
@@ -158,9 +254,10 @@ void Cgi::Write(void)
 	// get
 	char buf[1024 * 1024] = {0};
 	request_.body().read(buf, sizeof(buf));
-	if (request_.body().gcount() < 0) return;
+	if (request_.body().gcount() <= 0) return;
 	// send
 	ssize_t nbytes = send(identifier_, buf, request_.body().gcount(), MSG_DONTWAIT);
+	if (nbytes < 0) return this->ParseDone();
 	if (nbytes > 0) {
 		request_.body().clear();
 		request_.body().seekg(curr);
@@ -170,12 +267,16 @@ void Cgi::Write(void)
 	}
 	request_.body().clear();
 	request_.body().seekg(curr);
-	if (nbytes < 0) {
-		response_.set_status(kInternalServerError);
-		return this->Broken(errno);
-	}
 }
 
 void Cgi::Update(void)
 {
+	analyzer_.clear();
+	std::string line;
+	if (step_ == kParseHeader && this->GetLine(analyzer_, line) == true)
+		this->ParseHeader(line);
+	else if (step_ == kParseBody)
+		this->ParseBody();
+	else if (step_ == kParseDone)
+		this->ParseDone();
 }

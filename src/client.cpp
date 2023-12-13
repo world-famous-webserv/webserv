@@ -34,7 +34,7 @@ void Client::Read(void)
 		return ;
 	// recv
 	char buf[1024 * 1024] = {0};
-	ssize_t nbytes = recv(identifier_, buf, sizeof(buf), 0);
+	ssize_t nbytes = recv(identifier_, buf, sizeof(buf), MSG_DONTWAIT);
 	if (nbytes < 0) return this->Broken(errno);
 	if (nbytes == 0) return this->Close();
 	// put
@@ -46,15 +46,19 @@ void Client::Write(void)
 {
 	if (identifier_ == -1)
 		return ;
+	out_.clear();
+	std::streampos curr = out_.tellg();
 	// get
 	char buf[1024 * 1024] = {0};
 	out_.clear();
 	out_.read(buf, sizeof(buf));
 	if (out_.gcount() <= 0) return;
 	// send
-	ssize_t nbytes = send(identifier_, buf, out_.gcount(), 0);
+	ssize_t nbytes = send(identifier_, buf, out_.gcount(), MSG_DONTWAIT);
 	if (nbytes < 0) return this->Broken(errno);
 	if (nbytes == 0) return this->Close();
+	out_.clear();
+	out_.seekg(curr);
 	out_.seekg(nbytes, std::ios::cur);
 }
 

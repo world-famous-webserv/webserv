@@ -193,7 +193,7 @@ void HttpRequest::ParseHeader(const std::string& line)
 
 void HttpRequest::ParseBody(std::stringstream& req)
 {
-	char buf[1024];
+	char buf[1024 * 1024];
 
 	req.clear();
 	while (req.good() && remain_ > 0)

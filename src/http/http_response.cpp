@@ -17,6 +17,14 @@ HttpResponse::HttpResponse(void)
 // get / set
 /* ************************************************************************** */
 
+static std::string Trim(const std::string &str)
+{
+	std::string trim(str);
+	trim.erase(0, trim.find_first_not_of(" \t\n\r\f\v"));
+	trim.erase(trim.find_last_not_of(" \t\n\r\f\v") + 1);
+	return trim;
+}
+
 const bool &HttpResponse::done(void) const
 {
 	return done_;
@@ -133,9 +141,10 @@ const std::string HttpResponse::message(const enum HttpStatus &status) const
 
 const std::string HttpResponse::header(const std::string& key) const
 {
-	std::string lower(key);
+	std::string lower(Trim(key));
 	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
 	std::map<std::string, std::string>::const_iterator it = headers_.find(lower);
+
 	return it != headers_.end()? it->second : "";
 }
 
@@ -146,9 +155,9 @@ const std::map<std::string, std::string>& HttpResponse::headers(void) const
 
 void HttpResponse::add_header(const std::string &key, const std::string &val)
 {
-	std::string lower(key);
+	std::string lower(Trim(key));
 	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-	headers_[key] = val;
+	headers_[lower] = Trim(val);
 }
 
 std::stringstream& HttpResponse::body(void)

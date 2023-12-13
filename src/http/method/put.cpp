@@ -6,7 +6,8 @@ static void FileProcess(HttpRequest& req, HttpResponse& res, std::string path, H
 
 	if (file.is_open() == false)
 		return res.set_status(kInternalServerError);
-	file << req.body().str();
+	if (req.body().tellp() > 0)
+		file << req.body().rdbuf();
 	file.close();
 	res.set_status(success_status);
 	res.set_version(req.version());

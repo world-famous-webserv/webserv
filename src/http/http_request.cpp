@@ -59,7 +59,7 @@ void HttpRequest::set_uri(const std::string &uri)
 		uri_ = uri;
 	else {
 		uri_ = uri.substr(0, query_pos);
-		this->add_header("Query", uri);
+		this->add_header("Query", uri.substr(query_pos));
 	}
 }
 
@@ -119,7 +119,7 @@ bool HttpRequest::GetLine(std::stringstream& req, std::string& line)
 		std::getline(buf_, line);
 		if (line[line.length() - 1] == '\r')
 			line.erase(line.length() - 1);
-		buf_.str();
+		buf_.str("");
 		buf_.clear();
 		return true;
 	}
@@ -128,6 +128,8 @@ bool HttpRequest::GetLine(std::stringstream& req, std::string& line)
 
 void HttpRequest::ParseStartLine(const std::string& line)
 {
+	if (line.empty())
+		return;
 	std::istringstream iss(line);
 
 	std::string method;
@@ -243,11 +245,12 @@ void HttpRequest::Clear(void)
 	uri_.clear();
 	version_.clear();
 	headers_.clear();
+	body_.str("");
 	body_.clear();
 
 	// for parse
 	step_ = kParseStart;
-	buf_.str();
+	buf_.str("");
 	buf_.clear();
 	remain_ = 0;
 }

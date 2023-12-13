@@ -59,6 +59,7 @@ void Multiplex::Refresh(void)
 	{
 		if (it->second->identifier() == -1)
 		{
+			it->second->Close();
 			delete it->second;
 			ios_.erase(it++);
 		}
@@ -70,8 +71,23 @@ void Multiplex::Refresh(void)
 	}
 }
 
+IOEvent* Multiplex::GetItem(int identifier)
+{
+	IOMap::iterator it = ios_.find(identifier);
+	if (it == ios_.end())
+		return NULL;
+	return it->second;
+}
+
 void Multiplex::AddItem(IOEvent* event)
 {
+	event->Open();
+	if (event->identifier() == -1)
+	{
+		event->Close();
+		delete event;
+		return;
+	}
 	IOMap::iterator it = ios_.find(event->identifier());
 	if (it != ios_.end())
 	{
@@ -79,17 +95,16 @@ void Multiplex::AddItem(IOEvent* event)
 		delete it->second;
 		ios_.erase(it);
 	}
-	event->Open();
 #ifdef __LINUX__
 	struct epoll_event changes;
 	changes.events = EPOLLIN | EPOLLOUT;
-	changes.data.ptr = event;
+	changes.data.fd = event->identifier();
 	if (epoll_ctl(handler_, EPOLL_CTL_ADD, event->identifier(), &changes) == -1)
 		std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 #else
 	struct kevent changes[2];
-	EV_SET(&changes[0], event->identifier(), EVFILT_READ, EV_ADD, 0, 0, event);
-	EV_SET(&changes[1], event->identifier(), EVFILT_WRITE, EV_ADD, 0, 0, event);
+	EV_SET(&changes[0], event->identifier(), EVFILT_READ, EV_ADD, 0, 0, reinterpret_cast<void*>(event->identifier()));
+	EV_SET(&changes[1], event->identifier(), EVFILT_WRITE, EV_ADD, 0, 0, reinterpret_cast<void*>(event->identifier()));
     if (kevent(handler_, changes, 2, NULL, 0, NULL) == -1)
 		std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 #endif
@@ -110,14 +125,16 @@ void Multiplex::Loop(void)
 			std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 		for (int i = 0; i < nevents; i++)
 		{
-			IOEvent *event = static_cast<IOEvent*>(eventlist[i].data.ptr);
+			IOEvent *event = this->GetItem(eventlist[i].data.fd);
+			if (event == NULL)
+				continue;
 			if (eventlist[i].events & (EPOLLERR | EPOLLHUP))
 				event->Broken(0);
-			else if (eventlist[i].events & EPOLLRDHUP)
+			if (eventlist[i].events & EPOLLRDHUP)
 				event->Close();
-			else if (eventlist[i].events & EPOLLIN)
+			if (eventlist[i].events & EPOLLIN)
 				event->Read();
-			else if (eventlist[i].events & EPOLLOUT)
+			if (eventlist[i].events & EPOLLOUT)
 				event->Write();
 		}
 #else
@@ -127,7 +144,9 @@ void Multiplex::Loop(void)
 			std::cerr << "Multiplex: " << strerror(errno) << std::endl;
 		for (int i = 0; i < nevents; i++)
 		{
-			IOEvent *event = static_cast<IOEvent*>(eventlist[i].udata);
+			IOEvent *event = this->GetItem(reinterpret_cast<long>(eventlist[i].udata));
+			if (event == NULL)
+				continue;
 			if (eventlist[i].flags == EV_ERROR)
 				event->Broken(eventlist[i].data);
 			else if (eventlist[i].filter == EVFILT_READ)

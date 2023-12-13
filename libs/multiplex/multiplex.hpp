@@ -11,6 +11,7 @@ class Multiplex
 {
  public:
 	static Multiplex& GetInstance(void);
+	IOEvent* GetItem(int identifier);
 	void AddItem(IOEvent* item);
 	void Loop(void);
  private:

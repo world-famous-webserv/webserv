@@ -1,6 +1,9 @@
 #ifndef SRC_HTTP_CGI_HPP_
 # define SRC_HTTP_CGI_HPP_
+# include <fcntl.h>
+# include <sys/socket.h>
 # include <sys/wait.h>
+# include <csignal>
 # include "io_event.hpp"
 # include "conf.hpp"
 # include "http_request.hpp"

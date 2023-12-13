@@ -97,8 +97,6 @@ std::cerr << "execute fail" << std::endl;
 // Main
 /* ************************************************************************** */
 
-#include <fcntl.h>
-#include <sys/socket.h>
 void Cgi::Open()
 {
 	int fd[2];

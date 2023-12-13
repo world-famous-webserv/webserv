@@ -9,9 +9,10 @@ Cgi::~Cgi(void)
 	std::cerr << "Cgi::Close - " << request_.method() << std::endl;
 	int status = 0;
 	int ret = waitpid(pid_, &status, WNOHANG);
-	if (ret == 0) {
+	if (pid_ != -1 && ret == 0) {
 		kill(pid_, SIGKILL);
 		ret = waitpid(pid_, &status, WNOHANG);
+		pid_ = -1;
 	}
 	response_.set_done(true);
 }
@@ -22,7 +23,6 @@ Cgi::Cgi(const location_t& location, HttpRequest& req, HttpResponse& res):
 	response_(res)
 {
 	std::cerr << "Cgi::Open - " << request_.method() << std::endl;
-	this->Open();
 }
 
 /* ************************************************************************** */

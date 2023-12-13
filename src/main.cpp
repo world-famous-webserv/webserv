@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <csignal>
 #include <iostream>
 
 #include "config.hpp"
@@ -19,6 +20,7 @@ int main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	}
 	// 2. service
+	signal(SIGPIPE, SIG_IGN);
 	std::vector<server_t> servers = config.GetServers();
 
 	for (size_t i = 0; i < servers.size(); ++i) {

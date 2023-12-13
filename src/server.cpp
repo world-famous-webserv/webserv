@@ -6,13 +6,11 @@
 
 Server::~Server(void)
 {
-	this->Close();
 }
 
 Server::Server(const Conf &conf):
 	conf_(conf)
 {
-	this->Open();
 }
 
 /* ************************************************************************** */

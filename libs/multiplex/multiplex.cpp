@@ -75,9 +75,11 @@ void Multiplex::AddItem(IOEvent* event)
 	IOMap::iterator it = ios_.find(event->identifier());
 	if (it != ios_.end())
 	{
+		it->second->Close();
 		delete it->second;
 		ios_.erase(it);
 	}
+	event->Open();
 #ifdef __LINUX__
 	struct epoll_event changes;
 	changes.events = EPOLLIN | EPOLLOUT;

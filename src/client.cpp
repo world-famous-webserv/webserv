@@ -13,7 +13,6 @@ Client::Client(const int fd, const Conf &conf):
 	conf_(conf)
 {
 	identifier_ = fd;
-	this->Open();
 }
 
 /* ************************************************************************** */

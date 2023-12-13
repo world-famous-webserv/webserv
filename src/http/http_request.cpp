@@ -53,11 +53,14 @@ const std::string &HttpRequest::uri(void) const
 
 void HttpRequest::set_uri(const std::string &uri)
 {
+std::cerr << "REQUEST::URI [" << uri << "]" << std::endl;
 	std::size_t query_pos = uri.find('?');
 
 	if (query_pos == std::string::npos)
 		uri_ = uri;
 	else {
+std::cerr << "- uri [" << uri.substr(0, query_pos) << "]" << std::endl;
+std::cerr << "- query [" << uri.substr(query_pos) << "]" << std::endl;
 		uri_ = uri.substr(0, query_pos);
 		this->add_header("Query", uri.substr(query_pos));
 	}
@@ -75,9 +78,9 @@ void HttpRequest::set_version(const std::string &version)
 
 const std::string HttpRequest::header(const std::string& key) const
 {
-	std::string lower(Trim(key));
-	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-	std::map<std::string, std::string>::const_iterator it = headers_.find(lower);
+	std::string upper(Trim(key));
+	std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+	std::map<std::string, std::string>::const_iterator it = headers_.find(upper);
 
 	return it != headers_.end()? it->second : "";
 }
@@ -89,9 +92,9 @@ const std::map<std::string, std::string>& HttpRequest::headers(void) const
 
 void HttpRequest::add_header(const std::string &key, const std::string &val)
 {
-	std::string lower(Trim(key));
-	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-	headers_[lower] = Trim(val);
+	std::string upper(Trim(key));
+	std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+	headers_[upper] = Trim(val);
 }
 
 std::stringstream& HttpRequest::body(void)
@@ -130,18 +133,22 @@ void HttpRequest::ParseStartLine(const std::string& line)
 {
 	if (line.empty())
 		return;
+std::cerr << "STARTLINE[" << line << "]" << std::endl;
 	std::istringstream iss(line);
 
 	std::string method;
 	std::getline(iss, method, ' ');
+std::cerr << "- method[" << method << "]" << std::endl;
 	this->set_method(method);
 
 	std::string uri;
 	std::getline(iss, uri, ' ');
+std::cerr << "- uri[" << uri << "]" << std::endl;
 	this->set_uri(uri);
 
 	std::string version;
 	std::getline(iss, version);
+std::cerr << "- version[" << version << "]" << std::endl;
 	this->set_version(version);
 
 	step_ = kParseHeader;
@@ -163,8 +170,8 @@ void HttpRequest::ParseHeader(const std::string& line)
 			return;
 		}
 		std::string chunk = this->header("Transfer-Encoding");
-		std::transform(chunk.begin(), chunk.end(), chunk.begin(), ::tolower);
-		if (!chunk.empty() && chunk == "chunked")
+		std::transform(chunk.begin(), chunk.end(), chunk.begin(), ::toupper);
+		if (!chunk.empty() && chunk == "CHUNKED")
 		{
 			step_ = kParseChunkLen;
 			return;

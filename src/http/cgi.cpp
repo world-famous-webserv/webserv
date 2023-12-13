@@ -61,21 +61,56 @@ void Cgi::Child(void)
 
 	// environment
 	std::vector<std::string> envp;
-	envp.push_back("PATH_INFO=" + file);
+
+	// AUTH_TYPE
 	if (request_.header("Auth-Scheme") != "")
 		envp.push_back("AUTH_TYPE=" + request_.header("Authorization"));
+
+	// CONTENT_LENGTH
 	std::stringstream len;
 	len << request_.body().str().length();
 	envp.push_back("CONTENT_LENGTH=" + len.str());
-	envp.push_back("CONTENT_TYPE=" + request_.header("Content-Type"));
+
+	// CONTENT_TYPE
+	if (request_.header("Content-Type") != "")
+		envp.push_back("CONTENT_TYPE=" + request_.header("Content-Type"));
+
+	// GATEWAY_INTERFACE
 	envp.push_back("GATEWAY_INTERFACE=CGI/1.1");
+
+	// PATH_INFO
+	envp.push_back("PATH_INFO=" + file);
+
+	// PATH_TRANSLATED
 	if (request_.header("Query").empty() == false)
 		envp.push_back("QUERY_STRING=" + request_.header("Query"));
-	envp.push_back("REMOTE_HOST=" + request_.header("Authorization"));
-	envp.push_back("REMOTE_USER=" + request_.header("Authorization"));
+
+	// REMOTE_ADDR
+	// REMOTE_HOST
+	// REMOTE_IDENT
+	// REMOTE_USER
+
+	// REQUEST_METHOD
 	envp.push_back("REQUEST_METHOD=" + request_.method());
+
+	// SCRIPT_NAME
+	// SERVER_NAME
+	// SERVER_PORT
+
+	// SERVER_PROTOCOL
 	envp.push_back("SERVER_PROTOCOL=" + request_.version());
+
+	// SERVER_SOFTWARE
 	envp.push_back("SERVER_SOFTWARE=Webserv/1.0");
+
+	// HTTP_
+	for (std::map<std::string, std::string>::const_iterator it = request_.headers().begin(); it != request_.headers().end(); ++it) {
+		std::string key(it->first);
+		std::replace(key.begin(), key.end(), '-', '_');
+		key.insert(0, "HTTP_");
+		key.append("=");
+		envp.push_back(key + it->second);
+	}
 
 	std::vector<char*> envp_p;
 	for (std::size_t i = 0; i < envp.size(); ++i)

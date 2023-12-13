@@ -141,9 +141,9 @@ const std::string HttpResponse::message(const enum HttpStatus &status) const
 
 const std::string HttpResponse::header(const std::string& key) const
 {
-	std::string lower(Trim(key));
-	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-	std::map<std::string, std::string>::const_iterator it = headers_.find(lower);
+	std::string upper(Trim(key));
+	std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+	std::map<std::string, std::string>::const_iterator it = headers_.find(upper);
 
 	return it != headers_.end()? it->second : "";
 }
@@ -155,9 +155,9 @@ const std::map<std::string, std::string>& HttpResponse::headers(void) const
 
 void HttpResponse::add_header(const std::string &key, const std::string &val)
 {
-	std::string lower(Trim(key));
-	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-	headers_[lower] = Trim(val);
+	std::string upper(Trim(key));
+	std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+	headers_[upper] = Trim(val);
 }
 
 std::stringstream& HttpResponse::body(void)

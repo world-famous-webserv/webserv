@@ -268,7 +268,7 @@ void Cgi::Read(void)
 	ssize_t nbytes = recv(identifier_, buf, sizeof(buf), MSG_DONTWAIT);
 	if (nbytes < 0) {
 		response_.set_status(kInternalServerError);
-		return this->Broken(errno);
+		return this->Broken(0);
 	}
 	if (nbytes == 0) return this->ParseDone();
 	// put

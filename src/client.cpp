@@ -6,6 +6,7 @@
 
 Client::~Client(void)
 {
+	std::cout << "Client::Close" << std::endl;
 }
 
 Client::Client(const int fd, const Conf &conf):
@@ -35,7 +36,7 @@ void Client::Read(void)
 	// recv
 	char buf[1024 * 1024] = {0};
 	ssize_t nbytes = recv(identifier_, buf, sizeof(buf), MSG_DONTWAIT);
-	if (nbytes < 0) return this->Broken(errno);
+	if (nbytes < 0) return this->Broken(0);
 	if (nbytes == 0) return this->Close();
 	// put
 	in_.clear();
@@ -55,7 +56,7 @@ void Client::Write(void)
 	if (out_.gcount() <= 0) return;
 	// send
 	ssize_t nbytes = send(identifier_, buf, out_.gcount(), MSG_DONTWAIT);
-	if (nbytes < 0) return this->Broken(errno);
+	if (nbytes < 0) return this->Broken(0);
 	if (nbytes == 0) return this->Close();
 	out_.clear();
 	out_.seekg(curr);

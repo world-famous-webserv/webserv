@@ -6,6 +6,7 @@
 
 Server::~Server(void)
 {
+	std::cout << "Server::Close - " << conf_.listen.address << ":" << conf_.listen.port << std::endl;
 }
 
 Server::Server(const Conf &conf):

@@ -76,7 +76,12 @@ IOEvent* Multiplex::GetItem(int identifier)
 	IOMap::iterator it = ios_.find(identifier);
 	if (it == ios_.end())
 		return NULL;
-	return it->second;
+	if (it->second->identifier() > 0)
+		return it->second;
+	it->second->Close();
+	delete it->second;
+	ios_.erase(it);
+	return NULL;
 }
 
 void Multiplex::AddItem(IOEvent* event)
@@ -149,6 +154,8 @@ void Multiplex::Loop(void)
 				continue;
 			if (eventlist[i].flags == EV_ERROR)
 				event->Broken(eventlist[i].data);
+			else if (eventlist[i].flags == EV_EOF)
+				event->Close();
 			else if (eventlist[i].filter == EVFILT_READ)
 				event->Read();
 			else if (eventlist[i].filter == EVFILT_WRITE)

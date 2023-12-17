@@ -72,7 +72,6 @@ void Cgi::Child(void)
 	std::stringstream len;
 	len << request_.body().str().length();
 	envp.push_back("CONTENT_LENGTH=" + len.str());
-	envp.push_back("CONTENT=" + request_.body().str());
 	// CONTENT_TYPE
 	if (request_.header("Content-Type") != "")
 		envp.push_back("CONTENT_TYPE=" + request_.header("Content-Type"));

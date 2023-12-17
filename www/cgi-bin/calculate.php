@@ -1,7 +1,17 @@
 <?php
 
-// 원시 POST 데이터 읽기
-$rawPostData = $_SERVER['CONTENT'];
+// 표준 입력 스트림 열기
+$handle = fopen("php://stdin", "r");
+$rawPostData = '';
+
+// 파일의 끝에 도달할 때까지 반복
+$lineNumber = 0;
+while ($lineNumber < 13) {
+    $line = fgets($handle);
+    $rawPostData .= $line;
+    $lineNumber++;
+}
+fclose($handle);
 
 // CONTENT_TYPE 환경 변수에서 경계 문자열 찾기
 $contentType = $_SERVER['CONTENT_TYPE'];

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숫자 계산기</title>
+    <style>
+        /* 기존 스타일 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e7eff6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .calculator {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 300px;
+        }
+        h2 {
+            color: #30597f;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #30597f;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        input[type=number], select, input[type=submit] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #a0b1c5;
+            box-sizing: border-box;
+            background-color: #f8f9fa;
+        }
+        input[type=submit] {
+            background-color: #4a77d4;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        input[type=submit]:hover {
+            background-color: #3960a6;
+        }
+        /* 연산 선택 버튼 스타일링 */
+        select {
+            cursor: pointer;
+            background-color: white;
+            color: #30597f;
+        }
+        select:hover {
+            background-color: #ddefff;
+        }
+        .operation-btn {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #a0b1c5;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .operation-btn:hover {
+            background-color: #ddefff;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>숫자 계산기</h2>
+        <form action="/cgi-bin/calculate.php" method="post" enctype="multipart/form-data">
+            <label for="num1">첫 번째 숫자:</label>
+            <input type="number" id="num1" name="num1" required>
+
+            <label for="num2">두 번째 숫자:</label>
+            <input type="number" id="num2" name="num2" required>
+
+            <div class="buttons">
+                <button type="submit" name="operation" value="add" class="operation-btn">+</button>
+                <button type="submit" name="operation" value="subtract" class="operation-btn">-</button>
+                <button type="submit" name="operation" value="multiply" class="operation-btn">×</button>
+                <button type="submit" name="operation" value="divide" class="operation-btn">÷</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

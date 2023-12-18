@@ -17,7 +17,6 @@ static const std::string default_error(const HttpStatus &status, const std::stri
 
 void Http::GenerateError(HttpStatus status)
 {
-	response_.Clear();
 	response_.set_status(status);
 	response_.set_version(request_.version());
 	response_.add_header("Content-Type", "text/html");

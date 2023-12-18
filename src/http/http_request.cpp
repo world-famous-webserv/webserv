@@ -62,7 +62,7 @@ std::cerr << "REQUEST::URI [" << uri << "]" << std::endl;
 std::cerr << "- uri [" << uri.substr(0, query_pos) << "]" << std::endl;
 std::cerr << "- query [" << uri.substr(query_pos) << "]" << std::endl;
 		uri_ = uri.substr(0, query_pos);
-		this->add_header("Query", uri.substr(query_pos));
+		this->add_header("Query", uri.substr(query_pos + 1));
 	}
 }
 

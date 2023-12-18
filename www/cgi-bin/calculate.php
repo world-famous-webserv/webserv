@@ -1,49 +1,61 @@
 <?php
 
-// 표준 입력 스트림 열기
-$handle = fopen("php://stdin", "r");
-$rawPostData = '';
+// // 표준 입력 스트림 열기
+// $handle = fopen("php://stdin", "r");
+// $rawPostData = '';
 
-// 파일의 끝에 도달할 때까지 반복
-$lineNumber = 0;
-while ($lineNumber < 13) {
-    $line = fgets($handle);
-    $rawPostData .= $line;
-    $lineNumber++;
-}
-fclose($handle);
+// // 파일의 끝에 도달할 때까지 반복
+// $lineNumber = 0;
+// while ($lineNumber < 13) {
+//     $line = fgets($handle);
+//     $rawPostData .= $line;
+//     $lineNumber++;
+// }
+// fclose($handle);
 
-// CONTENT_TYPE 환경 변수에서 경계 문자열 찾기
-$contentType = $_SERVER['CONTENT_TYPE'];
-$boundary = substr($contentType, strpos($contentType, "boundary=") + 9);
+// // CONTENT_TYPE 환경 변수에서 경계 문자열 찾기
+// $contentType = $_SERVER['CONTENT_TYPE'];
+// $boundary = substr($contentType, strpos($contentType, "boundary=") + 9);
 
-// 경계 문자열로 데이터를 분할
-$parts = explode("--" . $boundary, $rawPostData);
-array_pop($parts); // 마지막 경계 문자열 제거
+// // 경계 문자열로 데이터를 분할
+// $parts = explode("--" . $boundary, $rawPostData);
+// array_pop($parts); // 마지막 경계 문자열 제거
 
-// $_POST 초기화
-$_POST = [];
+// // $_POST 초기화
+// $_POST = [];
 
-foreach ($parts as $part) {
-    // Content-Disposition 헤더 찾기
-    if (strpos($part, "Content-Disposition: form-data;") !== false) {
-        // 변수 이름 추출
-        preg_match('/name="([^"]+)"/', $part, $name);
+// foreach ($parts as $part) {
+//     // Content-Disposition 헤더 찾기
+//     if (strpos($part, "Content-Disposition: form-data;") !== false) {
+//         // 변수 이름 추출
+//         preg_match('/name="([^"]+)"/', $part, $name);
 
-        // 값 추출
-        $value = substr($part, strpos($part, "\r\n\r\n") + 4);
-        $value = substr($value, 0, -2);  // 마지막 CRLF 제거
+//         // 값 추출
+//         $value = substr($part, strpos($part, "\r\n\r\n") + 4);
+//         $value = substr($value, 0, -2);  // 마지막 CRLF 제거
 
-        // $_POST 배열에 추가
-        if (isset($name[1])) {
-            $_POST[$name[1]] = $value;
-        }
-    }
-}
+//         // $_POST 배열에 추가
+//         if (isset($name[1])) {
+//             $_POST[$name[1]] = $value;
+//         }
+//     }
+// }
 
-$num1 = isset($_POST['num1']) ? intval($_POST['num1']) : 0;
-$num2 = isset($_POST['num2']) ? intval($_POST['num2']) : 0;
-$operation = isset($_POST['operation']) ? $_POST['operation'] : 'add';
+// $num1 = isset($_POST['num1']) ? intval($_POST['num1']) : 0;
+// $num2 = isset($_POST['num2']) ? intval($_POST['num2']) : 0;
+// $operation = isset($_POST['operation']) ? $_POST['operation'] : 'add';
+
+// 쿼리 문자열 가져오기
+$queryString = $_SERVER['QUERY_STRING'];
+
+// 쿼리 문자열 파싱
+$params = [];
+parse_str($queryString, $params);
+
+// 파라미터 추출
+$num1 = isset($params['num1']) ? intval($params['num1']) : 0;
+$num2 = isset($params['num2']) ? intval($params['num2']) : 0;
+$operation = isset($params['operation']) ? $params['operation'] : 'add';
 
 $result = 0;
 $operationSymbol = '';

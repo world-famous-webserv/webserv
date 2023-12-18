@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>숫자 계산기</title>
     <style>
-        /* 기존 스타일 */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #e7eff6;
@@ -53,7 +52,6 @@
         input[type=submit]:hover {
             background-color: #3960a6;
         }
-        /* 연산 선택 버튼 스타일링 */
         select {
             cursor: pointer;
             background-color: white;
@@ -84,7 +82,7 @@
 <body>
     <div class="calculator">
         <h2>숫자 계산기</h2>
-        <form action="/cgi-bin/calculate.php" method="post" enctype="multipart/form-data">
+        <form action="/cgi-bin/calculate.php" method="get">
             <label for="num1">첫 번째 숫자:</label>
             <input type="number" id="num1" name="num1" required>
 

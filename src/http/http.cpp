@@ -57,7 +57,7 @@ std::cerr << "max body : " << location.client_max_body_size << std::endl;
 	// check return
 	if (location.ret.code != 0)
 	{
-		this->GenerateError(kFound);
+		this->GenerateError(static_cast<HttpStatus>(location.ret.code));
 		switch(location.ret.code)
 		{
 			case kMovedPermanently:

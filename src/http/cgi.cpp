@@ -43,16 +43,18 @@ std::string Cgi::GetCgi(const location_t& location, const std::string path)
 void Cgi::Child(void)
 {
 	const std::string url = request_.uri();
-    const std::string file = location_.root + url.substr(location_.name.length(), url.length() - location_.name.length());
+    const std::string path = location_.root + url.substr(location_.name.length(), url.length() - location_.name.length());
+	const std::string file = url.substr(url.find_last_of('/') + 1);
 	const std::string program = GetCgi(location_, file);
 	std::cerr << "program = " << program << std::endl;
 	std::cerr << "file = " << file << std::endl;
 
 	if (chdir(location_.root.c_str()) == -1)
 		std::exit(1);
-	// args
+	// argv
 	std::vector<std::string> args;
 	args.push_back(program);
+	args.push_back(file);
 
 	std::vector<char*> args_p;
 	for (std::size_t i = 0; i < args.size(); ++i)
@@ -70,7 +72,6 @@ void Cgi::Child(void)
 	std::stringstream len;
 	len << request_.body().str().length();
 	envp.push_back("CONTENT_LENGTH=" + len.str());
-
 	// CONTENT_TYPE
 	if (request_.header("Content-Type") != "")
 		envp.push_back("CONTENT_TYPE=" + request_.header("Content-Type"));
@@ -79,12 +80,12 @@ void Cgi::Child(void)
 	envp.push_back("GATEWAY_INTERFACE=CGI/1.1");
 
 	// PATH_INFO
-	envp.push_back("PATH_INFO=" + file);
+	envp.push_back("PATH_INFO=" + path);
 
 	// PATH_TRANSLATED
 	if (request_.header("Query").empty() == false)
 		envp.push_back("QUERY_STRING=" + request_.header("Query"));
-
+	std::cerr << "QUERY_STRING=" << request_.header("Query") << std::endl;
 	// REMOTE_ADDR
 	// REMOTE_HOST
 	// REMOTE_IDENT

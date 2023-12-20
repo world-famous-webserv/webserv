@@ -47,6 +47,7 @@ void Cgi::Child(void)
 	const std::string file = url.substr(url.find_last_of('/') + 1);
 	const std::string program = GetCgi(location_, file);
 	std::cerr << "program = " << program << std::endl;
+	std::cerr << "path = " << path << std::endl;
 	std::cerr << "file = " << file << std::endl;
 
 	if (chdir(location_.root.c_str()) == -1)
@@ -54,7 +55,6 @@ void Cgi::Child(void)
 	// argv
 	std::vector<std::string> args;
 	args.push_back(program);
-	args.push_back(file);
 
 	std::vector<char*> args_p;
 	for (std::size_t i = 0; i < args.size(); ++i)

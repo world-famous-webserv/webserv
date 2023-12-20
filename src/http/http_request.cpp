@@ -196,12 +196,15 @@ void HttpRequest::ParseBody(std::stringstream& req)
 	char buf[1024 * 1024];
 
 	req.clear();
-	while (req.good() && remain_ > 0)
+
+	if (!req.eof() && remain_ > 0)
 	{
 		std::size_t len = std::min(remain_, sizeof(buf));
-		if (req.read(buf, len))
+		req.read(buf, len);
+		if (req.gcount() > 0) {
 			body_.write(buf, req.gcount());
-		remain_ -= req.gcount();
+			remain_ -= req.gcount();
+		}
 	}
 	if (remain_ == 0)
 		step_ = kParseDone;

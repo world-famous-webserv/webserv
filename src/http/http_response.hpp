@@ -1,6 +1,7 @@
 #ifndef SRC_HTTP_HTTP_RESPONSE_HPP_
 # define SRC_HTTP_HTTP_RESPONSE_HPP_
 # include <map>
+# include <vector>
 # include <sstream>
 # include <algorithm>
 # include "http_code.hpp"
@@ -19,6 +20,7 @@ class HttpResponse
 	const std::string message(const enum HttpStatus &status) const;
 	const std::string header(const std::string& key) const;
 	const std::map<std::string, std::string>& headers(void) const;
+	const std::vector<std::string>& cookies(void) const;
 	std::stringstream& body(void);
 
 	void set_done(const bool &done);
@@ -35,6 +37,7 @@ class HttpResponse
 	std::string version_;
 	enum HttpStatus status_;
 	std::map<std::string, std::string> headers_;
+	std::vector<std::string> cookies_;
 	std::stringstream body_;
 };
 

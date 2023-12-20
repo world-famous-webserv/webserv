@@ -157,7 +157,16 @@ void HttpResponse::add_header(const std::string &key, const std::string &val)
 {
 	std::string upper(Trim(key));
 	std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-	headers_[upper] = Trim(val);
+
+	if (upper.compare("SET-COOKIE") == 0)
+		cookies_.push_back(Trim(val));
+	else
+		headers_[upper] = Trim(val);
+}
+
+const std::vector<std::string>& HttpResponse::cookies(void) const
+{
+	return cookies_;
 }
 
 std::stringstream& HttpResponse::body(void)
@@ -175,6 +184,7 @@ void HttpResponse::Clear(void)
 	status_ = kOk;
 	version_.clear();
 	headers_.clear();
+	cookies_.clear();
 	body_.clear();
 	body_.str("");
 }
@@ -193,6 +203,8 @@ HttpResponse& HttpResponse::operator>>(std::stringstream& res)
 	res << version_ << " " << status_ << " " << message(status_) << "\r\n";
 	for (std::map<std::string, std::string>::const_iterator it = headers_.begin(); it != headers_.end(); ++it)
 		res << it->first << ": " << it->second << "\r\n";
+	for (std::vector<std::string>::const_iterator it = cookies_.begin(); it != cookies_.end(); ++it)
+		res << "Set-Cookie: " << *it << "\r\n";
 	res << "\r\n";
 	res << body_.rdbuf();
 
@@ -203,6 +215,8 @@ std::cerr << body_.tellp() << "###########################" << std::endl;
 	std::cerr << version_ << " " << status_ << " " << message(status_) << "\r\n";
 	for (std::map<std::string, std::string>::const_iterator it = headers_.begin(); it != headers_.end(); ++it)
 		std::cerr << it->first << ": " << it->second << "\r\n";
+	for (std::vector<std::string>::const_iterator it = cookies_.begin(); it != cookies_.end(); ++it)
+		std::cerr << "Set-Cookie: " << *it << "\r\n";
 	std::cerr << "\r\n";
 	std::cerr << body_.rdbuf()->str().substr(0, 500) << "..." << std::endl;
 std::cerr << "###########################" << std::endl;

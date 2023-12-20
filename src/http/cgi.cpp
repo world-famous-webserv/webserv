@@ -237,6 +237,15 @@ void Cgi::Open()
 		return;
 	}
 	fcntl(fd[0], F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+
+	struct timeval timeout;
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    setsockopt (fd[0], SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    setsockopt (fd[0], SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    setsockopt (fd[1], SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    setsockopt (fd[1], SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
 	pid_ = fork();
 	if (pid_ == -1) {
 		std::cerr << "- fork erorr: " << strerror(errno) << std::endl;

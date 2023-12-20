@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # HTTP 상태 코드 및 Content type 헤더 출력
+echo "Status: 200 OK"
 echo "Content-type: text/html; charset=UTF-8"
 echo ""
 

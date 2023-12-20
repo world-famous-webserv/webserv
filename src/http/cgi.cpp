@@ -55,6 +55,7 @@ void Cgi::Child(void)
 	// argv
 	std::vector<std::string> args;
 	args.push_back(program);
+	args.push_back(file);
 
 	std::vector<char*> args_p;
 	for (std::size_t i = 0; i < args.size(); ++i)

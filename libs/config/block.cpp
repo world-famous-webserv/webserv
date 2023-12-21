@@ -61,11 +61,6 @@ location_s::location_s(const server_t &server):
     try_files(server.try_files),
     ret(server.ret)
 {
-    for (std::map<int, std::string>::const_iterator it = server.error_page.begin(); it != server.error_page.end(); ++it)
-        std::cout << it->first << " = " << it->second << '\n';
-    std::cout << "location start" << '\n';
-    for (std::map<int, std::string>::const_iterator it = error_page.begin(); it != error_page.end(); ++it)
-        std::cout << it->first << " = " << it->second << '\n';
 }
 
 server_s::server_s(const http_t &http):

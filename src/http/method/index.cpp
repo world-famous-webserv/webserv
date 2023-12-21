@@ -6,6 +6,7 @@ std::string	setAtag(std::string pathname, std::string filename);
 std::string	setEnd();
 
 bool	index(const HttpRequest& req, HttpResponse& res, const location_t &location, std::string path){
+	(void)req;
 	std::vector<std::string> index = location.index;
 	
 	for (size_t i = 0; i < index.size(); ++i) {
@@ -17,10 +18,6 @@ bool	index(const HttpRequest& req, HttpResponse& res, const location_t &location
 			continue;
 		res.body() << file.rdbuf();
 		file.close();
-		res.set_status(kOk);
-		res.set_version(req.version());
-		res.add_header("Content-Type", "text/html");
-		res.add_header("Connection", "keep-alive");
 		res.set_done(true);
 		return EXIT_SUCCESS;
 	}
@@ -81,9 +78,5 @@ void	autoindex(const HttpRequest& req, HttpResponse& res, std::string & path) {
 	}
 	res.body() << setEnd();
 	closedir(dp);
-	res.set_status(kOk);
-	res.set_version(req.version());
-	res.add_header("Content-Type", "text/html");
-	res.add_header("Connection", "keep-alive");
 	res.set_done(true);
 }

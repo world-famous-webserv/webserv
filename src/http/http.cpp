@@ -20,7 +20,11 @@ Http::Http(const Conf &conf):
 #include <iostream>
 void Http::Execute()
 {
+	response_.set_status(kOk);
 	response_.set_version(request_.version());
+	response_.add_header("Connection", "keep-alive");
+	response_.add_header("Content-Type", "text/html");
+
 	std::cout << "Uri = " << request_.uri() << std::endl;
 	std::cout << "Url = " << conf_.GetUrl(request_.uri()) << std::endl;
 	std::cout << "Path = " << conf_.GetPath(conf_.GetUrl(request_.uri())) << std::endl;
@@ -31,18 +35,14 @@ void Http::Execute()
 	const std::string url = conf_.GetUrl(request_.uri());
 	if (url.empty())
 	{
-		this->GenerateError(kFound);
 		response_.add_header("Location", "/");
-		return response_.set_done(true);
+		return response_.GenerateError(kFound, conf_.error_page);
 	}
 
 	// get location
 	const int location_idx = conf_.GetLocationIdx(url);
 	if (location_idx == -1)
-	{
-		this->GenerateError(kNotFound);
-		return response_.set_done(true);
-	}
+		return response_.GenerateError(kNotFound, conf_.error_page);
 	location_t location = conf_.GetLocation(location_idx);
 
 	// client_max_body_size
@@ -50,14 +50,13 @@ void Http::Execute()
 	{
 std::cerr << "body len : " << request_.body().tellp() << std::endl;
 std::cerr << "max body : " << location.client_max_body_size << std::endl;
-		this->GenerateError(kPayloadTooLarge);
-		return response_.set_done(true);
+		return response_.GenerateError(kPayloadTooLarge, location.error_page);
 	}
 
 	// check return
 	if (location.ret.code != 0)
 	{
-		this->GenerateError(static_cast<HttpStatus>(location.ret.code));
+		response_.GenerateError(static_cast<HttpStatus>(location.ret.code), location.error_page);
 		switch(location.ret.code)
 		{
 			case kMovedPermanently:
@@ -71,7 +70,7 @@ std::cerr << "max body : " << location.client_max_body_size << std::endl;
 				response_.body().str(location.ret.text);
 				break;
 		}
-		return response_.set_done(true);
+		return;
 	}
 
 	// check limit_except
@@ -81,13 +80,9 @@ std::cerr << "max body : " << location.client_max_body_size << std::endl;
 		const std::vector<std::string> &allows = location.limit_except.allows;
 		const std::vector<std::string> &denys = location.limit_except.denys;
 
-		if (std::find(allows.begin(), allows.end(), "all") == allows.end() && \
-			std::find(denys.begin(), denys.end(), "all") != denys.end())
-		{
-			this->GenerateError(kMethodNotAllowed);
-			response_.set_done(true);
-			return;
-		}
+		if (std::find(allows.begin(), allows.end(), "all") == allows.end()
+			&& std::find(denys.begin(), denys.end(), "all") != denys.end())
+			return response_.GenerateError(kMethodNotAllowed, location.error_page);
 	}
 	
 	// execute method
@@ -98,8 +93,8 @@ std::cerr << "max body : " << location.client_max_body_size << std::endl;
 	else if (request_.method().compare("POST") == 0)
 		return this->Post(location, url);
 	else if (request_.method().compare("DELETE") == 0)
-		return this->Delete(url);
-	response_.set_status(kMethodNotAllowed);
+		return this->Delete(location, url);
+	response_.GenerateError(kMethodNotAllowed, location.error_page);
 }
 
 
@@ -117,10 +112,4 @@ void Http::Do(std::stringstream& in, std::stringstream& out)
 		response_.set_status(kBadRequest);
 	else if (request_.step() == kParseDone)
 		this->Execute();
-
-	// error page
-	if (!(200 <= response_.status() && response_.status() <= 299)) {
-		this->GenerateError(response_.status());
-		response_.set_done(true);
-	}
 }

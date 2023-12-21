@@ -6,6 +6,7 @@
 # include <algorithm>
 # include "http_code.hpp"
 # include "cookie.hpp"
+# include "conf.hpp"
 
 class HttpResponse
 {
@@ -29,6 +30,7 @@ class HttpResponse
 	void add_header(const std::string &key, const std::string &val);
 
 	void Clear(void);
+	void GenerateError(HttpStatus status, const std::map<int, std::string>& location);
  private:
 	HttpResponse(const HttpResponse& obj);
 	HttpResponse& operator=(const HttpResponse& obj);

@@ -15,24 +15,30 @@ static const std::string default_error(const HttpStatus &status, const std::stri
 	return oss.str();
 }
 
-void Http::GenerateError(HttpStatus status)
+void HttpResponse::GenerateError(HttpStatus status, const std::map<int, std::string>& error_page)
 {
-	response_.set_status(status);
-	response_.set_version(request_.version());
-	response_.add_header("Content-Type", "text/html");
-	response_.add_header("Connection", "close");
+	this->set_done(true);
+	this->set_status(status);
+	this->add_header("Connection", "close");
+	this->add_header("Content-Type", "text/html");
 
-	std::map<int, std::string>::const_iterator it = conf_.error_page.find(status);
-	if (it != conf_.error_page.end())
+	// error_page not found
+	std::map<int, std::string>::const_iterator it = error_page.find(status);
+	if (it == error_page.end())
 	{
-		std::string path = conf_.GetPath(it->second);
-		std::ifstream page(path.c_str(), std::ios_base::in);
-		if (page.is_open())
-		{
-			response_.body() << page.rdbuf();
-			page.close();
-			return;
-		}
+		this->body() << default_error(status, this->message(status));
+		return;
 	}
-	response_.body() << default_error(status, response_.message(status));
+
+	// error_page found!
+	std::ifstream page(it->second, std::ios_base::in);
+	if (page.is_open())
+	{
+		this->body() << page.rdbuf();
+		page.close();
+		return;
+	}
+
+	// file cannot open
+	this->body() << default_error(status, this->message(status));
 }

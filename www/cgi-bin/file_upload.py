@@ -29,7 +29,7 @@ def manage_session() -> tuple:
         cookie['session_id']['path'] = '/'
         cookie['session_id']['httponly'] = True
         cookie['session_id']['secure'] = True
-        cookie['session_id']['samesite'] = 'Lax'
+#        cookie['session_id']['samesite'] = 'Lax'
         expiration = datetime.now() + timedelta(days=7)
         cookie['session_id']['expires'] = expiration.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
         print(cookie.output())  # 'Set-Cookie' 헤더를 출력합니다.

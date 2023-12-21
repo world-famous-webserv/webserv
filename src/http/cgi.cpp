@@ -55,6 +55,7 @@ void Cgi::Child(void)
 	// argv
 	std::vector<std::string> args;
 	args.push_back(program);
+	args.push_back(file);
 
 	std::vector<char*> args_p;
 	for (std::size_t i = 0; i < args.size(); ++i)
@@ -70,7 +71,7 @@ void Cgi::Child(void)
 
 	// CONTENT_LENGTH
 	std::stringstream len;
-	len << request_.body().str().length();
+	len << request_.body().tellp();
 	envp.push_back("CONTENT_LENGTH=" + len.str());
 	// CONTENT_TYPE
 	if (request_.header("Content-Type") != "")

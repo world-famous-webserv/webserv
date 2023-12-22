@@ -35,6 +35,7 @@ http {
         listen 8080;
         autoindex off;
         client_max_body_size 10G;
+		error_page 404 PWD/resources/www/html/404.html;
         location / {
             root PWD/resources/www/html/;
             index index.html;

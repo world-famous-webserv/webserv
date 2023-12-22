@@ -32,11 +32,8 @@ testcurl:
 chunk:
 	curl --http1.1 -X POST -H "Transfer-Encoding:chunked" --data-binary @Makefile localhost:8080/dump
 
-testconf:
-	sed 's=PWD=$(shell pwd)=g;' data/test_template.conf > data/test.conf
-
-defaultconf:
-	sed 's=PWD=$(shell pwd)=g;s=PYTHON3=$(shell which python3)=g;s=PHP=$(shell which php)=g;s=SHELL=$(shell which bash)=g;' data/default_template.conf > data/default.conf
+conf:
+	sed 's=PWD=$(shell pwd)=g;s=PYTHON3=$(shell which python3)=g;s=PHP=$(shell which php)=g;s=SHELL=$(shell which bash)=g;' data/webserv.conf.template > data/webserv.conf
 
 test_fileupload:
 	curl -X POST -F 'file=@testimage.png' http://localhost:8080/cgi-bin/file_upload.py

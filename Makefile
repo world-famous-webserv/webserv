@@ -33,6 +33,7 @@ chunk:
 	curl --http1.1 -X POST -H "Transfer-Encoding:chunked" --data-binary @Makefile localhost:8080/dump
 
 conf:
+	mkdir -p resources/www/uploaded_files
 	sed 's=PWD=$(shell pwd)=g;s=PYTHON3=$(shell which python3)=g;s=SHELL=$(shell which bash)=g;' data/webserv.conf.template > data/webserv.conf
 
 test_fileupload:

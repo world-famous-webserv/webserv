@@ -31,7 +31,7 @@ void HttpResponse::GenerateError(HttpStatus status, const std::map<int, std::str
 	}
 
 	// error_page found!
-	std::ifstream page(it->second, std::ios_base::in);
+	std::ifstream page(it->second.c_str(), std::ios_base::in);
 	if (page.is_open())
 	{
 		this->body() << page.rdbuf();

@@ -33,46 +33,28 @@ http {
     }
     server {
         listen 8080;
-        autoindex on;
+        autoindex off;
         client_max_body_size 10G;
         location / {
-            root PWD/resources/www;
+            root PWD/resources/www/html/;
             index index.html;
-            limit_except POST GET DELETE PUT {
+            limit_except GET {
                 deny all;
             }
         }
-        location /naver/ {
+        location /naver {
             return 301 http://www.naver.com;
         }
-        location /file_upload {
-            root resources/www/html/;
-            limit_except GET {
-                deny all;
-            }
-            index file_upload.html;
-        }
-        location /echo {
-            root resources/www/html/;
-            limit_except GET {
-                deny all;
-            }
-            index echo.html;
-        }
-        location /myfiles {
-            root resources/www/html/;
-            limit_except GET {
-                deny all;
-            }
-            index myfiles.html;
+        location /uploaded_files {
+            autoindex on;
+            root PWD/resources/www/uploaded_files/;
         }
         location /cgi-bin {
-            root resources/www/cgi-bin/;
-            limit_except POST GET DELETE {
+            root PWD/resources/www/cgi-bin/;
+            limit_except GET POST {
                 deny all;
             }
             fastcgi_pass py PYTHON3;
-            fastcgi_pass php PHP;
             fastcgi_pass sh SHELL;
         }
     }

@@ -136,7 +136,7 @@ body = f"""
         <h1>File Upload Result</h1>
         <p>{message}</p>
         <a href="/" class="button">Back to Home</a>
-        <a href="/file_upload" class="button">Upload Another File</a> <!-- 파일 업로드 폼으로 돌아가는 링크 -->
+        <a href="/file_upload.html" class="button">Upload Another File</a> <!-- 파일 업로드 폼으로 돌아가는 링크 -->
         <a href="/cgi-bin/myfiles.py" class="button">Check Uploaded Files</a>
     </div>
 </body>

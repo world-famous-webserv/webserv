@@ -14,7 +14,7 @@ int main(int argc, char **argv)
         return (EXIT_FAILURE);
     }
 	// 1. config
-    Config config(argc == 2 ? argv[1] : "data/default.conf");
+    Config config(argc == 2 ? argv[1] : "data/webserv.conf");
 	if (config.IsOpen() == false) {
 		std::cerr << "Error: " << config.ErrorMsg() << std::endl;
 		return (EXIT_FAILURE);

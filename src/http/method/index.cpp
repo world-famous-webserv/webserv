@@ -25,7 +25,14 @@ bool	index(const HttpRequest& req, HttpResponse& res, const location_t &location
 }
 
 std::string	setHead(const std::string & path) {
-	return "<html><head><title>Index of " + path + "</title><base href=\"" + path + "/\"></head>\n<body>\n<h1>Index of " + path + "</h1><hr><pre>\n";
+	std::stringstream ss;
+
+	ss << "<html><head>";
+	ss << "<title>Index of " + path + "</title>";
+	if (path[path.length() - 1] != '/')
+		ss << "<base href=\"" + path + "/\">";
+	ss << "</head>\n<body>\n<h1>Index of " + path + "</h1><hr><pre>\n";
+	return ss.str();
 }
 
 std::string setAtagLine(std::string filename, char * time,  off_t filesize, bool is_dir) {

@@ -42,6 +42,8 @@ void Server::SetSocket(int fd)
 {
 	int on = 1;
 
+	fcntl(fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+
 	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &conf_.linger, sizeof(linger)) == -1)
 		std::cerr << "SetSocket::SO_LINGER" << strerror(errno) << std::endl;
 	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1)

@@ -2,6 +2,7 @@
 # define SRC_SERVER_HPP_
 # include <stdio.h>
 # include <stdlib.h>
+# include <fcntl.h>
 # include <arpa/inet.h>
 # include <netdb.h>
 # include <netinet/tcp.h>

@@ -1,0 +1,62 @@
+http {
+    server {
+        listen 4242;
+        location / {
+            root PWD/resources/YoupiBanane/;
+            limit_except GET {
+                deny all;
+            }
+            autoindex on;
+        }
+        location /put_test {
+            root PWD/resources/YoupiBanane/directory/put_test;
+            limit_except GET PUT {
+                deny all;
+            }
+        }
+        location /post_body {
+            root PWD/resources/YoupiBanane/directory/post_body;
+            limit_except GET POST {
+                deny all;
+            }
+            client_max_body_size 100;
+        }
+        location /directory {
+            root PWD/resources/YoupiBanane/directory/;
+            limit_except GET POST {
+                deny all;
+            }
+            index youpi.bad_extension;
+            fastcgi_pass bla PWD/resources/YoupiBanane/cgi_tester;
+            client_max_body_size 100000000;
+        }
+    }
+    server {
+        listen 8080;
+        autoindex off;
+        client_max_body_size 10G;
+		error_page 404 PWD/resources/www/html/404.html;
+        location / {
+            root PWD/resources/www/html/;
+            index index.html;
+            limit_except GET {
+                deny all;
+            }
+        }
+        location /naver {
+            return 301 http://www.naver.com;
+        }
+        location /uploaded_files {
+            autoindex on;
+            root PWD/resources/www/uploaded_files/;
+        }
+        location /cgi-bin {
+            root PWD/resources/www/cgi-bin/;
+            limit_except GET POST {
+                deny all;
+            }
+            fastcgi_pass py PYTHON3;
+            fastcgi_pass sh SHELL;
+        }
+    }
+}

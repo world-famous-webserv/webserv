@@ -12,6 +12,12 @@ CXX 		= c++
 CXXFLAGS	= -Wall -Wextra -Werror -Wpedantic -std=c++98 -MMD -MP
 CPPFLAGS	= -I.
 
+ifeq ($(shell uname), Linux)
+TARGET_ARCH	+= -D__LINUX__
+else
+TARGET_ARCH	=
+endif
+
 ifdef DEBUG
 CPPFLAGS	+= -D__DEBUG__
 CXXFLAGS	+= -g -fsanitize=address,undefined
@@ -23,6 +29,17 @@ $(BUILD_DIR)/%.o: %.cpp
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
 
 # **************************************************************************** #
+# library rule
+# **************************************************************************** #
+
+$(LIBS):
+	$(MAKE) -C $(@D)
+
+CPPFLAGS	+= $(patsubst %,-I%,$(dir $(LIBS)))
+LDFLAGS		+= $(patsubst %,-L%,$(dir $(LIBS)))
+LDLIBS		+= $(patsubst lib%.a,-l%,$(notdir $(LIBS)))
+
+# **************************************************************************** #
 # default rule
 # **************************************************************************** #
 
@@ -30,7 +47,7 @@ OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
 DEPS = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.d))
 -include $(DEPS)
 
-all:
+all: $(LIBS)
 	$(MAKE) $(NAME)
 
 bonus:
